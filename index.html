@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🏔️ Ski Trip Planner</title>
-  <meta name="description" content="Pick from preset ski trip dates and share your commitment level." />
+  <meta name="description" content="Pick between two ski trip date options and share your commitment level." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛷️</text></svg>">
   <style>
     :root { --bg:#f8fafc; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --brand:#2563eb; }
@@ -18,7 +18,6 @@
     input, select, button { font:inherit; }
     input, select { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:12px; }
     button { padding:10px 14px; border:1px solid var(--brand); background:var(--brand); color:#fff; border-radius:12px; cursor:pointer; }
-    button.secondary { background:#fff; color:var(--brand); }
     table { border-collapse: collapse; width:100%; }
     th, td { border:1px solid var(--line); padding:6px 8px; }
     th { text-align:left; background:#f1f5f9; }
@@ -30,7 +29,7 @@
   <div class="container">
     <header class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
       <h1>🏔️ Ski Trip Planner</h1>
-      <div class="muted small">Preset dates • No login • Share the link</div>
+      <div class="muted small">2 fixed options • No login • Share the link</div>
     </header>
 
     <section class="card" id="app"></section>
@@ -41,7 +40,6 @@
   <script type="module">
     import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18";
     import { createRoot } from "https://esm.sh/react-dom@18/client";
-    import { format, parseISO } from "https://esm.sh/date-fns@3";
 
     const COMMITMENTS = [
       { key: "booked",   label: "Already booked my flight" },
@@ -51,9 +49,9 @@
     ];
     const WEIGHTS = { booked: 3, in: 2, deciding: 1, unlikely: 0 };
 
-    const PRESET_DATES = [
-      "2025-02-20","2025-02-21","2025-02-22","2025-02-23",
-      "2025-02-27","2025-02-28","2025-03-01","2025-03-02"
+    const OPTIONS = [
+      { key: "opt1", label: "Option 1: Feb 20–23, 2025" },
+      { key: "opt2", label: "Option 2: Feb 27–Mar 2, 2025" }
     ];
 
     function App(){
@@ -63,23 +61,27 @@
       });
 
       const names = Array.from(new Set(responses.map(r=>r.name))).filter(Boolean);
-      const myMap = (()=>{ const m={}; for(const r of responses){ if(r.name===name) m[r.date]=r.commitment; } return m; })();
-      const matrix = (()=>{ const m={}; for(const r of responses){ m[`${r.name}|${r.date}`]=WEIGHTS[r.commitment]||0; } return m; })();
-      const totals = PRESET_DATES.map(d=>({ d, total:names.reduce((a,n)=>a+(matrix[`${n}|${d}`]||0),0) })).sort((a,b)=>b.total-a.total);
+      const matrix = useMemo(()=>{
+        const m={}; for(const r of responses){ m[`${r.name}|${r.option}`]=WEIGHTS[r.commitment]||0; } return m;
+      },[responses]);
 
-      const save = (map) => {
+      const totals = OPTIONS.map(o=>({ option:o, total:names.reduce((a,n)=>a+(matrix[`${n}|${o.key}`]||0),0) }))
+        .sort((a,b)=>b.total-a.total);
+
+      const save = (choiceMap) => {
         if(!name.trim()) { alert('Please enter your name first.'); return; }
         localStorage.setItem('ski_name', name.trim());
         const others = responses.filter(r=>r.name!==name.trim());
-        const newRows = PRESET_DATES.map(d=>({ name: name.trim(), date: d, commitment: map[d]||"" })).filter(r=>r.commitment);
+        const newRows = OPTIONS.map(o=>({ name:name.trim(), option:o.key, commitment:choiceMap[o.key]||"" })).filter(r=>r.commitment);
         const merged = [...others, ...newRows];
         setResponses(merged);
         localStorage.setItem('ski_responses', JSON.stringify(merged));
         alert('Saved! You can adjust anytime.');
       };
 
-      const map = myMap;
-      window.updateChoice = (d, v) => { map[d]=v; };
+      const myMap = (()=>{ const m={}; for(const r of responses){ if(r.name===name) m[r.option]=r.commitment; } return m; })();
+      const [map, setMap] = useState(myMap);
+      useEffect(()=>setMap(myMap),[myMap]);
 
       return (
         React.createElement(React.Fragment, null,
@@ -88,10 +90,10 @@
               React.createElement('input', { placeholder:'Your name', value:name, onChange:e=>setName(e.target.value) }),
               React.createElement('button', { onClick:()=>save(map) }, 'Save my responses')
             ),
-            PRESET_DATES.map(d=> (
-              React.createElement('div', { key:d, className:'row' },
-                React.createElement('div', null, format(parseISO(d), 'EEE, MMM d, yyyy')),
-                React.createElement('select', { defaultValue: map[d]||'', onChange:e=>window.updateChoice(d, e.target.value) },
+            OPTIONS.map(o=>(
+              React.createElement('div', { key:o.key, className:'row' },
+                React.createElement('div', null, o.label),
+                React.createElement('select', { value: map[o.key]||'', onChange:e=>setMap(m=>({...m,[o.key]:e.target.value})) },
                   React.createElement('option', { value:'' }, 'Select...'),
                   COMMITMENTS.map(c=> React.createElement('option', { key:c.key, value:c.key }, c.label))
                 )
@@ -101,26 +103,24 @@
           ),
           React.createElement('div', { className:'card', style:{ marginTop:16 } },
             React.createElement('h2', null, 'Group Overview'),
-            React.createElement('div', { className:'tablewrap' },
-              React.createElement('table', null,
-                React.createElement('thead', null,
-                  React.createElement('tr', null,
-                    React.createElement('th', null, 'Name'),
-                    PRESET_DATES.map(d=> React.createElement('th', { key:d }, format(parseISO(d),'MMM d')))
-                  )
-                ),
-                React.createElement('tbody', null,
-                  names.map(n=> React.createElement('tr', { key:n },
-                    React.createElement('td', null, n),
-                    PRESET_DATES.map(d=> React.createElement('td', { key:d, style:{ textAlign:'center' } }, (matrix[`${n}|${d}`] ?? '') ))
-                  ))
+            React.createElement('table', null,
+              React.createElement('thead', null,
+                React.createElement('tr', null,
+                  React.createElement('th', null, 'Name'),
+                  OPTIONS.map(o=> React.createElement('th', { key:o.key }, o.label))
                 )
+              ),
+              React.createElement('tbody', null,
+                names.map(n=> React.createElement('tr', { key:n },
+                  React.createElement('td', null, n),
+                  OPTIONS.map(o=> React.createElement('td', { key:o.key, style:{ textAlign:'center' } }, (matrix[`${n}|${o.key}`] ?? '') ))
+                ))
               )
             ),
             React.createElement('div', { className:'small', style:{ marginTop:8 } },
-              React.createElement('strong', null, 'Best Dates (by score):'),
+              React.createElement('strong', null, 'Best Option (by score):'),
               React.createElement('ol', { className:'small' },
-                totals.map(t=> React.createElement('li', { key:t.d }, `${format(parseISO(t.d),'EEE, MMM d, yyyy')} — score ${t.total}`))
+                totals.map(t=> React.createElement('li', { key:t.option.key }, `${t.option.label} — score ${t.total}`))
               )
             )
           )
