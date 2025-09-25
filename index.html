@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🏔️ Ski Trip Planner</title>
+  <meta name="description" content="Pick from preset ski trip dates and share your commitment level." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛷️</text></svg>">
+  <style>
+    :root { --bg:#f8fafc; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --brand:#2563eb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:16px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--ink); }
+    .container { max-width: 880px; margin: 0 auto; padding: 24px; display:grid; gap:24px; }
+    h1 { font-size: 28px; margin: 0; }
+    h2 { font-size: 18px; margin: 0 0 8px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; box-shadow: 0 1px 2px rgba(2,8,23,.04); }
+    .row { display:grid; grid-template-columns: 1fr 280px; gap:12px; align-items:center; }
+    input, select, button { font:inherit; }
+    input, select { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:12px; }
+    button { padding:10px 14px; border:1px solid var(--brand); background:var(--brand); color:#fff; border-radius:12px; cursor:pointer; }
+    button.secondary { background:#fff; color:var(--brand); }
+    table { border-collapse: collapse; width:100%; }
+    th, td { border:1px solid var(--line); padding:6px 8px; }
+    th { text-align:left; background:#f1f5f9; }
+    .muted { color:var(--muted); font-size: 13px; }
+    .small { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <h1>🏔️ Ski Trip Planner</h1>
+      <div class="muted small">Preset dates • No login • Share the link</div>
+    </header>
+
+    <section class="card" id="app"></section>
+
+    <footer class="muted small" style="text-align:center; padding: 8px 0 24px;">Your name and choices save in your browser. Share the page URL with friends to collect responses.</footer>
+  </div>
+
+  <script type="module">
+    import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18";
+    import { createRoot } from "https://esm.sh/react-dom@18/client";
+    import { format, parseISO } from "https://esm.sh/date-fns@3";
+
+    const COMMITMENTS = [
+      { key: "booked",   label: "Already booked my flight" },
+      { key: "in",       label: "I'm definitely in, just haven't booked travel yet" },
+      { key: "deciding", label: "I'm still deciding" },
+      { key: "unlikely", label: "I'm unlikely to follow through - don't count on me" },
+    ];
+    const WEIGHTS = { booked: 3, in: 2, deciding: 1, unlikely: 0 };
+
+    const PRESET_DATES = [
+      "2025-02-20","2025-02-21","2025-02-22","2025-02-23",
+      "2025-02-27","2025-02-28","2025-03-01","2025-03-02"
+    ];
+
+    function App(){
+      const [name, setName] = useState(localStorage.getItem("ski_name")||"");
+      const [responses, setResponses] = useState(()=>{
+        try { return JSON.parse(localStorage.getItem("ski_responses")||"[]"); } catch { return []; }
+      });
+
+      const names = Array.from(new Set(responses.map(r=>r.name))).filter(Boolean);
+      const myMap = (()=>{ const m={}; for(const r of responses){ if(r.name===name) m[r.date]=r.commitment; } return m; })();
+      const matrix = (()=>{ const m={}; for(const r of responses){ m[`${r.name}|${r.date}`]=WEIGHTS[r.commitment]||0; } return m; })();
+      const totals = PRESET_DATES.map(d=>({ d, total:names.reduce((a,n)=>a+(matrix[`${n}|${d}`]||0),0) })).sort((a,b)=>b.total-a.total);
+
+      const save = (map) => {
+        if(!name.trim()) { alert('Please enter your name first.'); return; }
+        localStorage.setItem('ski_name', name.trim());
+        const others = responses.filter(r=>r.name!==name.trim());
+        const newRows = PRESET_DATES.map(d=>({ name: name.trim(), date: d, commitment: map[d]||"" })).filter(r=>r.commitment);
+        const merged = [...others, ...newRows];
+        setResponses(merged);
+        localStorage.setItem('ski_responses', JSON.stringify(merged));
+        alert('Saved! You can adjust anytime.');
+      };
+
+      const map = myMap;
+      window.updateChoice = (d, v) => { map[d]=v; };
+
+      return (
+        React.createElement(React.Fragment, null,
+          React.createElement('div', { className:'grid', style:{ display:'grid', gap:12 } },
+            React.createElement('div', { className:'row' },
+              React.createElement('input', { placeholder:'Your name', value:name, onChange:e=>setName(e.target.value) }),
+              React.createElement('button', { onClick:()=>save(map) }, 'Save my responses')
+            ),
+            PRESET_DATES.map(d=> (
+              React.createElement('div', { key:d, className:'row' },
+                React.createElement('div', null, format(parseISO(d), 'EEE, MMM d, yyyy')),
+                React.createElement('select', { defaultValue: map[d]||'', onChange:e=>window.updateChoice(d, e.target.value) },
+                  React.createElement('option', { value:'' }, 'Select...'),
+                  COMMITMENTS.map(c=> React.createElement('option', { key:c.key, value:c.key }, c.label))
+                )
+              )
+            )),
+            React.createElement('div', { className:'muted small' }, 'Tip: Save, then share this page URL with friends so everyone can add their responses.')
+          ),
+          React.createElement('div', { className:'card', style:{ marginTop:16 } },
+            React.createElement('h2', null, 'Group Overview'),
+            React.createElement('div', { className:'tablewrap' },
+              React.createElement('table', null,
+                React.createElement('thead', null,
+                  React.createElement('tr', null,
+                    React.createElement('th', null, 'Name'),
+                    PRESET_DATES.map(d=> React.createElement('th', { key:d }, format(parseISO(d),'MMM d')))
+                  )
+                ),
+                React.createElement('tbody', null,
+                  names.map(n=> React.createElement('tr', { key:n },
+                    React.createElement('td', null, n),
+                    PRESET_DATES.map(d=> React.createElement('td', { key:d, style:{ textAlign:'center' } }, (matrix[`${n}|${d}`] ?? '') ))
+                  ))
+                )
+              )
+            ),
+            React.createElement('div', { className:'small', style:{ marginTop:8 } },
+              React.createElement('strong', null, 'Best Dates (by score):'),
+              React.createElement('ol', { className:'small' },
+                totals.map(t=> React.createElement('li', { key:t.d }, `${format(parseISO(t.d),'EEE, MMM d, yyyy')} — score ${t.total}`))
+              )
+            )
+          )
+        )
+      );
+    }
+
+    const root = createRoot(document.getElementById('app'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
