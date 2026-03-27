@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Care Navigation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:linear-gradient(135deg,#1B6B93,#155a7a);padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(27,107,147,0.15);z-index:10}
+.header-logo{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.header-logo svg{width:22px;height:22px;fill:white}
+.header h1{color:white;font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.header-sub{color:rgba(255,255,255,0.7);font-size:12px;margin-left:auto}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:320px;background:white;border-right:1px solid #e8ecf0;padding:20px;overflow-y:auto;flex-shrink:0}
+.sidebar-title{font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
+.stat-card{background:#f0f7fa;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #e0eff5}
+.stat-card h3{font-size:12px;font-weight:500;color:#5a6b7b;margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:700;color:#1B6B93}
+.stat-val.up{animation:pulse .6s ease}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);color:#4FC0D0}}
+.stat-sub{font-size:11px;color:#7a8a9a;margin-top:4px}
+.stat-val.green{color:#27ae60}
+.live-dot{display:inline-block;width:8px;height:8px;background:#27ae60;border-radius:50%;margin-right:6px;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.triage-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f5;font-size:12px}
+.triage-row:last-child{border-bottom:none}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
+.message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
+@keyframes msgIn{to{opacity:1;transform:translateY(0)}}
+.message.aria{align-self:flex-start}
+.message.member{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700}
+.message.aria .avatar{background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
+.message.member .avatar{background:#e8ecf0;color:#3a4a5a}
+.bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55}
+.message.aria .bubble{background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.message.member .bubble{background:#1B6B93;color:white;border-bottom-right-radius:4px}
+.typing{display:flex;gap:10px;align-self:flex-start;max-width:85%}
+.typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
+.typing .dots span{width:7px;height:7px;background:#b0bec5;border-radius:50%;animation:bounce 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.15s}
+.typing .dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.gc{background:white;border:1px solid #e0e8ef;border-radius:14px;overflow:hidden;margin-top:8px;box-shadow:0 2px 8px rgba(27,107,147,0.06)}
+.gc-h{padding:14px 18px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef;display:flex;align-items:center;gap:8px}
+.gc-icon{width:28px;height:28px;background:#1B6B93;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.gc-icon svg{width:16px;height:16px;fill:white}
+.gc-h h4{font-size:14px;font-weight:600;color:#1a2332}
+.gc-b{padding:16px 18px}
+.assess-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;margin-bottom:4px;font-size:13px}
+.assess-row:nth-child(odd){background:#f8fafb}
+.assess-label{color:#3a4a5a}
+.assess-val{font-weight:600}
+.severity-bar{display:flex;gap:3px;align-items:center}
+.severity-bar .dot{width:12px;height:12px;border-radius:3px;background:#e0e8ef}
+.severity-bar .dot.active{background:#e67e22}
+.venue-card{border:1px solid #e0e8ef;border-radius:12px;padding:14px;margin-bottom:10px;transition:all .2s}
+.venue-card.recommended{border-color:#4FC0D0;background:#f0fbfc;box-shadow:0 0 0 2px rgba(79,192,208,0.2)}
+.venue-card .venue-top{display:flex;justify-content:space-between;align-items:flex-start}
+.venue-card h5{font-size:14px;font-weight:600;color:#1a2332}
+.venue-card .venue-type{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.venue-card .type-uc{background:#e8f8f0;color:#1a6b42}
+.venue-card .type-vv{background:#e6f3f8;color:#1B6B93}
+.venue-card .type-er{background:#ffeaea;color:#c0392b}
+.venue-meta{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#5a6b7b;flex-wrap:wrap}
+.venue-meta span{display:flex;align-items:center;gap:4px}
+.rec-badge{display:inline-block;font-size:10px;font-weight:700;color:#4FC0D0;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+.savings-callout{background:linear-gradient(135deg,#e8f8f0,#d4f0e2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-top:12px}
+.savings-callout .amount{font-size:24px;font-weight:700;color:#1a6b42}
+.savings-callout .desc{font-size:13px;color:#2d6b4a}
+.appt-confirm{background:#f0fbfc;border:2px solid #4FC0D0;border-radius:14px;padding:18px;margin-top:8px}
+.appt-confirm h5{font-size:16px;font-weight:700;color:#1a2332;margin-bottom:10px}
+.appt-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:#3a4a5a}
+.appt-row svg{width:16px;height:16px;fill:#1B6B93;flex-shrink:0}
+.confirmed-banner{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;background:#e8f8f0;border-radius:8px}
+.confirmed-banner svg{width:20px;height:20px;fill:#27ae60}
+.confirmed-banner span{font-size:13px;font-weight:600;color:#27ae60}
+.safety-card{background:#fff8f0;border:1px solid #fde0b0;border-radius:12px;padding:16px;margin-top:8px}
+.safety-card h5{font-size:14px;font-weight:600;color:#c0392b;margin-bottom:8px}
+.safety-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:#5a3a1a}
+.safety-item::before{content:'⚠';font-size:14px}
+.start-overlay{position:absolute;inset:0;background:rgba(248,250,251,0.95);display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px)}
+.start-overlay.hidden{display:none}
+.start-btn{padding:16px 40px;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(27,107,147,0.3);transition:transform .2s,box-shadow .2s}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(27,107,147,0.4)}
+.start-content{text-align:center}
+.start-content h2{font-size:24px;color:#1a2332;margin-bottom:8px}
+.start-content p{font-size:14px;color:#5a6b7b;margin-bottom:24px;max-width:420px}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
+  <h1>ARIA — Care Navigation</h1>
+  <span class="header-sub">Cambia Health Solutions</span>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title"><span class="live-dot"></span>Navigation Console</div>
+    <div class="stat-card">
+      <h3>Active Conversations</h3>
+      <div class="stat-val">37</div>
+      <div class="stat-sub">Across all channels</div>
+    </div>
+    <div class="stat-card">
+      <h3>ED Diversions Today</h3>
+      <div class="stat-val green" id="sDivert">23</div>
+      <div class="stat-sub">Members routed to lower-cost care</div>
+    </div>
+    <div class="stat-card">
+      <h3>Est. Savings Today</h3>
+      <div class="stat-val" id="sSavings" style="font-size:22px">$41,400</div>
+      <div class="stat-sub">vs. ER utilization baseline</div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="sidebar-title">Triage Distribution</div>
+      <div class="triage-row"><span style="color:#3a4a5a">Virtual Visit</span><span style="font-weight:600;color:#1B6B93">34%</span></div>
+      <div class="triage-row"><span style="color:#3a4a5a">Urgent Care</span><span style="font-weight:600;color:#1B6B93">41%</span></div>
+      <div class="triage-row"><span style="color:#3a4a5a">PCP Same-Day</span><span style="font-weight:600;color:#1B6B93">12%</span></div>
+      <div class="triage-row"><span style="color:#3a4a5a">Nurse Escalation</span><span style="font-weight:600;color:#e67e22">8%</span></div>
+      <div class="triage-row"><span style="color:#3a4a5a">ER (Appropriate)</span><span style="font-weight:600;color:#c0392b">5%</span></div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="sidebar-title">Avg. Time to Booked</div>
+      <div class="stat-card">
+        <div class="stat-val" style="font-size:22px">3.2 min</div>
+        <div class="stat-sub">Symptom to scheduled appointment</div>
+      </div>
+    </div>
+  </aside>
+  <main class="chat-area">
+    <div class="start-overlay" id="startOverlay">
+      <div class="start-content">
+        <h2>Care Navigation & Inbound Triage</h2>
+        <p>Watch a member go from symptom to scheduled appointment in one conversation — with cost comparison, provider matching, and booking.</p>
+        <button class="start-btn" onclick="startDemo()">Start Demo</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat"></div>
+  </main>
+</div>
+<script>
+const chat=document.getElementById('chat');let si=0;
+function sb(){chat.scrollTop=chat.scrollHeight}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function rt(){const t=document.getElementById('typing');if(t)t.remove()}
+function am(html,type='aria'){rt();const d=document.createElement('div');d.className=`message ${type}`;const av=type==='aria'?'A':'L';const st=type==='aria'?'background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white':'background:#e8ecf0;color:#3a4a5a';d.innerHTML=`<div class="avatar" style="${st};font-size:12px;font-weight:700">${av}</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+
+const steps=[
+// Member initiates
+{delay:800,action:()=>{am("Hi, I've had a really bad headache for 2 days and my neck feels stiff. Should I go to the ER?","member")}},
+
+// ARIA assesses
+{delay:1500,action:()=>at()},
+{delay:3000,action:()=>{
+am(`I'm sorry you're dealing with this, Lisa. Let me ask a few quick questions to help you get the right care.
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div><h4>Symptom Assessment</h4></div>
+  <div class="gc-b">
+    <div class="assess-row"><span class="assess-label">Headache severity</span><div class="severity-bar"><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:6px;font-weight:600;color:#e67e22">7/10</span></div></div>
+    <div class="assess-row"><span class="assess-label">Duration</span><span class="assess-val" style="color:#e67e22">2 days</span></div>
+    <div class="assess-row"><span class="assess-label">Neck stiffness</span><span class="assess-val" style="color:#e67e22">Yes</span></div>
+    <div class="assess-row"><span class="assess-label">Fever?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
+    <div class="assess-row"><span class="assess-label">Vision changes?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
+    <div class="assess-row"><span class="assess-label">Recent head injury?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
+  </div>
+</div>
+A few follow-ups: Do you have a fever? Any vision changes or sensitivity to light? Any recent head injury?`)}},
+
+// Member responds
+{delay:2500,action:()=>{am("No fever, no vision changes, no injury. It just won't go away and OTC meds aren't helping.","member")}},
+
+// ARIA recommends venues
+{delay:1500,action:()=>at()},
+{delay:4000,action:()=>{
+am(`Based on your symptoms, this looks like a tension or cervicogenic headache. The neck stiffness <strong>without fever or vision changes</strong> is reassuring. I'd recommend an urgent care visit today rather than the ER. Here are your options:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div><h4>Care Venue Comparison</h4></div>
+  <div class="gc-b">
+    <div class="venue-card recommended">
+      <div class="venue-top"><h5>CityMD Lloyd Center</h5><span class="venue-type type-uc">Urgent Care</span></div>
+      <div class="rec-badge">★ Recommended</div>
+      <div class="venue-meta">
+        <span>📍 2.1 mi</span><span>⏱ ~15 min wait</span><span>💰 $35 copay</span><span>⭐ 4.7</span><span style="color:#27ae60;font-weight:600">✓ In-network</span>
+      </div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-top"><h5>ZoomCare Division</h5><span class="venue-type type-uc">Urgent Care</span></div>
+      <div class="venue-meta">
+        <span>📍 3.4 mi</span><span>⏱ ~25 min wait</span><span>💰 $35 copay</span><span>⭐ 4.5</span><span style="color:#27ae60;font-weight:600">✓ In-network</span>
+      </div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-top"><h5>Teladoc</h5><span class="venue-type type-vv">Virtual Visit</span></div>
+      <div class="venue-meta">
+        <span>📍 Available now</span><span>💰 $0 copay</span><span style="color:#27ae60;font-weight:600">✓ In-network</span>
+      </div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-top"><h5>Providence Portland ER</h5><span class="venue-type type-er">Emergency</span></div>
+      <div class="venue-meta">
+        <span>📍 4.2 mi</span><span>⏱ ~95 min wait</span><span>💰 $250 copay</span><span style="color:#27ae60;font-weight:600">✓ In-network</span>
+      </div>
+    </div>
+    <div class="savings-callout">
+      <div class="amount">$215</div>
+      <div class="desc"><strong>saved</strong> choosing urgent care over ER — plus ~80 fewer minutes waiting</div>
+    </div>
+  </div>
+</div>`)}},
+
+// Member picks
+{delay:2500,action:()=>{am("I'll do CityMD. Can you book it?","member")}},
+
+// ARIA books
+{delay:1200,action:()=>at()},
+{delay:3500,action:()=>{
+am(`Absolutely! You're all set:
+<div class="appt-confirm" style="margin-top:12px">
+  <h5>Appointment Confirmed</h5>
+  <div class="appt-row"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>Today at <strong>2:45 PM</strong> (45 minutes from now)</div>
+  <div class="appt-row"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><strong>CityMD Lloyd Center</strong> · 1515 NE Broadway, Portland</div>
+  <div class="appt-row"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Dr. Karen Patel — Board Certified Family Medicine</div>
+  <div class="appt-row"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg><strong>$35</strong> copay</div>
+  <div class="confirmed-banner">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    <span>Symptom summary sent to clinic · Added to your calendar</span>
+  </div>
+</div>`)}},
+
+// Safety net
+{delay:2000,action:()=>at()},
+{delay:3000,action:()=>{
+am(`One more thing — please watch for these warning signs:
+<div class="safety-card" style="margin-top:8px">
+  <h5>Go to the ER or call 911 if you experience:</h5>
+  <div class="safety-item">Fever above 101°F</div>
+  <div class="safety-item">Sudden vision changes or double vision</div>
+  <div class="safety-item">"Worst headache of your life" — sudden onset</div>
+  <div class="safety-item">Confusion, difficulty speaking, or weakness</div>
+</div>
+<div style="margin-top:10px;font-size:13px;color:#5a6b7b">I'll check in with you tomorrow to see how you're feeling. Feel better, Lisa!</div>`);
+// Update sidebar
+const d=document.getElementById('sDivert');d.textContent='24';d.classList.add('up');
+const s=document.getElementById('sSavings');s.textContent='$43,200';s.classList.add('up');
+setTimeout(()=>{d.classList.remove('up');s.classList.remove('up')},700);
+}}
+];
+
+function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}
+function startDemo(){document.getElementById('startOverlay').classList.add('hidden');rs()}
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Post-Acute Follow-Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:linear-gradient(135deg,#1B6B93,#155a7a);padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(27,107,147,0.15);z-index:10}
+.header-logo{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.header-logo svg{width:22px;height:22px;fill:white}
+.header h1{color:white;font-size:18px;font-weight:600}
+.header-sub{color:rgba(255,255,255,0.7);font-size:12px;margin-left:auto}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:320px;background:white;border-right:1px solid #e8ecf0;padding:20px;overflow-y:auto;flex-shrink:0}
+.sidebar-title{font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
+.stat-card{background:#f0f7fa;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #e0eff5}
+.stat-card h3{font-size:12px;font-weight:500;color:#5a6b7b;margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:700;color:#1B6B93}
+.stat-val.up{animation:pulse .6s ease}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);color:#4FC0D0}}
+.stat-sub{font-size:11px;color:#7a8a9a;margin-top:4px}
+.stat-val.green{color:#27ae60}
+.live-dot{display:inline-block;width:8px;height:8px;background:#e74c3c;border-radius:50%;margin-right:6px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f5;font-size:12px}
+.info-row:last-child{border-bottom:none}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
+.message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
+@keyframes msgIn{to{opacity:1;transform:translateY(0)}}
+.message.aria{align-self:flex-start}
+.avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
+.bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55;background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.typing{display:flex;gap:10px;align-self:flex-start}
+.typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
+.typing .dots span{width:7px;height:7px;background:#b0bec5;border-radius:50%;animation:bounce 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.15s}
+.typing .dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.gc{background:white;border:1px solid #e0e8ef;border-radius:14px;overflow:hidden;margin-top:8px;box-shadow:0 2px 8px rgba(27,107,147,0.06)}
+.gc-h{padding:14px 18px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef;display:flex;align-items:center;gap:8px}
+.gc-h.alert{background:linear-gradient(135deg,#fff0f0,#ffe8e8);border-bottom-color:#fdd}
+.gc-icon{width:28px;height:28px;background:#1B6B93;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.gc-icon svg{width:16px;height:16px;fill:white}
+.gc-icon.red{background:#e74c3c}
+.gc-icon.green{background:#27ae60}
+.gc-icon.orange{background:#e67e22}
+.gc-h h4{font-size:14px;font-weight:600;color:#1a2332}
+.gc-b{padding:16px 18px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px 4px 2px 0}
+.badge-red{background:#ffeaea;color:#c0392b}
+.badge-green{background:#e8f8f0;color:#1a6b42}
+.badge-blue{background:#e6f3f8;color:#1B6B93}
+.badge-orange{background:#fff3e0;color:#e67e22}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.field{padding:6px 0}
+.field-l{font-size:10px;font-weight:600;color:#7a8a9a;text-transform:uppercase;letter-spacing:.5px}
+.field-v{font-size:13px;color:#1a2332;margin-top:2px}
+.check-list{margin-top:8px}
+.check-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:13px}
+.check-item:nth-child(odd){background:#f8fafb}
+.check-item .icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.check-item .icon.done{background:#e8f8f0;color:#27ae60}
+.check-item .icon.pending{background:#ffeaea;color:#c0392b}
+.check-item .icon.new{background:#e8f8f0;color:#27ae60}
+.sms-mock{background:#1a1a2e;border-radius:20px;padding:16px;max-width:300px;margin:0 auto}
+.sms-hdr{text-align:center;color:#8a8a9a;font-size:11px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #2a2a3e}
+.sms-b{padding:10px 14px;border-radius:16px;font-size:12px;line-height:1.5;margin-bottom:8px;max-width:85%}
+.sms-b.out{background:#1B6B93;color:white;margin-left:auto;border-bottom-right-radius:4px}
+.sms-b.in{background:#2a2a3e;color:#e0e0e0;border-bottom-left-radius:4px}
+.action-item{display:flex;gap:12px;padding:12px;background:#f8fafb;border-radius:10px;margin-bottom:8px;align-items:flex-start}
+.action-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.action-icon svg{width:18px;height:18px}
+.action-det h5{font-size:13px;font-weight:600;color:#1a2332}
+.action-det p{font-size:12px;color:#5a6b7b;margin-top:2px}
+.esc-card{background:#fff8f0;border:1px solid #fde0b0;border-radius:12px;padding:16px;margin-top:8px}
+.esc-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #fde0b0}
+.esc-row:last-child{border-bottom:none}
+.esc-label{color:#5a3a1a}
+.esc-val{font-weight:600;color:#1a2332}
+.start-overlay{position:absolute;inset:0;background:rgba(248,250,251,0.95);display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px)}
+.start-overlay.hidden{display:none}
+.start-btn{padding:16px 40px;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(27,107,147,0.3);transition:transform .2s,box-shadow .2s}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(27,107,147,0.4)}
+.start-content{text-align:center}
+.start-content h2{font-size:24px;color:#1a2332;margin-bottom:8px}
+.start-content p{font-size:14px;color:#5a6b7b;margin-bottom:24px;max-width:440px}
+.med-new{background:#fff3e0;border:1px solid #fde0b0;border-radius:8px;padding:8px 12px;margin-top:8px;font-size:12px;color:#5a3a1a}
+.med-new strong{color:#c0392b}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+  <h1>ARIA — Post-Acute Follow-Up</h1>
+  <span class="header-sub">Cambia Health Solutions</span>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title"><span class="live-dot"></span>Post-Acute Command Center</div>
+    <div class="stat-card"><h3>Discharges Today</h3><div class="stat-val">14</div><div class="stat-sub">Across Asuris MA network</div></div>
+    <div class="stat-card"><h3>Outreach Initiated</h3><div class="stat-val">12</div><div class="stat-sub">Within 24-hour TRC window</div></div>
+    <div class="stat-card"><h3>Follow-Ups Scheduled</h3><div class="stat-val">9</div><div class="stat-sub">Within care plan window</div></div>
+    <div class="stat-card"><h3>Readmissions Prevented (MTD)</h3><div class="stat-val green" id="sPrev">17</div><div class="stat-sub">vs. baseline</div></div>
+    <div class="stat-card"><h3>Cost Savings MTD</h3><div class="stat-val" id="sCost" style="font-size:22px">$187,000</div><div class="stat-sub">Avoided readmission costs</div></div>
+    <div style="margin-top:16px">
+      <div class="sidebar-title">TRC Compliance</div>
+      <div class="stat-card"><div class="stat-val green" style="font-size:22px">94.2%</div><div class="stat-sub">30-day follow-up rate</div></div>
+    </div>
+  </aside>
+  <main class="chat-area">
+    <div class="start-overlay" id="startOverlay">
+      <div class="start-content">
+        <h2>Post-Acute Follow-Up</h2>
+        <p>Watch ARIA receive an ADT discharge alert, contact the member within 24 hours, resolve gaps in the discharge plan, and prevent a readmission.</p>
+        <button class="start-btn" onclick="startDemo()">Start Demo</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat"></div>
+  </main>
+</div>
+<script>
+const chat=document.getElementById('chat');let si=0;
+function sb(){chat.scrollTop=chat.scrollHeight}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function rt(){const t=document.getElementById('typing');if(t)t.remove()}
+function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">A</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+
+const steps=[
+{delay:800,action:()=>at()},
+{delay:2000,action:()=>{
+am(`<span style="color:#e74c3c;font-weight:600">ADT Alert Received</span> — New discharge detected from Providence Portland Medical Center.
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h alert"><div class="gc-icon red"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div><h4>Discharge Alert — HIGH RISK</h4></div>
+  <div class="gc-b">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="font-size:18px;font-weight:700">James Rivera</div><div style="font-size:12px;color:#5a6b7b">Age 74 · Male · Asuris Medicare Advantage</div></div>
+      <span class="badge badge-red" style="font-size:12px;padding:5px 14px">Risk Score: 0.34 — Top Decile</span>
+    </div>
+    <div class="field-grid">
+      <div class="field"><div class="field-l">MBI</div><div class="field-v">3HK2-JR7-NV45</div></div>
+      <div class="field"><div class="field-l">PCP</div><div class="field-v">Dr. Elena Vasquez — Cascade Medical</div></div>
+      <div class="field"><div class="field-l">Admitted</div><div class="field-v">March 24, 2026</div></div>
+      <div class="field"><div class="field-l">Discharged</div><div class="field-v">March 27 at 11:00 AM (4 hrs ago)</div></div>
+      <div class="field"><div class="field-l">Diagnosis</div><div class="field-v">CHF Exacerbation (I50.9)</div></div>
+      <div class="field"><div class="field-l">LOS / Disposition</div><div class="field-v">3 days · Discharged to home</div></div>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:4000,action:()=>{
+am(`James is high-risk for readmission. Initiating TRC protocol — outreach within 24 hours. Checking his discharge plan:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7v-2h2V7h2v2h2v2z"/></svg></div><h4>Discharge Compliance Checklist</h4></div>
+  <div class="gc-b">
+    <div class="check-list">
+      <div class="check-item"><div class="icon done">✓</div>Discharge summary received</div>
+      <div class="check-item"><div class="icon done">✓</div>Medication reconciliation complete</div>
+      <div class="check-item"><div class="icon pending">✗</div><strong style="color:#c0392b">Follow-up appointment — NOT SCHEDULED</strong></div>
+      <div class="check-item"><div class="icon pending">✗</div><strong style="color:#c0392b">Prescriptions — NOT FILLED</strong></div>
+      <div class="check-item"><div class="icon pending">✗</div><strong style="color:#c0392b">Home health referral — NOT CONFIRMED</strong></div>
+      <div class="check-item"><div class="icon done">✓</div>Patient education provided</div>
+    </div>
+    <div class="med-new">
+      <strong>New Medications:</strong> Furosemide 40mg BID (new) · Carvedilol 25mg BID (dose changed) · Potassium 20mEq daily (new)
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:4000,action:()=>{
+am(`Three critical items incomplete. Reaching out to James now:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Outreach — James Rivera</h4></div>
+  <div class="gc-b" style="padding:0">
+    <div class="sms-mock">
+      <div class="sms-hdr">ARIA Health Assistant · SMS</div>
+      <div class="sms-b out">Hi James, this is ARIA from Asuris, following up on your discharge from Providence today. How are you feeling now that you're home?</div>
+      <div class="sms-b in">Tired but ok. Glad to be home. A little confused about all these new pills they gave me</div>
+      <div class="sms-b out">That's understandable — you have 3 medication changes. Furosemide helps remove extra fluid, Carvedilol protects your heart (dose was increased), and Potassium replaces what the Furosemide removes. Have you picked them up yet?</div>
+      <div class="sms-b in">No not yet. My daughter said she'd go but hasn't had time</div>
+      <div class="sms-b out">I'll send them to Walgreens on Cedar Hills — they can have them ready by 5 PM today. One more thing: any swelling in your ankles, trouble breathing, or weight gain since discharge?</div>
+      <div class="sms-b in">Ankles are a little puffy but breathing is fine</div>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:3000,action:()=>at()},
+{delay:5000,action:()=>{
+am(`James has mild ankle edema — expected post-CHF discharge, but flagged for monitoring. Now completing the gaps:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><h4>Actions Completed</h4></div>
+  <div class="gc-b">
+    <div class="action-item">
+      <div class="action-icon" style="background:#e6f3f8"><svg style="fill:#1B6B93" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+      <div class="action-det"><h5>Prescriptions</h5><p>Sent to Walgreens Cedar Hills — ready by 5 PM today</p></div>
+    </div>
+    <div class="action-item">
+      <div class="action-icon" style="background:#e8f8f0"><svg style="fill:#27ae60" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg></div>
+      <div class="action-det"><h5>Follow-Up Visit</h5><p>Dr. Vasquez — April 1 at 10:00 AM (5 days post-discharge, within TRC window)</p></div>
+    </div>
+    <div class="action-item">
+      <div class="action-icon" style="background:#f0e6f8"><svg style="fill:#8e44ad" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+      <div class="action-det"><h5>Home Health</h5><p>BrightSpring nurse visit confirmed — March 29 (edema + weight check)</p></div>
+    </div>
+    <div class="action-item">
+      <div class="action-icon" style="background:#e6f3f8"><svg style="fill:#1B6B93" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+      <div class="action-det"><h5>Daily Check-Ins</h5><p>Automated SMS symptom monitoring activated for 30 days</p></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="check-list">
+        <div class="check-item"><div class="icon done">✓</div>Discharge summary received</div>
+        <div class="check-item"><div class="icon done">✓</div>Medication reconciliation complete</div>
+        <div class="check-item"><div class="icon new">✓</div><strong style="color:#27ae60">Follow-up appointment — SCHEDULED</strong></div>
+        <div class="check-item"><div class="icon new">✓</div><strong style="color:#27ae60">Prescriptions — SENT TO PHARMACY</strong></div>
+        <div class="check-item"><div class="icon new">✓</div><strong style="color:#27ae60">Home health referral — CONFIRMED</strong></div>
+        <div class="check-item"><div class="icon done">✓</div>Patient education provided</div>
+      </div>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:3500,action:()=>{
+am(`Escalation check — ankle edema within expected range, but monitoring safeguards are set:
+<div class="esc-card" style="margin-top:8px">
+  <div style="font-size:14px;font-weight:600;color:#e67e22;margin-bottom:10px">⚠ Clinical Monitoring — LOW Severity</div>
+  <div class="esc-row"><span class="esc-label">Symptom</span><span class="esc-val">Bilateral ankle edema, mild</span></div>
+  <div class="esc-row"><span class="esc-label">Action</span><span class="esc-val">Home health nurse assess March 29</span></div>
+  <div class="esc-row"><span class="esc-label">Auto-escalation trigger</span><span class="esc-val" style="color:#c0392b">Weight gain >3 lbs/24hr OR SOB worsens</span></div>
+  <div class="esc-row"><span class="esc-label">Escalation target</span><span class="esc-val">Nurse Care Manager — immediate alert</span></div>
+</div>
+<div style="margin-top:12px;background:#e8f8f0;border-radius:10px;padding:12px;font-size:13px;color:#1a6b42">
+  <strong>James is now fully managed.</strong> TRC protocol complete. All discharge gaps closed within 4 hours of ADT alert.
+</div>`);
+const p=document.getElementById('sPrev');p.textContent='18';p.classList.add('up');
+const c=document.getElementById('sCost');c.textContent='$199,000';c.classList.add('up');
+setTimeout(()=>{p.classList.remove('up');c.classList.remove('up')},700);
+}}
+];
+
+function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}
+function startDemo(){document.getElementById('startOverlay').classList.add('hidden');rs()}
+</script>
+</body>
+</html>

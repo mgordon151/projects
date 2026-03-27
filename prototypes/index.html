@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Agentic Use Case Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;min-height:100vh}
+.hero{background:linear-gradient(135deg,#1B6B93 0%,#155a7a 50%,#0d4a66 100%);padding:60px 40px;text-align:center}
+.hero h1{color:white;font-size:36px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+.hero p{color:rgba(255,255,255,0.75);font-size:16px;max-width:600px;margin:0 auto}
+.hero .brand{display:inline-block;background:rgba(255,255,255,0.12);padding:6px 16px;border-radius:20px;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:20px;letter-spacing:0.5px}
+.grid{max-width:1100px;margin:0 auto;padding:40px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.card{background:white;border-radius:16px;border:1px solid #e0e8ef;box-shadow:0 2px 12px rgba(27,107,147,0.06);overflow:hidden;transition:transform .2s,box-shadow .2s;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(27,107,147,0.12)}
+.card-header{padding:20px 24px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef}
+.card-uc{font-size:11px;font-weight:700;color:#4FC0D0;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.card-header h2{font-size:18px;font-weight:700;color:#1a2332;line-height:1.3}
+.card-body{padding:20px 24px;flex:1}
+.card-headline{font-size:14px;font-weight:600;color:#1B6B93;margin-bottom:10px;font-style:italic}
+.card-desc{font-size:13px;color:#5a6b7b;line-height:1.6;margin-bottom:14px}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#e6f3f8;color:#1B6B93}
+.tag.green{background:#e8f8f0;color:#1a6b42}
+.tag.orange{background:#fff3e0;color:#e67e22}
+.card-footer{padding:16px 24px;border-top:1px solid #eef2f5;display:flex;align-items:center;justify-content:space-between}
+.card-footer span{font-size:13px;font-weight:600;color:#1B6B93}
+.card-footer .arrow{font-size:18px;color:#4FC0D0}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="brand">CAMBIA HEALTH SOLUTIONS</div>
+  <h1>ARIA — Agentic Use Case Prototypes</h1>
+  <p>Five conversational AI prototypes demonstrating ARIA's end-to-end agentic workflows across Regence, Asuris, BridgeSpan, and BCBSND.</p>
+</div>
+<div class="grid">
+  <a href="uc1-gaps-in-care.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 1</div><h2>Gaps-in-Care Closure</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"Close the gaps that drive your Star Rating"</div>
+      <div class="card-desc">ARIA ingests the gap file, contacts the member, educates on risk, books the appointment, coordinates transportation, and confirms completion. Gap closed. No extra staff.</div>
+      <div class="card-tags"><span class="tag">HEDIS</span><span class="tag">Star Ratings</span><span class="tag green">CDC-LDL</span><span class="tag green">BCS-E</span><span class="tag green">CBP</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+  </a>
+  <a href="uc2-chronic-condition.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 2</div><h2>Chronic Condition Navigation</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"Navigate your costliest members to better outcomes"</div>
+      <div class="card-desc">ARIA assembles Dx, Rx, labs, risk scores, and SDoH into one profile. Recommends programs, sends refill reminders, nudges adherence, and coordinates the full care plan.</div>
+      <div class="card-tags"><span class="tag">Diabetes</span><span class="tag">High-Risk</span><span class="tag orange">$128M Spend</span><span class="tag green">HEDIS CDC</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+  </a>
+  <a href="uc3-care-navigation.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 3</div><h2>Care Navigation & Inbound Triage</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"One conversation from symptom to scheduled appointment"</div>
+      <div class="card-desc">AI assesses symptoms, routes to the right venue of care, shows cost/quality comparisons via GenUI, matches in-network providers, and books the appointment.</div>
+      <div class="card-tags"><span class="tag">ED Diversion</span><span class="tag green">$2,200 Saved/Visit</span><span class="tag">In-Network Steering</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+  </a>
+  <a href="uc4-post-acute.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 4</div><h2>Post-Acute Follow-Up</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"Catch readmissions before they happen"</div>
+      <div class="card-desc">ADT feed triggers workflow. SMS outreach within 24 hours. Checks discharge compliance, Rx adherence, symptoms. Schedules follow-up. Nurse enters if complications arise.</div>
+      <div class="card-tags"><span class="tag">PCR/TRC</span><span class="tag orange">Triple-Weighted</span><span class="tag green">$8K–$15K Saved</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+  </a>
+  <a href="uc5-wellness-engagement.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 5</div><h2>Wellness Engagement</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"Replace portal-first wellness with outreach-first"</div>
+      <div class="card-desc">Risk scoring targets members due for preventive services. AI-personalized nudges hit the right timing and channel. Enrolls in programs, schedules screenings, tracks completion.</div>
+      <div class="card-tags"><span class="tag">All LOBs</span><span class="tag green">31.5% Engagement</span><span class="tag">Stars + QRS</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+  </a>
+</div>
+</body>
+</html>

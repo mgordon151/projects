@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Chronic Condition Navigation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:linear-gradient(135deg,#1B6B93,#155a7a);padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(27,107,147,0.15);z-index:10}
+.header-logo{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.header-logo svg{width:22px;height:22px;fill:white}
+.header h1{color:white;font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.header-sub{color:rgba(255,255,255,0.7);font-size:12px;margin-left:auto}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:320px;background:white;border-right:1px solid #e8ecf0;padding:20px;overflow-y:auto;flex-shrink:0}
+.sidebar-title{font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
+.stat-card{background:#f0f7fa;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #e0eff5}
+.stat-card h3{font-size:12px;font-weight:500;color:#5a6b7b;margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:700;color:#1B6B93}
+.stat-val.up{animation:pulse .6s ease}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);color:#4FC0D0}}
+.stat-sub{font-size:11px;color:#7a8a9a;margin-top:4px}
+.cond-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f5;font-size:12px}
+.cond-row:last-child{border-bottom:none}
+.cond-name{color:#3a4a5a}
+.cond-ct{font-weight:600;color:#1B6B93;background:#e6f3f8;padding:2px 8px;border-radius:10px;font-size:11px}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
+.message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
+@keyframes msgIn{to{opacity:1;transform:translateY(0)}}
+.message.aria{align-self:flex-start}
+.avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700}
+.message.aria .avatar{background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
+.bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55}
+.message.aria .bubble{background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.typing{display:flex;gap:10px;align-self:flex-start;max-width:85%}
+.typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
+.typing .dots span{width:7px;height:7px;background:#b0bec5;border-radius:50%;animation:bounce 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.15s}
+.typing .dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.gc{background:white;border:1px solid #e0e8ef;border-radius:14px;overflow:hidden;margin-top:8px;box-shadow:0 2px 8px rgba(27,107,147,0.06)}
+.gc-h{padding:14px 18px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef;display:flex;align-items:center;gap:8px}
+.gc-icon{width:28px;height:28px;background:#1B6B93;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.gc-icon svg{width:16px;height:16px;fill:white}
+.gc-h h4{font-size:14px;font-weight:600;color:#1a2332}
+.gc-b{padding:16px 18px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.sg-i{text-align:center;padding:12px;background:#f8fafb;border-radius:10px}
+.sg-n{font-size:22px;font-weight:700;color:#1B6B93}
+.sg-l{font-size:11px;color:#7a8a9a;margin-top:2px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px 4px 2px 0}
+.badge-red{background:#ffeaea;color:#c0392b}
+.badge-orange{background:#fff3e0;color:#e67e22}
+.badge-green{background:#e8f8f0;color:#1a6b42}
+.badge-blue{background:#e6f3f8;color:#1B6B93}
+.fl{font-size:12px;font-weight:600;color:#5a6b7b;margin-bottom:6px;margin-top:12px}
+.med-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:12px}
+.med-row:nth-child(odd){background:#f8fafb}
+.med-name{flex:1;color:#1a2332;font-weight:500}
+.med-status{font-weight:600;font-size:11px}
+.timeline{position:relative;padding-left:24px;margin-top:8px}
+.timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:#e0e8ef}
+.tl-step{position:relative;padding:10px 0 10px 16px;font-size:13px}
+.tl-step::before{content:'';position:absolute;left:-20px;top:14px;width:12px;height:12px;border-radius:50%;border:2px solid #1B6B93;background:white;z-index:1}
+.tl-step.done::before{background:#1B6B93}
+.tl-step.active::before{background:#4FC0D0;border-color:#4FC0D0;box-shadow:0 0 0 4px rgba(79,192,208,0.2)}
+.tl-step h5{font-size:13px;font-weight:600;color:#1a2332}
+.tl-step p{font-size:11px;color:#5a6b7b;margin-top:2px}
+.sms-mock{background:#1a1a2e;border-radius:20px;padding:16px;max-width:300px;margin:0 auto}
+.sms-hdr{text-align:center;color:#8a8a9a;font-size:11px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #2a2a3e}
+.sms-b{padding:10px 14px;border-radius:16px;font-size:12px;line-height:1.5;margin-bottom:8px;max-width:85%}
+.sms-b.out{background:#1B6B93;color:white;margin-left:auto;border-bottom-right-radius:4px}
+.sms-b.in{background:#2a2a3e;color:#e0e0e0;border-bottom-left-radius:4px}
+.appt-item{display:flex;gap:12px;padding:12px;background:#f8fafb;border-radius:10px;margin-bottom:8px;align-items:flex-start}
+.appt-icon{width:36px;height:36px;background:#e6f3f8;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.appt-icon svg{width:18px;height:18px;fill:#1B6B93}
+.appt-det h5{font-size:13px;font-weight:600;color:#1a2332}
+.appt-det p{font-size:12px;color:#5a6b7b;margin-top:2px}
+.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.outcome-item{text-align:center;padding:12px;border-radius:10px;background:#e8f8f0}
+.outcome-item .val{font-size:18px;font-weight:700;color:#1a6b42}
+.outcome-item .lbl{font-size:10px;color:#5a6b7b;margin-top:2px}
+.start-overlay{position:absolute;inset:0;background:rgba(248,250,251,0.95);display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px)}
+.start-overlay.hidden{display:none}
+.start-btn{padding:16px 40px;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(27,107,147,0.3);transition:transform .2s,box-shadow .2s}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(27,107,147,0.4)}
+.start-content{text-align:center}
+.start-content h2{font-size:24px;color:#1a2332;margin-bottom:8px}
+.start-content p{font-size:14px;color:#5a6b7b;margin-bottom:24px;max-width:420px}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+  <h1>ARIA — Chronic Condition Navigation</h1>
+  <span class="header-sub">Cambia Health Solutions</span>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Chronic Condition Panel</div>
+    <div class="stat-card">
+      <h3>High-Risk Members</h3>
+      <div class="stat-val" id="sHR">2,847</div>
+      <div class="stat-sub">Regence Medicare Advantage</div>
+    </div>
+    <div class="stat-card">
+      <h3>Avg HCC Risk Score</h3>
+      <div class="stat-val">2.31</div>
+      <div class="stat-sub">Top 5% of population</div>
+    </div>
+    <div class="stat-card">
+      <h3>Est. Annual Spend</h3>
+      <div class="stat-val" style="font-size:22px">$128M</div>
+      <div class="stat-sub">For high-risk cohort</div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="sidebar-title">Top Conditions</div>
+      <div class="cond-row"><span class="cond-name">Type 2 Diabetes</span><span class="cond-ct">1,134</span></div>
+      <div class="cond-row"><span class="cond-name">CHF</span><span class="cond-ct">487</span></div>
+      <div class="cond-row"><span class="cond-name">COPD</span><span class="cond-ct">392</span></div>
+      <div class="cond-row"><span class="cond-name">CKD Stage 3+</span><span class="cond-ct">341</span></div>
+      <div class="cond-row"><span class="cond-name">Multiple Chronic</span><span class="cond-ct">493</span></div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="sidebar-title">HEDIS at Stake</div>
+      <div class="cond-row"><span class="cond-name">CDC-HbA1c Control</span><span class="cond-ct">6 measures</span></div>
+      <div class="cond-row"><span class="cond-name">CBP Control</span><span class="cond-ct">2 measures</span></div>
+      <div class="cond-row"><span class="cond-name">Medication Adherence</span><span class="cond-ct">3 measures</span></div>
+    </div>
+  </aside>
+  <main class="chat-area">
+    <div class="start-overlay" id="startOverlay">
+      <div class="start-content">
+        <h2>Chronic Condition Navigation</h2>
+        <p>Watch ARIA assemble a member profile, initiate a care plan, resolve medication barriers, and coordinate programs — all in one conversation.</p>
+        <button class="start-btn" onclick="startDemo()">Start Demo</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat"></div>
+  </main>
+</div>
+<script>
+const chat=document.getElementById('chat');let si=0;
+function sb(){chat.scrollTop=chat.scrollHeight}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function rt(){const t=document.getElementById('typing');if(t)t.remove()}
+function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+
+const steps=[
+{delay:800,action:()=>at()},
+{delay:2200,action:()=>{
+am(`Good morning! I've assembled today's high-risk chronic condition panel for <strong>Regence MA</strong>. Here's the overview:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div><h4>High-Risk Panel Overview</h4></div>
+  <div class="gc-b">
+    <div class="sg">
+      <div class="sg-i"><div class="sg-n">2,847</div><div class="sg-l">High-Risk Members</div></div>
+      <div class="sg-i"><div class="sg-n">2.31</div><div class="sg-l">Avg HCC Score</div></div>
+      <div class="sg-i"><div class="sg-n">$128M</div><div class="sg-l">Annual Spend</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:600;color:#5a6b7b;margin-bottom:8px">Condition Breakdown</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="badge badge-red">T2 Diabetes: 1,134 (6 HEDIS measures)</span>
+      <span class="badge badge-orange">CHF: 487</span>
+      <span class="badge badge-orange">COPD: 392</span>
+      <span class="badge badge-blue">CKD 3+: 341</span>
+      <span class="badge badge-blue">Multi-chronic: 493</span>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:4500,action:()=>{
+am(`Let me pull up your highest-priority member:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><h4>Member Profile — Highest Priority</h4></div>
+  <div class="gc-b">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="font-size:18px;font-weight:700;color:#1a2332">Robert Jackson</div><div style="font-size:12px;color:#5a6b7b">Age 68 · Male · Regence MA</div></div>
+      <span class="badge badge-red" style="font-size:13px;padding:5px 14px">HCC 2.74</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div><div style="font-size:10px;font-weight:600;color:#7a8a9a;text-transform:uppercase">MBI</div><div style="font-size:13px">2FK8-RB3-JK91</div></div>
+      <div><div style="font-size:10px;font-weight:600;color:#7a8a9a;text-transform:uppercase">PCP</div><div style="font-size:13px">Dr. Michael Torres — Cedar Creek Medical</div></div>
+    </div>
+    <div class="fl">Clinical Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:#ffeaea;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:#c0392b">9.2%</div><div style="font-size:10px;color:#7a5a5a">A1C (target &lt;8%)</div></div>
+      <div style="background:#ffeaea;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:#c0392b">142</div><div style="font-size:10px;color:#7a5a5a">LDL mg/dL</div></div>
+      <div style="background:#fff3e0;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:#e67e22">148/92</div><div style="font-size:10px;color:#7a5a5a">Blood Pressure</div></div>
+    </div>
+    <div class="fl">Medications</div>
+    <div class="med-row"><span class="med-name">Metformin 1000mg BID</span><span class="med-status" style="color:#c0392b">⚠ OVERDUE — 47 days</span></div>
+    <div class="med-row"><span class="med-name">Lisinopril 20mg daily</span><span class="med-status" style="color:#27ae60">✓ Adherent</span></div>
+    <div class="med-row"><span class="med-name">Atorvastatin 40mg daily</span><span class="med-status" style="color:#c0392b">⚠ OVERDUE — 52 days</span></div>
+    <div class="fl">Risk & Utilization</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <span class="badge badge-red">3 ED visits (12 mo)</span>
+      <span class="badge badge-orange">Predicted cost: $47,200/yr</span>
+      <span class="badge badge-orange">Food insecurity</span>
+      <span class="badge badge-blue">No reliable internet</span>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:4000,action:()=>{
+am(`Robert is overdue on two medications and his A1C is trending up. I'm initiating a multi-step care plan:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon" style="background:#4FC0D0"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7v-2h2V7h2v2h2v2z"/></svg></div><h4>Care Plan — Robert Jackson</h4></div>
+  <div class="gc-b">
+    <div class="timeline">
+      <div class="tl-step active"><h5>Step 1: Medication Refill Reminders</h5><p>SMS outreach today — Metformin & Atorvastatin</p></div>
+      <div class="tl-step"><h5>Step 2: PCP Visit</h5><p>Schedule A1C/BP review this week</p></div>
+      <div class="tl-step"><h5>Step 3: Program Enrollment</h5><p>Diabetes management program (Livongo)</p></div>
+      <div class="tl-step"><h5>Step 4: SDoH Support</h5><p>Connect to food assistance program</p></div>
+      <div class="tl-step"><h5>Step 5: Follow-Up Labs</h5><p>A1C + lipid panel in 30 days</p></div>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:4000,action:()=>{
+am(`I've sent Robert a refill reminder and he responded:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Conversation — Robert Jackson</h4></div>
+  <div class="gc-b" style="padding:0">
+    <div class="sms-mock">
+      <div class="sms-hdr">ARIA Health Assistant · SMS</div>
+      <div class="sms-b out">Hi Robert, this is ARIA from Regence. I noticed you're overdue on your Metformin and Atorvastatin refills. These are important for managing your diabetes and cholesterol. Can I help get them refilled?</div>
+      <div class="sms-b in">Yeah I've been skipping them. Honestly they've gotten too expensive since my plan changed.</div>
+      <div class="sms-b out">I understand the concern. Let me check — I see your plan has a $0 copay formulary option. Metformin ER and Atorvastatin generic are both covered at no cost through Walgreens. Would you like me to switch your prescriptions?</div>
+      <div class="sms-b in">Wait really? $0? Yes please do that</div>
+      <div class="sms-b out">Done! I've coordinated with your doctor's office and Walgreens. Your new prescriptions will be ready for pickup by 5 PM today. I'll also schedule a visit with Dr. Torres to review your A1C — would next Wednesday work?</div>
+      <div class="sms-b in">Wednesday works. Thank you for helping with this</div>
+    </div>
+  </div>
+</div>`)}},
+
+{delay:3000,action:()=>at()},
+{delay:5000,action:()=>{
+am(`Pharmacy switch processed. PCP visit booked and programs enrolled:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon" style="background:#27ae60"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><h4>Actions Completed</h4></div>
+  <div class="gc-b">
+    <div class="appt-item">
+      <div class="appt-icon"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg></div>
+      <div class="appt-det"><h5>PCP Visit — Dr. Torres</h5><p>Wednesday, April 2 at 2:00 PM · A1C recheck + med review</p></div>
+    </div>
+    <div class="appt-item">
+      <div class="appt-icon" style="background:#e8f8f0"><svg viewBox="0 0 24 24" style="fill:#27ae60"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
+      <div class="appt-det"><h5>Diabetes Management — Livongo</h5><p>Enrollment initiated · Connected glucose monitoring + coaching</p></div>
+    </div>
+    <div class="appt-item">
+      <div class="appt-icon" style="background:#fff3e0"><svg viewBox="0 0 24 24" style="fill:#e67e22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+      <div class="appt-det"><h5>Food Assistance — 211 Referral</h5><p>Connected to Supplemental Nutrition program · Nearest pantry: 1.2 mi</p></div>
+    </div>
+    <div style="margin-top:16px;font-size:12px;font-weight:600;color:#5a6b7b;margin-bottom:8px">Projected Outcomes (6 months)</div>
+    <div class="outcome-grid">
+      <div class="outcome-item"><div class="val">9.2% → 7.8%</div><div class="lbl">A1C Reduction</div></div>
+      <div class="outcome-item"><div class="val">$12,400</div><div class="lbl">Cost Avoidance/yr</div></div>
+      <div class="outcome-item"><div class="val">3 → 0</div><div class="lbl">ED Visits Target</div></div>
+    </div>
+    <div style="background:#e8f8f0;border-radius:10px;padding:12px;font-size:13px;color:#1a6b42;margin-top:12px">
+      <strong>HEDIS Impact:</strong> CDC-HbA1c, CDC-LDL, CBP measures — Robert's closure directly improves 3 Star Rating domains. Nurse Care Manager will step in if next A1C doesn't trend below 8%.
+    </div>
+  </div>
+</div>`);
+}}
+];
+
+function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}
+function startDemo(){document.getElementById('startOverlay').classList.add('hidden');rs()}
+</script>
+</body>
+</html>
