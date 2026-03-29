@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARIA — Care Navigation</title>
+<title>Pager — Care Navigation</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -33,13 +33,13 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 .chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
 .message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
 @keyframes msgIn{to{opacity:1;transform:translateY(0)}}
-.message.aria{align-self:flex-start}
+.message.pager{align-self:flex-start}
 .message.member{align-self:flex-end;flex-direction:row-reverse}
 .avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700}
-.message.aria .avatar{background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
+.message.pager .avatar{background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
 .message.member .avatar{background:#e8ecf0;color:#3a4a5a}
 .bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55}
-.message.aria .bubble{background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.message.pager .bubble{background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
 .message.member .bubble{background:#1B6B93;color:white;border-bottom-right-radius:4px}
 .typing{display:flex;gap:10px;align-self:flex-start;max-width:85%}
 .typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
@@ -97,7 +97,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <body>
 <header class="header">
   <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
-  <h1>ARIA — Care Navigation</h1>
+  <h1>Pager — Care Navigation</h1>
   <span class="header-sub">Cambia Health Solutions</span>
 </header>
 <div class="layout">
@@ -148,15 +148,15 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <script>
 const chat=document.getElementById('chat');let si=0;
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">P</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
 function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html,type='aria'){rt();const d=document.createElement('div');d.className=`message ${type}`;const av=type==='aria'?'A':'L';const st=type==='aria'?'background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white':'background:#e8ecf0;color:#3a4a5a';d.innerHTML=`<div class="avatar" style="${st};font-size:12px;font-weight:700">${av}</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+function am(html,type='pager'){rt();const d=document.createElement('div');d.className=`message ${type}`;const av=type==='pager'?'P':'L';const st=type==='pager'?'background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white':'background:#e8ecf0;color:#3a4a5a';d.innerHTML=`<div class="avatar" style="${st};font-size:12px;font-weight:700">${av}</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
 
 const steps=[
 // Member initiates
 {delay:800,action:()=>{am("Hi, I've had a really bad headache for 2 days and my neck feels stiff. Should I go to the ER?","member")}},
 
-// ARIA assesses
+// Pager assesses
 {delay:1500,action:()=>at()},
 {delay:3000,action:()=>{
 am(`I'm sorry you're dealing with this, Lisa. Let me ask a few quick questions to help you get the right care.
@@ -176,7 +176,7 @@ A few follow-ups: Do you have a fever? Any vision changes or sensitivity to ligh
 // Member responds
 {delay:2500,action:()=>{am("No fever, no vision changes, no injury. It just won't go away and OTC meds aren't helping.","member")}},
 
-// ARIA recommends venues
+// Pager recommends venues
 {delay:1500,action:()=>at()},
 {delay:4000,action:()=>{
 am(`Based on your symptoms, this looks like a tension or cervicogenic headache. The neck stiffness <strong>without fever or vision changes</strong> is reassuring. I'd recommend an urgent care visit today rather than the ER. Here are your options:
@@ -218,7 +218,7 @@ am(`Based on your symptoms, this looks like a tension or cervicogenic headache. 
 // Member picks
 {delay:2500,action:()=>{am("I'll do CityMD. Can you book it?","member")}},
 
-// ARIA books
+// Pager books
 {delay:1200,action:()=>at()},
 {delay:3500,action:()=>{
 am(`Absolutely! You're all set:
@@ -250,7 +250,20 @@ am(`One more thing — please watch for these warning signs:
 const d=document.getElementById('sDivert');d.textContent='24';d.classList.add('up');
 const s=document.getElementById('sSavings');s.textContent='$43,200';s.classList.add('up');
 setTimeout(()=>{d.classList.remove('up');s.classList.remove('up')},700);
-}}
+}},
+
+// Cambia Data Dependencies
+{delay:2000,action:()=>at()},
+{delay:3000,action:()=>{
+am(`<div class="gc">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
+  <div class="gc-b">
+    <div class="assess-row"><span class="assess-label">Member info (ID, name, contact, language, PCP)</span></div>
+    <div class="assess-row"><span class="assess-label">Provider directory data or API/MCP (incl cost/quality tiers)</span></div>
+    <div class="assess-row"><span class="assess-label">Benefit plan details &amp; MRF data for OOP estimation</span></div>
+    <div class="assess-row"><span class="assess-label">Services outside defined benefit (e.g., telemedicine)</span></div>
+  </div>
+</div>`)}}
 ];
 
 function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}

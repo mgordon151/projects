@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARIA — Chronic Condition Navigation</title>
+<title>Pager — Chronic Condition Navigation</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -97,7 +97,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <body>
 <header class="header">
   <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
-  <h1>ARIA — Chronic Condition Navigation</h1>
+  <h1>Pager — Chronic Condition Navigation</h1>
   <span class="header-sub">Cambia Health Solutions</span>
 </header>
 <div class="layout">
@@ -137,8 +137,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
     <div class="start-overlay" id="startOverlay">
       <div class="start-content">
         <h2>Chronic Condition Navigation</h2>
-        <p>Watch ARIA assemble a member profile, initiate a care plan, resolve medication barriers, and coordinate programs — all in one conversation.</p>
+        <p>Watch Pager assemble a member profile, initiate a care plan, resolve medication barriers, and coordinate programs — all in one conversation.</p>
         <button class="start-btn" onclick="startDemo()">Start Demo</button>
+
       </div>
     </div>
     <div class="chat-messages" id="chat"></div>
@@ -147,9 +148,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <script>
 const chat=document.getElementById('chat');let si=0;
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">P</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
 function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">A</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar" style="background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;font-size:12px;font-weight:700">P</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
 
 const steps=[
 {delay:800,action:()=>at()},
@@ -231,8 +232,8 @@ am(`I've sent Robert a refill reminder and he responded:
   <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Conversation — Robert Jackson</h4></div>
   <div class="gc-b" style="padding:0">
     <div class="sms-mock">
-      <div class="sms-hdr">ARIA Health Assistant · SMS</div>
-      <div class="sms-b out">Hi Robert, this is ARIA from Regence. I noticed you're overdue on your Metformin and Atorvastatin refills. These are important for managing your diabetes and cholesterol. Can I help get them refilled?</div>
+      <div class="sms-hdr">Pager Health Assistant · SMS</div>
+      <div class="sms-b out">Hi Robert, this is Pager from Regence. I noticed you're overdue on your Metformin and Atorvastatin refills. These are important for managing your diabetes and cholesterol. Can I help get them refilled?</div>
       <div class="sms-b in">Yeah I've been skipping them. Honestly they've gotten too expensive since my plan changed.</div>
       <div class="sms-b out">I understand the concern. Let me check — I see your plan has a $0 copay formulary option. Metformin ER and Atorvastatin generic are both covered at no cost through Walgreens. Would you like me to switch your prescriptions?</div>
       <div class="sms-b in">Wait really? $0? Yes please do that</div>
@@ -267,7 +268,28 @@ am(`Pharmacy switch processed. PCP visit booked and programs enrolled:
       <div class="outcome-item"><div class="val">3 → 0</div><div class="lbl">ED Visits Target</div></div>
     </div>
     <div style="background:#e8f8f0;border-radius:10px;padding:12px;font-size:13px;color:#1a6b42;margin-top:12px">
-      <strong>HEDIS Impact:</strong> CDC-HbA1c, CDC-LDL, CBP measures — Robert's closure directly improves 3 Star Rating domains. Nurse Care Manager will step in if next A1C doesn't trend below 8%.
+      <strong>HEDIS Impact:</strong> CDC-HbA1c, CDC-LDL, CBP measures — Robert's closure directly improves 3 Star Rating domains. Automated Rx fills close medication adherence measures directly. Nurse Care Manager will step in if next A1C doesn't trend below 8%.
+    </div>
+  </div>
+</div>`);
+}},
+
+{delay:2500,action:()=>at()},
+{delay:3500,action:()=>{
+am(`To power this workflow end-to-end, Pager relies on the following data integrations:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
+  <div class="gc-b">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafb;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Dx; medical, Rx, lab claims</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Risk stratification scores (HCC or internal)</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafb;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Member info (ID, name, contact, language, PCP)</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Member comms prefs (SMS, channel, language)</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafb;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Provider directory data or API/MCP (incl cost/quality tiers)</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Care &amp; wellness program catalog + enrollment API/MCP</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafb;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Services outside defined benefit (e.g., telemedicine)</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px"><span style="color:#27ae60;font-weight:700">✓</span> Benefit plan details &amp; MRF data for OOP estimation</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff3e0;border-radius:8px;font-size:13px"><span style="color:#e67e22;font-weight:700">○</span> Optional: encounter data, labs, SDoH</div>
     </div>
   </div>
 </div>`);

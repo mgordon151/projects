@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARIA — Post-Acute Follow-Up</title>
+<title>Pager — Post-Acute Follow-Up</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -97,7 +97,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <body>
 <header class="header">
   <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
-  <h1>ARIA — Post-Acute Follow-Up</h1>
+  <h1>Pager — Post-Acute Follow-Up</h1>
   <span class="header-sub">Cambia Health Solutions</span>
 </header>
 <div class="layout">
@@ -117,7 +117,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
     <div class="start-overlay" id="startOverlay">
       <div class="start-content">
         <h2>Post-Acute Follow-Up</h2>
-        <p>Watch ARIA receive an ADT discharge alert, contact the member within 24 hours, resolve gaps in the discharge plan, and prevent a readmission.</p>
+        <p>Watch Pager receive an ADT discharge alert, contact the member within 24 hours, resolve gaps in the discharge plan, and prevent a readmission.</p>
         <button class="start-btn" onclick="startDemo()">Start Demo</button>
       </div>
     </div>
@@ -127,9 +127,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <script>
 const chat=document.getElementById('chat');let si=0;
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">P</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
 function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">A</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">P</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
 
 const steps=[
 {delay:800,action:()=>at()},
@@ -180,8 +180,8 @@ am(`Three critical items incomplete. Reaching out to James now:
   <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Outreach — James Rivera</h4></div>
   <div class="gc-b" style="padding:0">
     <div class="sms-mock">
-      <div class="sms-hdr">ARIA Health Assistant · SMS</div>
-      <div class="sms-b out">Hi James, this is ARIA from Asuris, following up on your discharge from Providence today. How are you feeling now that you're home?</div>
+      <div class="sms-hdr">Pager Health Assistant · SMS</div>
+      <div class="sms-b out">Hi James, this is Pager from Asuris, following up on your discharge from Providence today. How are you feeling now that you're home?</div>
       <div class="sms-b in">Tired but ok. Glad to be home. A little confused about all these new pills they gave me</div>
       <div class="sms-b out">That's understandable — you have 3 medication changes. Furosemide helps remove extra fluid, Carvedilol protects your heart (dose was increased), and Potassium replaces what the Furosemide removes. Have you picked them up yet?</div>
       <div class="sms-b in">No not yet. My daughter said she'd go but hasn't had time</div>
@@ -242,6 +242,26 @@ am(`Escalation check — ankle edema within expected range, but monitoring safeg
 const p=document.getElementById('sPrev');p.textContent='18';p.classList.add('up');
 const c=document.getElementById('sCost');c.textContent='$199,000';c.classList.add('up');
 setTimeout(()=>{p.classList.remove('up');c.classList.remove('up')},700);
+}},
+
+{delay:2500,action:()=>at()},
+{delay:3500,action:()=>{
+am(`To power this workflow end-to-end, Pager relies on the following data integrations:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
+  <div class="gc-b">
+    <div class="check-list">
+      <div class="check-item"><div class="icon done">✓</div>ADT feed (admit / discharge / transfer)</div>
+      <div class="check-item"><div class="icon done">✓</div>Discharge summary + care plan (structured or PDF)</div>
+      <div class="check-item"><div class="icon done">✓</div>Rx claims for adherence checks</div>
+      <div class="check-item"><div class="icon done">✓</div>Member info (ID, name, contact, language, PCP)</div>
+      <div class="check-item"><div class="icon done">✓</div>Member comms prefs (SMS, channel, language)</div>
+      <div class="check-item"><div class="icon done">✓</div>Provider directory data or API / MCP (incl cost / quality tiers)</div>
+      <div class="check-item"><div class="icon done">✓</div>Benefit plan details &amp; MRF data for OOP estimation</div>
+      <div class="check-item"><div class="icon done">✓</div>Services outside defined benefit (e.g., telemedicine)</div>
+    </div>
+  </div>
+</div>`);
 }}
 ];
 

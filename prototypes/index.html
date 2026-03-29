@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARIA — Agentic Use Case Prototypes</title>
+<title>Pager — Agentic Use Case Prototypes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -25,63 +25,128 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 .tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#e6f3f8;color:#1B6B93}
 .tag.green{background:#e8f8f0;color:#1a6b42}
 .tag.orange{background:#fff3e0;color:#e67e22}
+.tag.purple{background:#f5eef8;color:#8e44ad}
 .card-footer{padding:16px 24px;border-top:1px solid #eef2f5;display:flex;align-items:center;justify-content:space-between}
 .card-footer span{font-size:13px;font-weight:600;color:#1B6B93}
 .card-footer .arrow{font-size:18px;color:#4FC0D0}
+.section-title{max-width:1100px;margin:40px auto 0;padding:0 24px;font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px}
+.dep-section{max-width:1100px;margin:16px auto 40px;padding:0 24px}
+.dep-table{width:100%;background:white;border-radius:16px;border:1px solid #e0e8ef;overflow:hidden;box-shadow:0 2px 12px rgba(27,107,147,0.06)}
+.dep-table table{width:100%;border-collapse:collapse;font-size:12px}
+.dep-table th{background:linear-gradient(135deg,#f0f7fa,#e6f3f8);padding:12px 10px;text-align:center;font-weight:600;color:#1a2332;border-bottom:1px solid #e0e8ef;font-size:11px}
+.dep-table th:first-child{text-align:left;padding-left:18px;min-width:280px}
+.dep-table td{padding:10px;text-align:center;border-bottom:1px solid #f0f3f6;color:#3a4a5a}
+.dep-table td:first-child{text-align:left;padding-left:18px;font-weight:500}
+.dep-table tr:last-child td{border-bottom:none}
+.dep-table tr:hover{background:#f8fafb}
+.dep-table .section-row td{background:#f8fafb;font-weight:700;color:#1B6B93;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+.dep-table .check{color:#27ae60;font-weight:700;font-size:14px}
+.dep-table .init-row td{font-weight:600;font-size:11px;color:#5a6b7b}
 </style>
 </head>
 <body>
 <div class="hero">
   <div class="brand">CAMBIA HEALTH SOLUTIONS</div>
-  <h1>ARIA — Agentic Use Case Prototypes</h1>
-  <p>Five conversational AI prototypes demonstrating ARIA's end-to-end agentic workflows across Regence, Asuris, BridgeSpan, and BCBSND.</p>
+  <h1>Pager — Agentic Use Case Prototypes</h1>
+  <p>Six conversational AI prototypes demonstrating Pager's end-to-end agentic workflows across Regence, Asuris, BridgeSpan, and BCBSND.</p>
 </div>
 <div class="grid">
   <a href="uc1-gaps-in-care.html" class="card">
     <div class="card-header"><div class="card-uc">Use Case 1</div><h2>Gaps-in-Care Closure</h2></div>
     <div class="card-body">
       <div class="card-headline">"Close the gaps that drive your Star Rating"</div>
-      <div class="card-desc">ARIA ingests the gap file, contacts the member, educates on risk, books the appointment, coordinates transportation, and confirms completion. Gap closed. No extra staff.</div>
+      <div class="card-desc">Pager ingests the gap file, contacts the member, educates on risk, books the appointment, coordinates transportation, and confirms completion. Gap closed. No extra staff.</div>
       <div class="card-tags"><span class="tag">HEDIS</span><span class="tag">Star Ratings</span><span class="tag green">CDC-LDL</span><span class="tag green">BCS-E</span><span class="tag green">CBP</span></div>
     </div>
-    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
   </a>
   <a href="uc2-chronic-condition.html" class="card">
     <div class="card-header"><div class="card-uc">Use Case 2</div><h2>Chronic Condition Navigation</h2></div>
     <div class="card-body">
       <div class="card-headline">"Navigate your costliest members to better outcomes"</div>
-      <div class="card-desc">ARIA assembles Dx, Rx, labs, risk scores, and SDoH into one profile. Recommends programs, sends refill reminders, nudges adherence, and coordinates the full care plan.</div>
+      <div class="card-desc">Pager assembles Dx, Rx, labs, risk scores into one context. Recommends programs, fills Rx, nudges adherence, and coordinates the full care plan. Nurse steps in when complexity requires it.</div>
       <div class="card-tags"><span class="tag">Diabetes</span><span class="tag">High-Risk</span><span class="tag orange">$128M Spend</span><span class="tag green">HEDIS CDC</span></div>
     </div>
-    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
   </a>
   <a href="uc3-care-navigation.html" class="card">
-    <div class="card-header"><div class="card-uc">Use Case 3</div><h2>Care Navigation & Inbound Triage</h2></div>
+    <div class="card-header"><div class="card-uc">Use Case 3</div><h2>Care Navigation &amp; Inbound Triage</h2></div>
     <div class="card-body">
       <div class="card-headline">"One conversation from symptom to scheduled appointment"</div>
-      <div class="card-desc">AI assesses symptoms, routes to the right venue of care, shows cost/quality comparisons via GenUI, matches in-network providers, and books the appointment.</div>
-      <div class="card-tags"><span class="tag">ED Diversion</span><span class="tag green">$2,200 Saved/Visit</span><span class="tag">In-Network Steering</span></div>
+      <div class="card-desc">AI assesses symptoms, routes to the right venue of care, shows cost/quality comparisons via generative UI, matches in-network providers, and books the appointment.</div>
+      <div class="card-tags"><span class="tag">ED Diversion</span><span class="tag green">$2,200 Saved/Visit</span><span class="tag">In-Network Guidance</span></div>
     </div>
-    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
   </a>
   <a href="uc4-post-acute.html" class="card">
     <div class="card-header"><div class="card-uc">Use Case 4</div><h2>Post-Acute Follow-Up</h2></div>
     <div class="card-body">
       <div class="card-headline">"Catch readmissions before they happen"</div>
-      <div class="card-desc">ADT feed triggers workflow. SMS outreach within 24 hours. Checks discharge compliance, Rx adherence, symptoms. Schedules follow-up. Nurse enters if complications arise.</div>
-      <div class="card-tags"><span class="tag">PCR/TRC</span><span class="tag orange">Triple-Weighted</span><span class="tag green">$8K–$15K Saved</span></div>
+      <div class="card-desc">ADT feed triggers SMS outreach within 24 hours. Checks discharge compliance, Rx adherence, symptoms. Schedules follow-up. Nurse enters if member reports complications.</div>
+      <div class="card-tags"><span class="tag">PCR/TRC</span><span class="tag orange">Triple-Weighted</span><span class="tag green">$8K&ndash;$15K Saved</span></div>
     </div>
-    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
   </a>
   <a href="uc5-wellness-engagement.html" class="card">
     <div class="card-header"><div class="card-uc">Use Case 5</div><h2>Wellness Engagement</h2></div>
     <div class="card-body">
       <div class="card-headline">"Replace portal-first wellness with outreach-first"</div>
-      <div class="card-desc">Risk scoring targets members due for preventive services. AI-personalized nudges hit the right timing and channel. Enrolls in programs, schedules screenings, tracks completion.</div>
+      <div class="card-desc">Risk scoring targets members due for care. AI nudges: right timing, right channel. Enrolls, schedules screenings and other appointments, tracks completion.</div>
       <div class="card-tags"><span class="tag">All LOBs</span><span class="tag green">31.5% Engagement</span><span class="tag">Stars + QRS</span></div>
     </div>
-    <div class="card-footer"><span>Launch Demo</span><span class="arrow">→</span></div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
   </a>
+  <a href="uc6-nurse-triage.html" class="card">
+    <div class="card-header"><div class="card-uc">Use Case 6</div><h2>Nurse Triage 2.0 &mdash; Agentic Clinical Navigation</h2></div>
+    <div class="card-body">
+      <div class="card-headline">"50&ndash;70% of triage resolved by AI before nurse"</div>
+      <div class="card-desc">AI conducts intake: symptoms, history, acuity scoring. Low-acuity to self-care; high-acuity to live nurse. 24/7 via SMS/chat; nurse joins same thread. Full context handed off &mdash; no member repeats story.</div>
+      <div class="card-tags"><span class="tag purple">Nurse Handoff</span><span class="tag green">50&ndash;70% AI-Resolved</span><span class="tag">CAHPS Lift</span><span class="tag">24/7</span></div>
+    </div>
+    <div class="card-footer"><span>Launch Demo</span><span class="arrow">&rarr;</span></div>
+  </a>
+</div>
+
+<div class="section-title">Data Dependency Map Across All Use Cases</div>
+<div class="dep-section">
+  <div class="dep-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Dependency</th>
+          <th>UC1<br>Star Rating</th>
+          <th>UC2<br>Chronic Care</th>
+          <th>UC3<br>Symptom&rarr;Appt</th>
+          <th>UC4<br>Readmission</th>
+          <th>UC5<br>Wellness</th>
+          <th>UC6<br>Nurse Triage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="init-row">
+          <td>Initiation</td>
+          <td>Agent</td><td>Agent</td><td>Member</td><td>Agent</td><td>Agent</td><td>Member</td>
+        </tr>
+        <tr class="section-row"><td colspan="7">Common</td></tr>
+        <tr><td>Member info (ID, name, contact, language, PCP)</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+        <tr><td>Provider directory data or API/MCP</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+        <tr><td>Benefit plan &amp; MRF / OOP estimation</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+        <tr><td>Services outside defined benefit (e.g., telemedicine)</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+        <tr class="section-row"><td colspan="7">Unique</td></tr>
+        <tr><td>HEDIS gap-in-care file</td><td class="check">&check;</td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Member comms prefs (SMS, channel, language)</td><td class="check">&check;</td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+        <tr><td>Dx (diagnosis) data</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+        <tr><td>Medical claims</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+        <tr><td>Rx claims</td><td></td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+        <tr><td>Lab claims</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+        <tr><td>Risk stratification scores (HCC/internal)</td><td></td><td class="check">&check;</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Care &amp; wellness program catalog + enrollment API/MCP</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+        <tr><td>ADT feed (admit/discharge/transfer)</td><td></td><td></td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+        <tr><td>Discharge summary + care plan</td><td></td><td></td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+        <tr><td>Optional: encounter data, labs, SDoH</td><td></td><td class="check">&check;</td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </body>
 </html>

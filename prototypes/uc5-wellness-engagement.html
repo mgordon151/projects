@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARIA — Wellness Engagement</title>
+<title>Pager — Wellness Engagement</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -107,7 +107,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <body>
 <header class="header">
   <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
-  <h1>ARIA — Wellness Engagement</h1>
+  <h1>Pager — Wellness Engagement</h1>
   <span class="header-sub">Cambia Health Solutions</span>
 </header>
 <div class="layout">
@@ -135,7 +135,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
     <div class="start-overlay" id="startOverlay">
       <div class="start-content">
         <h2>Wellness Engagement</h2>
-        <p>Watch ARIA flip from portal-first to outreach-first — finding members where they are, personalizing nudges, and scheduling preventive services in one conversation.</p>
+        <p>Watch Pager flip from portal-first to outreach-first — finding members where they are, personalizing nudges, and scheduling preventive services in one conversation.</p>
         <button class="start-btn" onclick="startDemo()">Start Demo</button>
       </div>
     </div>
@@ -145,9 +145,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a23
 <script>
 const chat=document.getElementById('chat');let si=0;
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
+function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">P</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
 function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">A</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">P</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
 
 const steps=[
 {delay:800,action:()=>at()},
@@ -217,8 +217,8 @@ am(`Sarah's risk profile makes mammogram screening high priority. Reaching out w
   <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Outreach — Sarah Kim</h4></div>
   <div class="gc-b" style="padding:0">
     <div class="sms-mock">
-      <div class="sms-hdr">ARIA Wellness · SMS</div>
-      <div class="sms-b out">Hi Sarah! This is ARIA from Regence. It's been almost a year since your last wellness visit, and based on your age and family history, a mammogram screening is now recommended. Both are covered at $0 — would you like help scheduling?</div>
+      <div class="sms-hdr">Pager Wellness · SMS</div>
+      <div class="sms-b out">Hi Sarah! This is Pager from Regence. It's been almost a year since your last wellness visit, and based on your age and family history, a mammogram screening is now recommended. Both are covered at $0 — would you like help scheduling?</div>
       <div class="sms-b in">I've been meaning to do that but keep putting it off 😅</div>
       <div class="sms-b out">Totally normal! I can make it easy — I'll book your wellness visit and mammogram on the same day so it's just one trip. Your PCP Dr. Chen and the Overlake Breast Center are in the same building. Any day preference?</div>
       <div class="sms-b in">That would be amazing, can you do a Saturday?</div>
@@ -271,20 +271,20 @@ am(`Here's Sarah's personalized wellness roadmap for the next 12 months:
 
 {delay:2500,action:()=>at()},
 {delay:3500,action:()=>{
-am(`And here's the impact vs. your previous portal-first vendor:
+am(`And here's the impact — ReallyWell flips the model:
 <div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div><h4>ARIA vs. Portal-First Vendor</h4></div>
+  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div><h4>Pager vs. ReallyWell (Portal-First)</h4></div>
   <div class="gc-b">
     <div class="compare-grid">
       <div class="compare-col old">
-        <h5>Portal-First (Previous)</h5>
+        <h5>ReallyWell (Portal-First)</h5>
         <div class="cv">18%</div><div class="cl">Engagement Rate</div>
         <div style="margin-top:12px"><div class="cv">4,200</div><div class="cl">Screenings/Quarter</div></div>
         <div style="margin-top:12px;font-size:11px;color:#7a3a3a">Members must log in</div>
       </div>
       <div class="compare-arrow">→</div>
       <div class="compare-col new">
-        <h5>ARIA (Outreach-First)</h5>
+        <h5>Pager (Outreach-First)</h5>
         <div class="cv">31.5%</div><div class="cl">Engagement Rate</div>
         <div style="margin-top:12px"><div class="cv">8,240</div><div class="cl">Screenings/Quarter</div></div>
         <div style="margin-top:12px;font-size:11px;color:#1a6b42">AI finds members where they are</div>
@@ -292,6 +292,24 @@ am(`And here's the impact vs. your previous portal-first vendor:
     </div>
     <div class="impact-bar">
       <strong>Impact:</strong> +75% engagement · +96% screenings · Projected <strong>+0.3 Stars</strong> across preventive measures · One platform for Regence, Asuris, BridgeSpan, BCBSND
+    </div>
+  </div>
+</div>`)}},
+
+{delay:2500,action:()=>at()},
+{delay:3500,action:()=>{
+am(`To power this experience, Pager needs the following data from Cambia:
+<div class="gc" style="margin-top:12px">
+  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
+  <div class="gc-b">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Dx; medical, Rx, lab claims</strong></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Care &amp; wellness program catalog + enrollment API/MCP</strong></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Member info</strong> <span style="color:#5a6b7b">(ID, name, contact, language, PCP)</span></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Member comms prefs</strong> <span style="color:#5a6b7b">(SMS, channel, language)</span></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Provider directory data or API/MCP</strong> <span style="color:#5a6b7b">(incl cost/quality tiers)</span></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Benefit plan details &amp; MRF data</strong> <span style="color:#5a6b7b">for OOP estimation</span></div>
+      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Services outside defined benefit</strong> <span style="color:#5a6b7b">(e.g., telemedicine)</span></div>
     </div>
   </div>
 </div>`)}},
