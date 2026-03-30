@@ -129,6 +129,22 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 
 /* UC label */
 .uc-badge{display:inline-block;background:#1a3a4a;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;margin-bottom:10px;letter-spacing:0.5px}
+
+/* Day/Time Picker */
+.schedule-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.schedule-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.day-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.day-chip{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.day-chip.selected{background:#1a3a4a;color:white}
+.time-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.time-chip{padding:8px 16px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.time-chip.selected{background:#1a3a4a;color:white}
+.find-times-btn{width:100%;padding:10px;border-radius:12px;background:#e8ecf0;color:#8a9baa;font-size:13px;font-weight:500;text-align:center;border:none;font-family:'Inter',sans-serif}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -224,8 +240,9 @@ const steps=[
 // 7. User action
 {delay:1500,action:()=>{actionBtn("Yes, find me a lab")}},
 
-// 8. Bot typing then response
-{delay:1200,action:()=>addTyping()},
+// 8. Loading state — provider directory
+{delay:1200,action:()=>{addEl('<div class="spinner"></div> Pulling in provider directory ...','loading-state')}},
+{delay:2000,action:()=>addTyping()},
 {delay:3000,action:()=>{
   removeTyping();
   botMsg("Here are the closest in-network options:");
@@ -275,9 +292,35 @@ const steps=[
 // 13. User action
 {delay:1500,action:()=>{actionBtn("Yes, schedule both")}},
 
-// 14. Bot typing then appointment options
-{delay:1200,action:()=>addTyping()},
-{delay:3000,action:()=>{
+// 14. Schedule preference card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="schedule-label">SCHEDULING PREFERENCE</div>
+    <div class="day-chips">
+      <span class="day-chip">Mon</span>
+      <span class="day-chip">Tue</span>
+      <span class="day-chip">Wed</span>
+      <span class="day-chip selected">Thu</span>
+      <span class="day-chip selected">Fri</span>
+      <span class="day-chip">Sat</span>
+      <span class="day-chip">Sun</span>
+    </div>
+    <div class="schedule-label">PREFERRED TIME</div>
+    <div class="time-chips">
+      <span class="time-chip">Morning</span>
+      <span class="time-chip selected">Afternoon</span>
+      <span class="time-chip">Evening</span>
+    </div>
+    <button class="find-times-btn">Find available times</button>
+  `,'schedule-card');
+}},
+
+// 14b. Loading state — checking availability
+{delay:1500,action:()=>{addEl('<div class="spinner"></div> Checking appointment availability ...','loading-state')}},
+
+// 14c. Bot typing then appointment options
+{delay:2000,action:()=>addTyping()},
+{delay:2500,action:()=>{
   removeTyping();
   botMsg("Perfect — here are available times:");
 }},

@@ -168,6 +168,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .alert-banner{background:linear-gradient(135deg,#e67e22,#f39c12);border-radius:16px;padding:14px 16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;color:white}
 .alert-banner h5{font-size:13px;font-weight:700;margin-bottom:4px}
 .alert-banner p{font-size:12px;opacity:0.9;line-height:1.4}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -251,8 +256,11 @@ const steps=[
 {delay:1200,action:()=>addTyping()},
 {delay:2800,action:()=>{botMsg("That's completely normal after a procedure like this. Let me review your discharge plan:")}},
 
+// 5b. Loading state — discharge records
+{delay:1000,action:()=>{addEl('<div class="spinner"></div> Pulling in discharge records ...','loading-state')}},
+
 // 6. Discharge Summary Card
-{delay:1200,action:()=>{
+{delay:1500,action:()=>{
   addEl(`
     <div class="discharge-header">
       <div class="discharge-icon">&#128203;</div>
@@ -301,8 +309,11 @@ const steps=[
 {delay:1200,action:()=>addTyping()},
 {delay:2500,action:()=>{botMsg("Delivery confirmed for today by 3 PM. Now let's get your orthopedic follow-up scheduled. Your surgeon recommends a visit within 10&ndash;14 days.")}},
 
+// 13b. Loading state — provider directory
+{delay:1000,action:()=>{addEl('<div class="spinner"></div> Searching provider directory ...','loading-state')}},
+
 // 14. Provider card with slots
-{delay:1200,action:()=>{
+{delay:1500,action:()=>{
   addEl(`
     <div class="provider-check">&#10003;</div>
     <div class="provider-top">

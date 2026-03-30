@@ -180,6 +180,20 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .selfcare-title{font-size:14px;font-weight:700;color:#1a6b42;margin-bottom:10px}
 .selfcare-item{font-size:13px;color:#2a5a3a;padding:4px 0;display:flex;align-items:flex-start;gap:8px}
 .selfcare-icon{flex-shrink:0;font-size:14px}
+
+/* Call Summary Card */
+.call-summary{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.call-summary-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.call-summary-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #eef2f5;font-size:13px;color:#1a2332}
+.call-summary-item:last-child{border-bottom:none}
+.call-summary-item .bullet{width:8px;height:8px;border-radius:50%;background:#e67e22;flex-shrink:0;margin-top:5px}
+.call-summary-item .time{font-size:11px;color:#8a9baa;margin-left:auto;flex-shrink:0}
+.call-summary-note{font-size:11px;color:#8a9baa;text-align:center;margin-top:8px}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -288,8 +302,11 @@ const steps=[
 {delay:1200,action:()=>addTyping()},
 {delay:2800,action:()=>{botMsg("Based on what you've described, here's my assessment:")}},
 
+// 10b. Loading state — analyzing symptoms
+{delay:1000,action:()=>{addEl('<div class="spinner"></div> Analyzing symptoms ...','loading-state')}},
+
 // 11. Acuity Card
-{delay:1200,action:()=>{
+{delay:1500,action:()=>{
   addEl(`
     <div class="assess-label">TRIAGE ASSESSMENT</div>
     <div class="assess-title">Upper Respiratory Infection with Fever</div>
@@ -380,6 +397,18 @@ const steps=[
 
 // 20. User action — book
 {delay:1500,action:()=>{actionBtn("Book 8:30 AM")}},
+
+// 20b. Call Summary Card
+{delay:1500,action:()=>{
+  addEl(`
+    <div class="call-summary-label">CALL SUMMARY</div>
+    <div class="call-summary-item"><span class="bullet"></span>Confirmed viral URI with possible otitis media<span class="time">0:42</span></div>
+    <div class="call-summary-item"><span class="bullet"></span>Tylenol dosing reviewed for weight<span class="time">2:15</span></div>
+    <div class="call-summary-item"><span class="bullet"></span>Hydration and comfort measures discussed<span class="time">3:45</span></div>
+    <div class="call-summary-item"><span class="bullet"></span>Dr. Lin appointment booked for 8:30 AM<span class="time">5:10</span></div>
+    <div class="call-summary-note">Summarized from 6:30 consultation</div>
+  `,'call-summary');
+}},
 
 // 21. Safety card
 {delay:1500,action:()=>{

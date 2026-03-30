@@ -151,6 +151,36 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 
 /* UC label */
 .uc-badge{display:inline-block;background:#1a3a4a;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;margin-bottom:10px;letter-spacing:0.5px}
+
+/* Day/Time Picker */
+.schedule-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.schedule-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.day-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.day-chip{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.day-chip.selected{background:#1a3a4a;color:white}
+.time-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.time-chip{padding:8px 16px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.time-chip.selected{background:#1a3a4a;color:white}
+.find-times-btn{width:100%;padding:10px;border-radius:12px;background:#e8ecf0;color:#8a9baa;font-size:13px;font-weight:500;text-align:center;border:none;font-family:'Inter',sans-serif}
+
+/* Deductible & Cost Card */
+.deductible-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.deductible-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.deductible-amount{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
+.deductible-amount .big{font-size:28px;font-weight:700;color:#1a3a4a}
+.deductible-amount .of{font-size:13px;color:#8a9baa}
+.deductible-remaining{font-size:12px;color:#8a9baa;text-align:right;margin-bottom:6px}
+.deductible-bar{height:6px;background:#e8ecf0;border-radius:3px;margin-bottom:12px;overflow:hidden}
+.deductible-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.deductible-text{font-size:13px;color:#3a4a5a;line-height:1.5;margin-bottom:12px}
+.deductible-oop{text-align:center;padding-top:8px;border-top:1px solid #eef2f5}
+.deductible-oop .label{font-size:12px;color:#8a9baa}
+.deductible-oop .amount{font-size:24px;font-weight:700;color:#1a2332;margin-top:2px}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -294,6 +324,9 @@ const steps=[
 // Typing
 {delay:1500,action:()=>addTyping()},
 
+// Loading state
+{delay:1500,action:()=>{addEl('<div class="spinner"></div> Pulling in provider directory ...','loading-state')}},
+
 // Provider results
 {delay:3000,action:()=>{
   removeTyping();
@@ -359,6 +392,21 @@ const steps=[
 {delay:1200,action:()=>addTyping()},
 {delay:2500,action:()=>{botMsg("What days and times work best for you?")}},
 
+// Day/Time picker card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="schedule-label">DAYS</div>
+    <div class="day-chips">
+      <div class="day-chip selected">Mon</div><div class="day-chip">Tue</div><div class="day-chip">Wed</div><div class="day-chip">Thu</div><div class="day-chip">Fri</div><div class="day-chip">Sat</div><div class="day-chip">Sun</div>
+    </div>
+    <div class="schedule-label">TIME OF DAY</div>
+    <div class="time-chips">
+      <div class="time-chip">Morning</div><div class="time-chip selected">Afternoon</div><div class="time-chip">Evening</div>
+    </div>
+    <button class="find-times-btn">Find Available Times &rarr;</button>
+  `,'schedule-card');
+}},
+
 // User picks
 {delay:1200,action:()=>{actionBtn("Today &middot; Afternoon")}},
 
@@ -399,14 +447,16 @@ const steps=[
   botMsg("You're all set! I'll confirm the appointment and send you a text. Your estimated copay is <strong>$35</strong> — that's <strong>$215 less</strong> than the ER.");
 }},
 
-// Cost card
+// Deductible & Cost card
 {delay:1200,action:()=>{
   addEl(`
-    <div class="assess-label">COST COMPARISON</div>
-    <div class="cost-row"><span class="cost-label">Urgent Care (CityMD)</span><span class="cost-val" style="color:#27ae60">$35 copay</span></div>
-    <div class="cost-row"><span class="cost-label">Emergency Room</span><span class="cost-val" style="color:#c0392b;text-decoration:line-through">$250 copay</span></div>
-    <div class="cost-row"><span class="cost-label">You save</span><span class="cost-val" style="color:#27ae60;font-size:16px">$215</span></div>
-  `,'cost-card');
+    <div class="deductible-label">DEDUCTIBLE AND COST</div>
+    <div class="deductible-amount"><span class="big">$1,250</span><span class="of">of $3,000</span></div>
+    <div class="deductible-remaining">$1,750 remaining</div>
+    <div class="deductible-bar"><div class="deductible-fill" style="width:42%"></div></div>
+    <div class="deductible-text">Your plan has a <strong>Co-Pay of $35</strong> for urgent care visits with <strong>80% co-insurance</strong> before you've met your deductible.</div>
+    <div class="deductible-oop"><div class="label">Estimated out of pocket cost</div><div class="amount">$35</div></div>
+  `,'deductible-card');
 }},
 
 // Safety net

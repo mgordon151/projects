@@ -176,6 +176,34 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .med-status.adherent{background:#e8f8f0;color:#27ae60}
 .med-status.due{background:#fff3e0;color:#e67e22}
 .med-status.overdue{background:#fde8e8;color:#c0392b}
+
+/* Deductible & Cost Card */
+.deductible-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.deductible-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.deductible-amount{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
+.deductible-amount .big{font-size:28px;font-weight:700;color:#1a3a4a}
+.deductible-amount .of{font-size:13px;color:#8a9baa}
+.deductible-remaining{font-size:12px;color:#8a9baa;text-align:right;margin-bottom:6px}
+.deductible-bar{height:6px;background:#e8ecf0;border-radius:3px;margin-bottom:12px;overflow:hidden}
+.deductible-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.deductible-text{font-size:13px;color:#3a4a5a;line-height:1.5;margin-bottom:12px}
+.deductible-oop{text-align:center;padding-top:8px;border-top:1px solid #eef2f5}
+.deductible-oop .label{font-size:12px;color:#8a9baa}
+.deductible-oop .amount{font-size:24px;font-weight:700;color:#1a2332;margin-top:2px}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Enrollment Success Card */
+.enroll-card{background:linear-gradient(135deg,#1a3a4a,#2d6b7a);border-radius:16px;padding:20px 16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;color:white;text-align:center}
+.enroll-emoji{font-size:32px;margin-bottom:6px}
+.enroll-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.enroll-subtitle{font-size:12px;opacity:0.7;margin-bottom:12px}
+.enroll-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.enroll-chip{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;background:rgba(255,255,255,0.15);color:white}
+.enroll-text{font-size:12px;opacity:0.8;line-height:1.4}
 </style>
 </head>
 <body>
@@ -252,6 +280,9 @@ const steps=[
 // 4. Bot responds
 {delay:2800,action:()=>{botMsg("I'm sorry to hear that. Let me pull up your current health snapshot:")}},
 
+// 5a. Loading state for clinical records
+{delay:1500,action:()=>{addEl('<div class="spinner"></div> Pulling in clinical records ...','loading-state')}},
+
 // 5. Clinical Summary Card
 {delay:1200,action:()=>{
   addEl(`
@@ -327,9 +358,22 @@ const steps=[
 // 13. User enrolls
 {delay:1500,action:()=>{actionBtn("Enroll me in the program")}},
 
-// 14. Bot confirms and shows providers
+// 14. Bot confirms enrollment with rich card
 {delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("You're enrolled! Let's also get you scheduled for blood work and a PCP visit. Here are available providers:")}},
+{delay:2800,action:()=>{
+  removeTyping();
+  addEl(`
+    <div class="enroll-emoji">🎉</div>
+    <div class="enroll-title">You're enrolled!</div>
+    <div class="enroll-subtitle">Welcome to Regence Diabetes Care Program</div>
+    <div class="enroll-chips"><span class="enroll-chip">📊 A1C Monitoring</span><span class="enroll-chip">🥗 Nutrition</span><span class="enroll-chip">💊 Rx Management</span><span class="enroll-chip">📱 Connected Glucose</span></div>
+    <div class="enroll-text">All yours at <strong>no additional cost</strong> — your care team will reach out within 48 hours to get started.</div>
+  `,'enroll-card');
+}},
+{delay:1500,action:()=>{botMsg("Let's also get you scheduled for blood work and a PCP visit. Here are available providers:")}},
+
+// 14b. Loading state for provider search
+{delay:1500,action:()=>{addEl('<div class="spinner"></div> Searching provider directory ...','loading-state')}},
 
 // 15. Provider card
 {delay:1000,action:()=>{

@@ -136,6 +136,20 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .screening-status.overdue{background:#fde8e8;color:#c0392b}
 .screening-status.due{background:#fff3e0;color:#e67e22}
 .screening-status.complete{background:#e8f8f0;color:#27ae60}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
+.loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Enrollment Success Card */
+.enroll-card{background:linear-gradient(135deg,#1a3a4a,#2d6b7a);border-radius:16px;padding:20px 16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;color:white;text-align:center}
+.enroll-emoji{font-size:32px;margin-bottom:6px}
+.enroll-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.enroll-subtitle{font-size:12px;opacity:0.7;margin-bottom:12px}
+.enroll-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.enroll-chip{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;background:rgba(255,255,255,0.15);color:white}
+.enroll-text{font-size:12px;opacity:0.8;line-height:1.4}
 </style>
 </head>
 <body>
@@ -210,8 +224,11 @@ const steps=[
 {delay:1200,action:()=>addTyping()},
 {delay:2800,action:()=>{botMsg("No worries — let me show you where you stand:")}},
 
+// 4b. Loading state — wellness data
+{delay:1000,action:()=>{addEl('<div class="spinner"></div> Pulling your wellness data ...','loading-state')}},
+
 // 5. GenUI — Wellness Score Card
-{delay:1200,action:()=>{
+{delay:1500,action:()=>{
   addEl(`
     <div class="wellness-score">64</div>
     <div class="wellness-label">Wellness Score &middot; out of 100</div>
@@ -229,8 +246,11 @@ const steps=[
 // 6. Bot: score explanation
 {delay:1800,action:()=>{botMsg("You're at 64 out of 100 — completing your overdue screenings would bump you to 88. Here's the breakdown:")}},
 
+// 6b. Loading state — screening records
+{delay:1000,action:()=>{addEl('<div class="spinner"></div> Checking screening records ...','loading-state')}},
+
 // 7. GenUI — Screening Details Card
-{delay:1200,action:()=>{
+{delay:1500,action:()=>{
   addEl(`
     <div class="assess-label">PREVENTIVE SCREENINGS</div>
     <div class="screening-row">
@@ -360,6 +380,21 @@ const steps=[
     <div class="assess-row"><span class="assess-check">&#10003;</span>Health Assessment — Link sent via text</div>
     <div style="text-align:center;margin-top:12px;font-size:14px;font-weight:700;color:#1a2332">Projected Score: <span style="color:#8a9baa">64</span> <span style="color:#8a9baa">&rarr;</span> <span style="color:#27ae60">88</span></div>
   `,'assess-card');
+}},
+
+// 21b. Enrollment Success Card — Regence Empower
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="enroll-emoji">&#127881;</div>
+    <div class="enroll-title">Enrolled in Regence Empower</div>
+    <div class="enroll-subtitle">Your personalized wellness program is active</div>
+    <div class="enroll-chips">
+      <span class="enroll-chip">Screenings</span>
+      <span class="enroll-chip">Rewards</span>
+      <span class="enroll-chip">Health Profile</span>
+    </div>
+    <div class="enroll-text">Complete your actions to earn up to $75 in rewards. We'll keep you on track with reminders.</div>
+  `,'enroll-card');
 }},
 
 // 22. Bot: closing
