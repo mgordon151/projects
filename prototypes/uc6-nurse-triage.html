@@ -7,262 +7,407 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:linear-gradient(135deg,#1B6B93,#155a7a);padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(27,107,147,0.15);z-index:10}
-.header-logo{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
-.header-logo svg{width:22px;height:22px;fill:white}
-.header h1{color:white;font-size:18px;font-weight:600}
-.header-sub{color:rgba(255,255,255,0.7);font-size:12px;margin-left:auto}
-.layout{display:flex;flex:1;overflow:hidden}
-.sidebar{width:320px;background:white;border-right:1px solid #e8ecf0;padding:20px;overflow-y:auto;flex-shrink:0}
-.sidebar-title{font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
-.stat-card{background:#f0f7fa;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #e0eff5}
-.stat-card h3{font-size:12px;font-weight:500;color:#5a6b7b;margin-bottom:6px}
-.stat-val{font-size:28px;font-weight:700;color:#1B6B93}
-.stat-sub{font-size:11px;color:#7a8a9a;margin-top:4px}
-.stat-val.green{color:#27ae60}
-.stat-val.up{animation:pulse .6s ease}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);color:#4FC0D0}}
-.live-dot{display:inline-block;width:8px;height:8px;background:#27ae60;border-radius:50%;margin-right:6px;animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.triage-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f5;font-size:12px}
-.triage-row:last-child{border-bottom:none}
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
-.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
-.chat-messages::-webkit-scrollbar{width:6px}
-.chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
-.message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
+body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135deg,#e8eef5,#f5f7fb,#ebf0f9);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+
+/* iPhone Frame */
+.phone{width:390px;height:844px;background:#fff;border-radius:50px;box-shadow:0 24px 80px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.04);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:50}
+.status-bar{height:54px;background:#1a3a4a;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;z-index:40;flex-shrink:0}
+.status-bar .time{color:white;font-size:15px;font-weight:600}
+.status-bar .icons{display:flex;gap:4px;align-items:center;color:white;font-size:12px}
+.status-bar .icons span{font-weight:600}
+
+/* Header */
+.chat-header{background:#1a3a4a;padding:10px 20px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-header .back{color:white;font-size:22px;font-weight:300;cursor:pointer;line-height:1}
+.chat-header h1{color:white;font-size:17px;font-weight:600;flex:1;text-align:center;margin-right:22px}
+
+/* Chat Area */
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#fff}
+.chat-body::-webkit-scrollbar{width:0}
+
+/* Timestamp */
+.timestamp{text-align:center;font-size:11px;color:#8a9baa;padding:4px 0}
+
+/* Messages */
+.msg{display:flex;gap:8px;max-width:88%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
 @keyframes msgIn{to{opacity:1;transform:translateY(0)}}
-.message.pager{align-self:flex-start}
-.message.member{align-self:flex-end;flex-direction:row-reverse}
-.message.nurse{align-self:flex-start}
-.avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700}
-.message.pager .avatar{background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
-.message.member .avatar{background:#e8ecf0;color:#3a4a5a}
-.message.nurse .avatar{background:linear-gradient(135deg,#8e44ad,#a569bd);color:white}
-.bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55}
-.message.pager .bubble{background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.message.member .bubble{background:#1B6B93;color:white;border-bottom-right-radius:4px}
-.message.nurse .bubble{background:white;border:1px solid #d5bfe6;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(142,68,173,0.08)}
-.typing{display:flex;gap:10px;align-self:flex-start}
-.typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
-.typing .dots span{width:7px;height:7px;background:#b0bec5;border-radius:50%;animation:bounce 1.2s infinite}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:32px;height:32px;border-radius:50%;background:#1a3a4a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:white;font-family:Georgia,serif}
+.bub{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;max-width:100%}
+.msg.bot .bub{background:#f0f2f5;color:#1a2332;border-bottom-left-radius:4px}
+.msg.user .bub{background:#1a3a4a;color:white;border-bottom-right-radius:4px}
+
+/* Typing */
+.typing{display:flex;gap:8px;align-self:flex-start;opacity:0;animation:msgIn .35s ease forwards}
+.typing .dots{display:flex;gap:4px;padding:12px 16px;background:#f0f2f5;border-radius:18px;border-bottom-left-radius:4px}
+.typing .dots span{width:6px;height:6px;background:#8a9baa;border-radius:50%;animation:bounce 1.2s infinite}
 .typing .dots span:nth-child(2){animation-delay:.15s}
 .typing .dots span:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-.gc{background:white;border:1px solid #e0e8ef;border-radius:14px;overflow:hidden;margin-top:8px;box-shadow:0 2px 8px rgba(27,107,147,0.06)}
-.gc-h{padding:14px 18px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef;display:flex;align-items:center;gap:8px}
-.gc-h.nurse-h{background:linear-gradient(135deg,#f5eef8,#ece0f4);border-bottom-color:#d5bfe6}
-.gc-icon{width:28px;height:28px;background:#1B6B93;border-radius:8px;display:flex;align-items:center;justify-content:center}
-.gc-icon svg{width:16px;height:16px;fill:white}
-.gc-icon.purple{background:#8e44ad}
-.gc-icon.green{background:#27ae60}
-.gc-h h4{font-size:14px;font-weight:600;color:#1a2332}
-.gc-b{padding:16px 18px}
-.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.sg-i{text-align:center;padding:12px;background:#f8fafb;border-radius:10px}
-.sg-n{font-size:22px;font-weight:700;color:#1B6B93}
-.sg-l{font-size:11px;color:#7a8a9a;margin-top:2px}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px 4px 2px 0}
-.badge-red{background:#ffeaea;color:#c0392b}
-.badge-green{background:#e8f8f0;color:#1a6b42}
-.badge-blue{background:#e6f3f8;color:#1B6B93}
-.badge-orange{background:#fff3e0;color:#e67e22}
-.badge-purple{background:#f5eef8;color:#8e44ad}
-.assess-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;margin-bottom:4px;font-size:13px}
-.assess-row:nth-child(odd){background:#f8fafb}
-.assess-label{color:#3a4a5a}
-.assess-val{font-weight:600}
-.severity-bar{display:flex;gap:3px;align-items:center}
-.severity-bar .dot{width:12px;height:12px;border-radius:3px;background:#e0e8ef}
-.severity-bar .dot.active{background:#e67e22}
-.severity-bar .dot.active-red{background:#e74c3c}
-.handoff-card{background:#f5eef8;border:2px solid #d5bfe6;border-radius:14px;padding:16px;margin-top:8px}
-.handoff-card h5{font-size:14px;font-weight:700;color:#8e44ad;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.handoff-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:#3a4a5a}
-.handoff-row svg{width:16px;height:16px;fill:#8e44ad;flex-shrink:0}
-.selfcare-card{background:#e8f8f0;border:1px solid #c8e8d8;border-radius:14px;padding:16px;margin-top:8px}
-.selfcare-card h5{font-size:14px;font-weight:600;color:#1a6b42;margin-bottom:10px}
-.selfcare-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:#2d6b4a}
-.selfcare-item::before{content:'✓';color:#27ae60;font-weight:700}
-.appt-item{display:flex;gap:12px;padding:12px;background:#f8fafb;border-radius:10px;margin-bottom:8px;align-items:flex-start}
-.appt-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.appt-icon svg{width:18px;height:18px}
-.appt-det h5{font-size:13px;font-weight:600;color:#1a2332}
-.appt-det p{font-size:12px;color:#5a6b7b;margin-top:2px}
-.start-overlay{position:absolute;inset:0;background:rgba(248,250,251,0.95);display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px)}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Suggested Actions */
+.actions{display:flex;flex-direction:column;gap:8px;align-self:flex-end;max-width:88%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
+.action-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#1a3a4a;color:white;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-end}
+.action-btn .icon{font-size:12px;opacity:0.7}
+
+/* GenUI Cards */
+.card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;overflow:hidden;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);max-width:100%;align-self:flex-start}
+.card-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;padding:14px 16px 0}
+
+/* Pain Level Card */
+.pain-card{background:#1a3a4a;border-radius:16px;padding:16px;color:white;margin:4px 0;align-self:flex-end;max-width:70%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
+.pain-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.6);margin-bottom:8px}
+.pain-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pain-badge{background:#e67e22;color:white;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600}
+.pain-num{font-size:36px;font-weight:700}
+.pain-dots{display:flex;gap:4px}
+.pain-dots .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2)}
+.pain-dots .dot.active{background:#e67e22}
+.pain-dots .dot.current{background:#e67e22;box-shadow:0 0 6px rgba(230,126,34,0.5)}
+
+/* Symptom Chips */
+.symptom-card{background:#1a3a4a;border-radius:16px;padding:14px 16px;align-self:flex-end;max-width:75%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
+.symptom-card .card-label{color:rgba(255,255,255,0.6);padding:0 0 8px}
+.symptom-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 14px;border-radius:16px;font-size:12px;font-weight:500;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5)}
+.chip.selected{background:white;color:#1a3a4a;font-weight:600}
+
+/* Assessment Card */
+.assess-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.assess-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.assess-title{font-size:16px;font-weight:700;color:#1a2332;margin-bottom:6px}
+.assess-badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#fff3e0;color:#e67e22;margin-bottom:12px}
+.assess-section{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 8px}
+.assess-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;color:#1a2332}
+.assess-check{width:20px;height:20px;border-radius:50%;background:#27ae60;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0}
+.calc-time{text-align:center;font-size:11px;color:#8a9baa;margin-top:8px}
+
+/* Provider Card */
+.provider-card{background:white;border:2px solid #e8ecf0;border-radius:16px;padding:14px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;position:relative}
+.provider-card.selected{border-color:#1a3a4a}
+.provider-top{display:flex;gap:10px;align-items:flex-start}
+.provider-photo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1a3a4a,#2d6b7a);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:600;flex-shrink:0}
+.provider-info{flex:1}
+.provider-name{font-size:15px;font-weight:700;color:#1a2332}
+.provider-spec{font-size:12px;color:#5a6b7b;margin-top:1px}
+.provider-rating{display:flex;align-items:center;gap:4px;margin-top:4px}
+.stars{color:#e67e22;font-size:12px}
+.rating-num{font-size:13px;font-weight:600;color:#1a2332}
+.rating-count{font-size:11px;color:#8a9baa}
+.tier-badge{font-size:11px;font-weight:600;color:#27ae60;margin-left:auto}
+.provider-check{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;background:#1a3a4a;display:flex;align-items:center;justify-content:center;color:white;font-size:12px}
+.provider-meta{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.provider-meta span{font-size:11px;color:#5a6b7b}
+.provider-desc{font-size:12px;color:#5a6b7b;margin-top:8px;line-height:1.4}
+
+/* Filter Tabs */
+.filter-tabs{display:flex;gap:8px;padding:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start}
+.filter-tab{padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.filter-tab.active{background:#1a3a4a;color:white}
+
+/* Time Slots */
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.slot{padding:6px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b}
+.slot.selected{background:#1a3a4a;color:white}
+
+/* Nurse Card */
+.nurse-card{border-radius:16px;overflow:hidden;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.nurse-header{background:linear-gradient(135deg,#27ae60,#2ecc71);padding:16px;display:flex;align-items:center;gap:12px}
+.nurse-photo{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid rgba(255,255,255,0.5)}
+.nurse-name{color:white;font-size:16px;font-weight:700}
+.nurse-org{display:inline-block;background:rgba(255,255,255,0.25);color:white;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;margin-top:2px}
+.nurse-body{background:white;border:1px solid #e8ecf0;border-top:none;padding:14px 16px;font-size:13px;color:#3a4a5a;line-height:1.5}
+.nurse-creds{margin-top:8px;font-size:13px}
+.nurse-creds span{display:flex;align-items:center;gap:6px;padding:2px 0}
+
+/* Cost Card */
+.cost-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.cost-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eef2f5;font-size:13px}
+.cost-row:last-child{border-bottom:none}
+.cost-label{color:#5a6b7b}
+.cost-val{font-weight:600;color:#1a2332}
+
+/* Safety Card */
+.safety-card{background:#fff8f0;border:1px solid #fde0b0;border-radius:16px;padding:14px 16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.safety-card h5{font-size:13px;font-weight:600;color:#c0392b;margin-bottom:8px}
+.safety-item{font-size:12px;color:#5a3a1a;padding:3px 0}
+
+/* Input Bar */
+.input-bar{padding:10px 16px 28px;background:#fff;border-top:1px solid #f0f2f5;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.input-field{flex:1;padding:10px 16px;border-radius:24px;border:1px solid #e0e4e8;font-size:14px;color:#8a9baa;background:#f8f9fb;font-family:'Inter',sans-serif}
+.send-btn{width:36px;height:36px;border-radius:50%;background:#1a3a4a;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.send-btn svg{width:16px;height:16px;fill:white}
+
+/* Start Overlay */
+.start-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.97);display:flex;align-items:center;justify-content:center;z-index:60;border-radius:50px}
 .start-overlay.hidden{display:none}
-.start-btn{padding:16px 40px;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(27,107,147,0.3);transition:transform .2s,box-shadow .2s}
-.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(27,107,147,0.4)}
-.start-content{text-align:center}
-.start-content h2{font-size:24px;color:#1a2332;margin-bottom:8px}
-.start-content p{font-size:14px;color:#5a6b7b;margin-bottom:24px;max-width:440px}
-.dep-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px}
-.dep-row:nth-child(odd){background:#f8fafb}
-.dep-check{color:#27ae60;font-weight:700}
+.start-content{text-align:center;padding:40px}
+.start-content h2{font-size:22px;color:#1a2332;margin-bottom:6px;font-weight:700}
+.start-content p{font-size:13px;color:#5a6b7b;margin-bottom:20px;line-height:1.5}
+.start-btn{padding:14px 36px;background:#1a3a4a;color:white;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .2s}
+.start-btn:hover{transform:scale(1.04)}
+
+/* UC label */
+.uc-badge{display:inline-block;background:#1a3a4a;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;margin-bottom:10px;letter-spacing:0.5px}
+
+/* ===== UC6-specific additions ===== */
+
+/* Acuity Card */
+.acuity-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.acuity-meter{display:flex;gap:4px;margin:10px 0}
+.acuity-seg{flex:1;height:8px;border-radius:4px;background:#e8ecf0}
+.acuity-seg.low{background:#27ae60}
+.acuity-seg.med{background:#e67e22}
+.acuity-seg.high{background:#c0392b}
+.acuity-seg.active{box-shadow:0 0 6px rgba(0,0,0,0.2)}
+
+/* Handoff Card */
+.handoff-card{border-radius:16px;overflow:hidden;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.handoff-header{background:linear-gradient(135deg,#27ae60,#2ecc71);padding:14px 16px;display:flex;align-items:center;gap:10px}
+.handoff-photo{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid rgba(255,255,255,0.5)}
+.handoff-info{color:white}
+.handoff-name{font-size:15px;font-weight:700}
+.handoff-role{font-size:11px;opacity:0.8}
+.handoff-body{background:white;border:1px solid #e8ecf0;border-top:none;padding:14px 16px}
+.handoff-section{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin:8px 0 6px}
+.handoff-section:first-child{margin-top:0}
+.handoff-item{font-size:12px;color:#3a4a5a;padding:2px 0;display:flex;align-items:center;gap:6px}
+
+/* Self Care Card */
+.selfcare-card{background:#e8f8f0;border:1px solid #b8e6cc;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.selfcare-title{font-size:14px;font-weight:700;color:#1a6b42;margin-bottom:10px}
+.selfcare-item{font-size:13px;color:#2a5a3a;padding:4px 0;display:flex;align-items:flex-start;gap:8px}
+.selfcare-icon{flex-shrink:0;font-size:14px}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg></div>
-  <h1>Pager — Nurse Triage 2.0</h1>
-  <span class="header-sub">Cambia Health Solutions</span>
-</header>
-<div class="layout">
-  <aside class="sidebar">
-    <div class="sidebar-title"><span class="live-dot"></span>Triage Command Center</div>
-    <div class="stat-card"><h3>Active Triage Sessions</h3><div class="stat-val">42</div><div class="stat-sub">24/7 via SMS + chat</div></div>
-    <div class="stat-card"><h3>AI-Resolved (No Nurse)</h3><div class="stat-val green" id="sAI">63%</div><div class="stat-sub">Low-acuity self-care guidance</div></div>
-    <div class="stat-card"><h3>Avg Time to Resolution</h3><div class="stat-val" style="font-size:22px">4.1 min</div><div class="stat-sub">vs. 12 min phone NAL average</div></div>
-    <div class="stat-card"><h3>ED Diversions Today</h3><div class="stat-val green" id="sDiv">31</div><div class="stat-sub">Members routed to lower-cost care</div></div>
-    <div class="stat-card"><h3>Nurse Escalations</h3><div class="stat-val" style="font-size:22px">37%</div><div class="stat-sub">High-acuity, seamless handoff</div></div>
-    <div style="margin-top:16px">
-      <div class="sidebar-title">Resolution Breakdown</div>
-      <div class="triage-row"><span style="color:#3a4a5a">Self-care guidance</span><span style="font-weight:600;color:#27ae60">38%</span></div>
-      <div class="triage-row"><span style="color:#3a4a5a">Urgent care booked</span><span style="font-weight:600;color:#1B6B93">25%</span></div>
-      <div class="triage-row"><span style="color:#3a4a5a">Nurse escalation</span><span style="font-weight:600;color:#8e44ad">22%</span></div>
-      <div class="triage-row"><span style="color:#3a4a5a">PCP same-day</span><span style="font-weight:600;color:#1B6B93">10%</span></div>
-      <div class="triage-row"><span style="color:#3a4a5a">ER (appropriate)</span><span style="font-weight:600;color:#c0392b">5%</span></div>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">11:45</span>
+    <span class="icons"><span>5G</span> <span>&#9679;</span></span>
+  </div>
+  <div class="chat-header">
+    <span class="back">&#8249;</span>
+    <h1>Your Regence Companion</h1>
+  </div>
+  <div class="chat-body" id="chat"></div>
+  <div class="input-bar">
+    <input class="input-field" placeholder="Type a message..." readonly>
+    <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-content">
+      <div class="uc-badge">USE CASE 6</div>
+      <h2>Nurse Triage 2.0</h2>
+      <p>AI-powered clinical intake with smart nurse handoff — 24/7 symptom assessment, acuity scoring, and seamless context transfer.</p>
+      <button class="start-btn" onclick="startDemo()">Start Demo</button>
     </div>
-  </aside>
-  <main class="chat-area">
-    <div class="start-overlay" id="startOverlay">
-      <div class="start-content">
-        <h2>Nurse Triage 2.0</h2>
-        <p>Watch Pager conduct AI intake, score acuity, resolve low-acuity cases with self-care, and seamlessly hand off high-acuity cases to a live nurse — all in the same thread.</p>
-        <button class="start-btn" onclick="startDemo()">Start Demo</button>
-      </div>
-    </div>
-    <div class="chat-messages" id="chat"></div>
-  </main>
+  </div>
 </div>
+
 <script>
-const chat=document.getElementById('chat');let si=0;
+const chat=document.getElementById('chat');
+let si=0;
+
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(type){const d=document.createElement('div');d.className='typing';d.id='typing';const isNurse=type==='nurse';const bg=isNurse?'background:linear-gradient(135deg,#8e44ad,#a569bd)':'background:linear-gradient(135deg,#1B6B93,#4FC0D0)';const lbl=isNurse?'RN':'P';d.innerHTML=`<div class="avatar" style="${bg};color:white;font-size:12px;font-weight:700">${lbl}</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
-function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html,type='pager'){rt();const d=document.createElement('div');d.className=`message ${type}`;let av,st;if(type==='pager'){av='P';st='background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white'}else if(type==='nurse'){av='RN';st='background:linear-gradient(135deg,#8e44ad,#a569bd);color:white'}else{av='D';st='background:#e8ecf0;color:#3a4a5a'}d.innerHTML=`<div class="avatar" style="${st};font-size:${type==='nurse'?'10':'12'}px;font-weight:700">${av}</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+
+function addEl(html,cls=''){
+  const d=document.createElement('div');
+  if(cls)d.className=cls;
+  d.innerHTML=html;
+  chat.appendChild(d);
+  sb();
+  return d;
+}
+
+function addTyping(){
+  const d=document.createElement('div');d.className='typing';d.id='typing';
+  d.innerHTML=`<div class="avatar">R</div><div class="dots"><span></span><span></span><span></span></div>`;
+  chat.appendChild(d);sb();
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+function botMsg(text){
+  removeTyping();
+  addEl(`<div class="avatar">R</div><div class="bub">${text}</div>`,'msg bot');
+}
+function userMsg(text){
+  addEl(`<div class="bub">${text}</div>`,'msg user');
+}
+function actionBtn(text){
+  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
+}
 
 const steps=[
-// Member initiates
-{delay:800,action:()=>{am("My 4-year-old daughter has had a fever of 102 for two days and she's pulling at her ear. It's 11pm — should I take her to the ER?","member")}},
+// 1. Timestamp
+{delay:500,action:()=>{addEl('Today 11:45 PM','timestamp')}},
 
-// Pager intake
-{delay:1500,action:()=>at()},
-{delay:3500,action:()=>{
-am(`I understand how concerning that must be. Let me help you figure out the best next step. A few quick questions:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div><h4>AI Intake — Pediatric Triage</h4></div>
-  <div class="gc-b">
-    <div class="assess-row"><span class="assess-label">Patient</span><span class="assess-val" style="color:#1B6B93">4-year-old female</span></div>
-    <div class="assess-row"><span class="assess-label">Temperature</span><span class="assess-val" style="color:#e67e22">102°F (2 days)</span></div>
-    <div class="assess-row"><span class="assess-label">Ear pulling</span><span class="assess-val" style="color:#e67e22">Yes</span></div>
-    <div class="assess-row"><span class="assess-label">Rash?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
-    <div class="assess-row"><span class="assess-label">Fluid intake?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
-    <div class="assess-row"><span class="assess-label">Breathing difficulty?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
-    <div class="assess-row"><span class="assess-label">Responsiveness?</span><span class="assess-val" style="color:#7a8a9a">Checking...</span></div>
-  </div>
-</div>
-Is she drinking fluids? Any rash, difficulty breathing, or unusual drowsiness?`)}},
+// 2. User message
+{delay:800,action:()=>{userMsg("My 4-year-old has had a fever of 102.5 for the past few hours and he's really fussy. Should I take him to the ER?")}},
 
-// Member responds
-{delay:2500,action:()=>{am("She's been drinking some water and juice. No rash. Breathing seems normal. She's fussy but alert when awake.","member")}},
+// 3. Typing then bot
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("I understand your concern — a fever in a young child can be scary. Let me ask a few important questions to help determine the best next step.")}},
 
-// Pager acuity scoring
-{delay:1500,action:()=>at()},
-{delay:4000,action:()=>{
-am(`Thank you — that's really helpful. Based on the symptoms, here's my assessment:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon" style="background:#e67e22"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div><h4>Acuity Assessment</h4></div>
-  <div class="gc-b">
-    <div class="assess-row"><span class="assess-label">Acuity Level</span><div class="severity-bar"><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:8px;font-weight:600;color:#e67e22">MODERATE</span></div></div>
-    <div class="assess-row"><span class="assess-label">Likely Dx</span><span class="assess-val">Acute otitis media (ear infection)</span></div>
-    <div class="assess-row"><span class="assess-label">ER Needed?</span><span class="assess-val" style="color:#27ae60">No — can wait for urgent care</span></div>
-    <div class="assess-row"><span class="assess-label">Reassuring Signs</span><span class="assess-val" style="color:#27ae60">Alert, drinking fluids, no rash</span></div>
-    <div class="assess-row"><span class="assess-label">Decision</span><span class="assess-val" style="color:#8e44ad">Escalate to nurse — pediatric fever + 2 days</span></div>
-  </div>
-</div>
-This looks like it could be an ear infection — common and treatable. Since she's had a fever for 2 days, I'm going to bring a nurse into our conversation to review. They'll have full context — <strong>you won't need to repeat anything</strong>.`)}},
+// 4. Bot asks about symptoms
+{delay:1500,action:()=>{botMsg("First, besides the fever, is Tyler experiencing any of these symptoms?")}},
 
-// Nurse handoff
-{delay:2000,action:()=>{
-am(`<div class="handoff-card">
-  <h5><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#8e44ad"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Nurse Handoff — Same Thread</h5>
-  <div class="handoff-row"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Full symptom history transferred</div>
-  <div class="handoff-row"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Acuity score: Moderate</div>
-  <div class="handoff-row"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Member does not need to repeat story</div>
-  <div class="handoff-row"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Connecting: RN Karen Mitchell</div>
-</div>`)}},
-
-// Nurse joins
-{delay:2500,action:()=>at('nurse')},
-{delay:4000,action:()=>{
-am(`Hi, I'm Karen, one of the nurses on the Asuris triage team. I can see everything you've shared — your daughter's 102° fever for 2 days and the ear pulling.
-
-A couple more questions: Has she had ear infections before? And has she had any vomiting or diarrhea with the fever?`,'nurse')}},
-
-// Member responds to nurse
-{delay:2500,action:()=>{am("She had one ear infection about 6 months ago. No vomiting or diarrhea.","member")}},
-
-// Nurse recommendation
-{delay:1500,action:()=>at('nurse')},
-{delay:4000,action:()=>{
-am(`Good — that history is helpful. This is very consistent with another ear infection. Here's my recommendation:
-
-<div class="selfcare-card">
-  <h5>Tonight (Safe to Wait)</h5>
-  <div class="selfcare-item">Children's ibuprofen per weight-based dosing for fever and pain</div>
-  <div class="selfcare-item">Keep her hydrated — water, diluted juice, popsicles all count</div>
-  <div class="selfcare-item">Slightly elevated pillow can ease ear pressure</div>
-</div>
-
-<strong>Tomorrow morning:</strong> She needs to be seen for an exam and likely antibiotics. Pager can book a same-day urgent care or PCP visit right now — would you like that?`,'nurse')}},
-
-// Member agrees
-{delay:2000,action:()=>{am("Yes please! Her pediatrician if possible.","member")}},
-
-// Pager books
-{delay:1200,action:()=>at()},
-{delay:3500,action:()=>{
-am(`I've got her booked:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><h4>Appointment Confirmed</h4></div>
-  <div class="gc-b">
-    <div class="appt-item">
-      <div class="appt-icon" style="background:#e8f8f0"><svg style="fill:#27ae60" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg></div>
-      <div class="appt-det"><h5>Dr. Priya Sharma — Pediatrics</h5><p>Tomorrow, March 30 at 8:30 AM · First available slot</p><p style="color:#27ae60;font-weight:500">$25 copay · In-network</p></div>
+// 5. Symptom chips
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">SYMPTOMS REPORTED</div>
+    <div class="symptom-chips">
+      <span class="chip">Rash</span>
+      <span class="chip selected">Vomiting</span>
+      <span class="chip">Difficulty breathing</span>
+      <span class="chip">Stiff neck</span>
+      <span class="chip selected">Ear pain</span>
+      <span class="chip selected">Cough</span>
+      <span class="chip">Diarrhea</span>
+      <span class="chip">Lethargy</span>
     </div>
-    <div style="background:#e8f8f0;border-radius:8px;padding:10px;font-size:12px;color:#1a6b42;margin-top:8px">
-      <strong>Symptom summary + nurse notes sent to Dr. Sharma's office.</strong> No paperwork for you.
-    </div>
-  </div>
-</div>
-Nurse Karen's notes are attached to the visit. If anything changes overnight — fever above 104°, difficulty breathing, or she becomes unresponsive — go to the ER immediately.`);
-// Update sidebar
-const d=document.getElementById('sDiv');d.textContent='32';d.classList.add('up');
-setTimeout(()=>d.classList.remove('up'),700);
+  `,'symptom-card');
 }},
 
-// Data dependencies
-{delay:2500,action:()=>at()},
-{delay:3500,action:()=>{
-am(`To power this triage experience, Pager needs the following from Cambia:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
-  <div class="gc-b">
-    <div style="display:flex;flex-direction:column;gap:4px">
-      <div class="dep-row"><span class="dep-check">✓</span> Member info (ID, name, contact, language, PCP)</div>
-      <div class="dep-row"><span class="dep-check">✓</span> Provider directory data or API/MCP (incl cost/quality tiers)</div>
-      <div class="dep-row"><span class="dep-check">✓</span> Benefit plan details &amp; MRF data for OOP estimation</div>
-      <div class="dep-row"><span class="dep-check">✓</span> Services outside defined benefit (e.g., telemedicine)</div>
+// 6. Bot asks about duration and fluids
+{delay:1500,action:()=>{botMsg("How long has he had the fever? And has he been able to keep fluids down?")}},
+
+// 7. User responds
+{delay:1500,action:()=>{userMsg("About 5 hours. He vomited once but has been drinking a little water since.")}},
+
+// 8. Typing then bot asks vaccinations
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("Thank you. Let me also check — is Tyler up to date on his vaccinations, and has he been around anyone who's been sick recently?")}},
+
+// 9. User responds
+{delay:1500,action:()=>{userMsg("Yes, vaccinations are current. A few kids at daycare had a cold last week.")}},
+
+// 10. Typing then assessment intro
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("Based on what you've described, here's my assessment:")}},
+
+// 11. Acuity Card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="assess-label">TRIAGE ASSESSMENT</div>
+    <div class="assess-title">Upper Respiratory Infection with Fever</div>
+    <div class="acuity-meter">
+      <div class="acuity-seg low"></div>
+      <div class="acuity-seg low"></div>
+      <div class="acuity-seg low"></div>
+      <div class="acuity-seg med active"></div>
+      <div class="acuity-seg high"></div>
     </div>
-  </div>
-</div>`);
-}}
+    <div style="font-size:13px;font-weight:600;color:#e67e22;margin-bottom:12px">Moderate Acuity — Level 3</div>
+    <div class="assess-section">KEY FINDINGS</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Fever 102.5&deg;F (within manageable range for age)</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Mild vomiting with fluid intake maintained</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Ear pain suggests possible otitis media</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Daycare exposure consistent with viral URI</div>
+  `,'acuity-card');
+}},
+
+// 12. Bot explains assessment
+{delay:2000,action:()=>{botMsg("Tyler's symptoms suggest a viral upper respiratory infection, possibly with an ear infection. This doesn't require an ER visit tonight, but I'd recommend a pediatrician visit tomorrow. Given the ear pain, I want to connect you with a nurse to discuss this further.")}},
+
+// 13. Bot announces handoff
+{delay:2000,action:()=>{botMsg("Let me transfer you to Nurse Sarah — she specializes in pediatric care. I'll share everything we've discussed so you won't need to repeat anything.")}},
+
+// 14. Handoff Card
+{delay:1500,action:()=>{
+  addEl(`
+    <div class="handoff-header">
+      <div class="handoff-photo">&#129681;</div>
+      <div class="handoff-info">
+        <div class="handoff-name">Sarah Chen, RN</div>
+        <div class="handoff-role">Pediatric Triage Nurse &middot; Available now</div>
+      </div>
+    </div>
+    <div class="handoff-body">
+      <div class="handoff-section">CONTEXT TRANSFERRED</div>
+      <div class="handoff-item">&#128203; 4yo male, fever 102.5&deg;F &times; 5hrs</div>
+      <div class="handoff-item">&#128203; Vomiting &times;1, ear pain, cough</div>
+      <div class="handoff-item">&#128203; Fluid intake maintained</div>
+      <div class="handoff-item">&#128203; Daycare exposure, vaccines current</div>
+      <div class="handoff-section">AI ASSESSMENT</div>
+      <div class="handoff-item">&#129302; Moderate acuity — URI + possible otitis media</div>
+    </div>
+  `,'handoff-card');
+}},
+
+// 15. Nurse Sarah greeting
+{delay:2000,action:()=>{botMsg("Hi Jennifer, this is Nurse Sarah. I've reviewed everything your health companion gathered. Tyler's symptoms are consistent with what we've been seeing from daycare this season.")}},
+
+// 16. Nurse recommends
+{delay:1800,action:()=>{botMsg("For tonight, here's what I recommend:")}},
+
+// 17. Self-Care Card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="selfcare-title">Tonight's Care Plan for Tyler</div>
+    <div class="selfcare-item"><span class="selfcare-icon">&#127777;&#65039;</span>Children's Tylenol (acetaminophen) per package dosing for his weight</div>
+    <div class="selfcare-item"><span class="selfcare-icon">&#128167;</span>Small frequent sips of water, Pedialyte, or diluted juice</div>
+    <div class="selfcare-item"><span class="selfcare-icon">&#128705;</span>Lukewarm bath if fever rises above 103&deg;F</div>
+    <div class="selfcare-item"><span class="selfcare-icon">&#128564;</span>Keep him comfortable — light clothing, cool room</div>
+  `,'selfcare-card');
+}},
+
+// 18. Bot offers appointment
+{delay:2000,action:()=>{botMsg("I'd also like to get him seen by his pediatrician tomorrow for the ear pain. Let me find available appointments:")}},
+
+// 19. Provider Card — Dr. Amy Lin
+{delay:1500,action:()=>{
+  addEl(`
+    <div class="provider-check">&#10003;</div>
+    <div class="provider-top">
+      <div class="provider-photo">AL</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. Amy Lin, MD</div>
+        <div class="provider-spec">Pediatrics &middot; Regence Preferred</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(342)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="provider-meta"><span>&#128118; Tyler's pediatrician</span><span>&#128176; $20 copay</span></div>
+    <div class="slots">
+      <span class="slot selected">Tomorrow &middot; 8:30 AM</span>
+      <span class="slot">Tomorrow &middot; 10:15 AM</span>
+      <span class="slot">Tomorrow &middot; 2:00 PM</span>
+    </div>
+  `,'provider-card selected');
+}},
+
+// 20. User action — book
+{delay:1500,action:()=>{actionBtn("Book 8:30 AM")}},
+
+// 21. Safety card
+{delay:1500,action:()=>{
+  addEl(`
+    <h5>Go to the ER or call 911 if Tyler experiences:</h5>
+    <div class="safety-item">&#9888; Fever rises above 104&deg;F</div>
+    <div class="safety-item">&#9888; Difficulty breathing or rapid breathing</div>
+    <div class="safety-item">&#9888; Becomes unusually lethargic or difficult to wake</div>
+    <div class="safety-item">&#9888; Develops a rash that doesn't blanch with pressure</div>
+    <div class="safety-item">&#9888; Stops drinking fluids entirely</div>
+  `,'safety-card');
+}},
+
+// 22. Final bot message
+{delay:1500,action:()=>{
+  botMsg("You're doing a great job, Jennifer. Dr. Lin's office will see Tyler at 8:30 AM tomorrow. I'll send a text reminder in the morning. If anything changes tonight, text us back anytime — we're here 24/7. &#128154;");
+}},
 ];
 
-function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}
-function startDemo(){document.getElementById('startOverlay').classList.add('hidden');rs()}
+function runStep(){
+  if(si>=steps.length)return;
+  const s=steps[si];si++;
+  setTimeout(()=>{s.action();runStep()},s.delay);
+}
+function startDemo(){
+  document.getElementById('startOverlay').classList.add('hidden');
+  runStep();
+}
 </script>
 </body>
 </html>
