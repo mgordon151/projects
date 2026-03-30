@@ -89,7 +89,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 
 /* Time Slots */
 .slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.slot{padding:6px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b}
+.slot{padding:6px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b;cursor:pointer;transition:all .2s}
+.slot:hover{background:#e0e4e8}
 .slot.selected{background:#1a3a4a;color:white}
 
 /* Input Bar */
@@ -178,57 +179,77 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-let si=0;
+const chat = document.getElementById('chat');
 
-function sb(){chat.scrollTop=chat.scrollHeight}
+function sb() { chat.scrollTop = chat.scrollHeight; }
 
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function addEl(html, cls = '') {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.innerHTML = html;
   chat.appendChild(d);
   sb();
   return d;
 }
 
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
-}
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
-
-function botMsg(text){
-  removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
+function botMsg(text) {
+  return addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`, 'msg bot');
 }
 
-const steps=[
-// 1. Timestamp
-{delay:500,action:()=>{addEl('Today 9:00 AM','timestamp')}},
+function userMsg(text) {
+  return addEl(`<div class="bub">${text}</div>`, 'msg user');
+}
 
-// 2. Bot: proactive outreach
-{delay:800,action:()=>{botMsg("Good morning Lisa! &#127807; This is ARIA, your health companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?")}},
+function actionBtn(text) {
+  return new Promise(resolve => {
+    const el = addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`, 'actions');
+    el.querySelector('.action-btn').addEventListener('click', () => {
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.5';
+      resolve(text);
+    });
+  });
+}
 
-// 3. User responds
-{delay:2000,action:()=>{userMsg("I've been meaning to schedule those but keep putting it off. What do I need?")}},
+function addLoading(text) {
+  return addEl(`<div class="spinner"></div> ${text}`, 'loading-state');
+}
 
-// 4. Bot typing then message
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("No worries — let me show you where you stand:")}},
+async function typing(ms = 1200) {
+  const d = document.createElement('div');
+  d.className = 'typing'; d.id = 'typing';
+  d.innerHTML = `<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
+  chat.appendChild(d); sb();
+  await wait(ms);
+  d.remove();
+}
 
-// 4b. Loading state — wellness data
-{delay:1000,action:()=>{addEl('<div class="spinner"></div> Pulling your wellness data ...','loading-state')}},
+async function startDemo() {
+  document.getElementById('startOverlay').classList.add('hidden');
 
-// 5. GenUI — Wellness Score Card
-{delay:1500,action:()=>{
+  // 1. Timestamp
+  await wait(500);
+  addEl('Today 9:00 AM', 'timestamp');
+
+  // 2. Bot: greeting about preventive care
+  await typing(1000);
+  botMsg("Good morning Lisa! &#127807; This is ARIA, your health companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?");
+
+  // 3. USER CLICK: "What do I need?"
+  await actionBtn("What do I need?");
+  userMsg("I've been meaning to schedule those but keep putting it off. What do I need?");
+
+  // 4. Loading: "Pulling your wellness data..."
+  await typing(1000);
+  botMsg("No worries — let me show you where you stand:");
+  await wait(600);
+  const loader1 = addLoading('Pulling your wellness data ...');
+  await wait(1800);
+  loader1.remove();
+
+  // 5. Wellness score card (64/100 gradient card)
   addEl(`
     <div class="wellness-score">64</div>
     <div class="wellness-label">Wellness Score &middot; out of 100</div>
@@ -240,17 +261,20 @@ const steps=[
       <div class="wellness-item"><span>Flu Vaccine</span><span class="done">Complete &#10003;</span></div>
       <div class="wellness-item"><span>Dental Check</span><span class="pending">Due in 2 months</span></div>
     </div>
-  `,'wellness-card');
-}},
+  `, 'wellness-card');
 
-// 6. Bot: score explanation
-{delay:1800,action:()=>{botMsg("You're at 64 out of 100 — completing your overdue screenings would bump you to 88. Here's the breakdown:")}},
+  // 6. Bot: explains score
+  await wait(800);
+  await typing(1200);
+  botMsg("You're at 64 out of 100 — completing your overdue screenings would bump you to 88. Here's the breakdown:");
 
-// 6b. Loading state — screening records
-{delay:1000,action:()=>{addEl('<div class="spinner"></div> Checking screening records ...','loading-state')}},
+  // 7. Loading: "Checking screening records..."
+  await wait(600);
+  const loader2 = addLoading('Checking screening records ...');
+  await wait(1800);
+  loader2.remove();
 
-// 7. GenUI — Screening Details Card
-{delay:1500,action:()=>{
+  // 8. Screening details card (with urgency icons)
   addEl(`
     <div class="assess-label">PREVENTIVE SCREENINGS</div>
     <div class="screening-row">
@@ -285,30 +309,31 @@ const steps=[
       </div>
       <span class="screening-status complete">COMPLETE</span>
     </div>
-  `,'screening-card');
-}},
+  `, 'screening-card');
 
-// 8. Bot: colorectal priority
-{delay:2000,action:()=>{botMsg("The colorectal screening is the priority — you're 3 months overdue. The good news? You can do a Cologuard home test kit, no prep or office visit needed. Want me to order one?")}},
+  // 9. Bot: recommends Cologuard home kit
+  await wait(800);
+  await typing(1400);
+  botMsg("The colorectal screening is the priority — you're 3 months overdue. The good news? You can do a Cologuard home test kit, no prep or office visit needed. Want me to order one?");
 
-// 9. User action
-{delay:1500,action:()=>{actionBtn("Yes, order the home kit")}},
+  // 10. USER CLICK: "Yes, order the home kit"
+  await actionBtn("Yes, order the home kit");
+  userMsg("Yes, order the home kit");
 
-// 10. Bot typing then confirmation
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Cologuard kit ordered — it'll arrive at your home in 3-5 business days with instructions. Now let's tackle that mammogram.")}},
+  // 11. Bot: confirms kit ordered, moves to mammogram
+  await typing(1400);
+  botMsg("Cologuard kit ordered — it'll arrive at your home in 3-5 business days with instructions. Now let's tackle that mammogram.");
+  await wait(600);
+  await typing(1000);
+  botMsg("Here are the top-rated imaging centers near you:");
 
-// 11. Bot: imaging centers
-{delay:1500,action:()=>{botMsg("Here are the top-rated imaging centers near you:")}},
+  // 12. Filter tabs
+  await wait(400);
+  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`, 'filter-tabs');
 
-// 12. Filter tabs
-{delay:800,action:()=>{
-  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`,'filter-tabs');
-}},
-
-// 13. Provider card 1 (selected)
-{delay:800,action:()=>{
-  addEl(`
+  // 13. Provider 1 with clickable time slots (Providence Breast Health)
+  await wait(600);
+  const provider1 = addEl(`
     <div class="provider-check">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">PB</div>
@@ -320,15 +345,14 @@ const steps=[
     </div>
     <div class="provider-meta"><span>&#128205; 1.9 miles</span><span>&#128176; $0 copay (preventive)</span></div>
     <div class="slots">
-      <span class="slot selected">Apr 10 &middot; 8:30 AM</span>
-      <span class="slot">Apr 12 &middot; 10:00 AM</span>
-      <span class="slot">Apr 14 &middot; 2:15 PM</span>
+      <span class="slot" data-slot="Apr 10 &middot; 8:30 AM">Apr 10 &middot; 8:30 AM</span>
+      <span class="slot" data-slot="Apr 12 &middot; 10:00 AM">Apr 12 &middot; 10:00 AM</span>
+      <span class="slot" data-slot="Apr 14 &middot; 2:15 PM">Apr 14 &middot; 2:15 PM</span>
     </div>
-  `,'provider-card selected');
-}},
+  `, 'provider-card selected');
 
-// 14. Provider card 2
-{delay:600,action:()=>{
+  // 14. Provider 2 (OHSU)
+  await wait(400);
   addEl(`
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">OI</div>
@@ -339,51 +363,52 @@ const steps=[
       </div>
     </div>
     <div class="provider-meta"><span>&#128205; 4.1 miles</span><span>&#128176; $0 copay</span></div>
-  `,'provider-card');
-}},
+  `, 'provider-card');
 
-// 15. User action: book
-{delay:1200,action:()=>{actionBtn("Book Apr 10 8:30 AM")}},
+  // 15. USER CLICKS a time slot
+  const selectedSlot = await new Promise(resolve => {
+    const slots = provider1.querySelectorAll('.slot');
+    slots.forEach(slot => {
+      slot.addEventListener('click', () => {
+        slots.forEach(s => s.classList.remove('selected'));
+        slot.classList.add('selected');
+        resolve(slot.getAttribute('data-slot'));
+      });
+    });
+  });
 
-// 16. Bot: booked + rewards
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Booked! One more thing — completing these screenings earns you rewards through your wellness program:")}},
+  // 16. USER CLICK: "Book [slot]"
+  await actionBtn(`Book ${selectedSlot}`);
+  userMsg(`Book ${selectedSlot}`);
 
-// 17. GenUI — Rewards card
-{delay:1200,action:()=>{
+  // 17. Bot: mentions rewards
+  await typing(1400);
+  botMsg("Booked! One more thing — completing these screenings earns you rewards through your wellness program:");
+
+  // 18. Rewards card
+  await wait(600);
   addEl(`
     <div class="assess-label">WELLNESS REWARDS</div>
     <div class="assess-title">$75 in Rewards Available</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Colorectal screening — $25 reward</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — $25 reward</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Complete wellness profile — $25 reward</div>
-  `,'assess-card');
-}},
+  `, 'assess-card');
 
-// 18. User action: wellness profile
-{delay:1500,action:()=>{actionBtn("Tell me about the wellness profile")}},
+  // 19. USER CLICK: "Tell me about the wellness profile"
+  await actionBtn("Tell me about the wellness profile");
+  userMsg("Tell me about the wellness profile");
 
-// 19. Bot typing then response
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("It's a quick online health assessment — takes about 5 minutes. You'll get personalized health insights plus the $25 reward. Want me to send you the link?")}},
+  // 20. Bot: explains wellness profile
+  await typing(1400);
+  botMsg("It's a quick online health assessment — takes about 5 minutes. You'll get personalized health insights plus the $25 reward. Want me to send you the link?");
 
-// 20. User action: send link
-{delay:1500,action:()=>{actionBtn("Yes, send me the link")}},
+  // 21. USER CLICK: "Yes, send me the link"
+  await actionBtn("Yes, send me the link");
+  userMsg("Yes, send me the link");
 
-// 21. Confirmation card
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="assess-label">WELLNESS PLAN</div>
-    <div class="assess-title">3 Actions Scheduled</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span>Cologuard Kit — Shipping in 3-5 days</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — Apr 10, 8:30 AM at Providence</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span>Health Assessment — Link sent via text</div>
-    <div style="text-align:center;margin-top:12px;font-size:14px;font-weight:700;color:#1a2332">Projected Score: <span style="color:#8a9baa">64</span> <span style="color:#8a9baa">&rarr;</span> <span style="color:#27ae60">88</span></div>
-  `,'assess-card');
-}},
-
-// 21b. Enrollment Success Card
-{delay:1200,action:()=>{
+  // 22. Enrollment card (Wellness Rewards)
+  await typing(1000);
   addEl(`
     <div class="enroll-emoji">&#127881;</div>
     <div class="enroll-title">Enrolled in Wellness Rewards</div>
@@ -394,21 +419,23 @@ const steps=[
       <span class="enroll-chip">Health Profile</span>
     </div>
     <div class="enroll-text">Complete your actions to earn up to $75 in rewards. We'll keep you on track with reminders.</div>
-  `,'enroll-card');
-}},
+  `, 'enroll-card');
 
-// 22. Bot: closing
-{delay:1500,action:()=>{botMsg("You're taking great steps for your health! I'll send reminders before each appointment and follow up when the Cologuard kit arrives. Here's to hitting 88! &#128154;")}},
-];
+  // 23. Confirmation card (3 actions, projected score 64 -> 88)
+  await wait(600);
+  addEl(`
+    <div class="assess-label">WELLNESS PLAN</div>
+    <div class="assess-title">3 Actions Scheduled</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Cologuard Kit — Shipping in 3-5 days</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — ${selectedSlot} at Providence</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Health Assessment — Link sent via text</div>
+    <div style="text-align:center;margin-top:12px;font-size:14px;font-weight:700;color:#1a2332">Projected Score: <span style="color:#8a9baa">64</span> <span style="color:#8a9baa">&rarr;</span> <span style="color:#27ae60">88</span></div>
+  `, 'assess-card');
 
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
-}
-function startDemo(){
-  document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  // 24. Bot: closing message
+  await wait(600);
+  await typing(1200);
+  botMsg("You're taking great steps for your health! I'll send reminders before each appointment and follow up when the Cologuard kit arrives. Here's to hitting 88! &#128154;");
 }
 </script>
 </body>
