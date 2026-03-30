@@ -7,316 +7,374 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,sans-serif;background:#F8FAFB;color:#1a2332;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:linear-gradient(135deg,#1B6B93,#155a7a);padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(27,107,147,0.15);z-index:10}
-.header-logo{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center}
-.header-logo svg{width:22px;height:22px;fill:white}
-.header h1{color:white;font-size:18px;font-weight:600}
-.header-sub{color:rgba(255,255,255,0.7);font-size:12px;margin-left:auto}
-.layout{display:flex;flex:1;overflow:hidden}
-.sidebar{width:320px;background:white;border-right:1px solid #e8ecf0;padding:20px;overflow-y:auto;flex-shrink:0}
-.sidebar-title{font-size:13px;font-weight:600;color:#1B6B93;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
-.stat-card{background:#f0f7fa;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #e0eff5}
-.stat-card h3{font-size:12px;font-weight:500;color:#5a6b7b;margin-bottom:6px}
-.stat-val{font-size:28px;font-weight:700;color:#1B6B93}
-.stat-sub{font-size:11px;color:#7a8a9a;margin-top:4px}
-.stat-val.green{color:#27ae60}
-.lob-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f5;font-size:12px}
-.lob-row:last-child{border-bottom:none}
-.lob-name{color:#3a4a5a}
-.lob-pct{font-weight:600;color:#1B6B93}
-.channel-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px}
-.channel-name{color:#5a6b7b}
-.channel-val{font-weight:600;color:#1B6B93}
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
-.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
-.chat-messages::-webkit-scrollbar{width:6px}
-.chat-messages::-webkit-scrollbar-thumb{background:#cdd5dc;border-radius:3px}
-.message{display:flex;gap:10px;max-width:85%;opacity:0;transform:translateY(12px);animation:msgIn .4s ease forwards}
+body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135deg,#e8eef5,#f5f7fb,#ebf0f9);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+
+/* iPhone Frame */
+.phone{width:390px;height:844px;background:#fff;border-radius:50px;box-shadow:0 24px 80px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.04);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:50}
+.status-bar{height:54px;background:#1a3a4a;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;z-index:40;flex-shrink:0}
+.status-bar .time{color:white;font-size:15px;font-weight:600}
+.status-bar .icons{display:flex;gap:4px;align-items:center;color:white;font-size:12px}
+.status-bar .icons span{font-weight:600}
+
+/* Header */
+.chat-header{background:#1a3a4a;padding:10px 20px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-header .back{color:white;font-size:22px;font-weight:300;cursor:pointer;line-height:1}
+.chat-header h1{color:white;font-size:17px;font-weight:600;flex:1;text-align:center;margin-right:22px}
+
+/* Chat Area */
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#fff}
+.chat-body::-webkit-scrollbar{width:0}
+
+/* Timestamp */
+.timestamp{text-align:center;font-size:11px;color:#8a9baa;padding:4px 0}
+
+/* Messages */
+.msg{display:flex;gap:8px;max-width:88%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
 @keyframes msgIn{to{opacity:1;transform:translateY(0)}}
-.message.aria{align-self:flex-start}
-.avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white}
-.bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.55;background:white;border:1px solid #e4e9ed;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.typing{display:flex;gap:10px;align-self:flex-start}
-.typing .dots{display:flex;gap:4px;padding:14px 18px;background:white;border:1px solid #e4e9ed;border-radius:16px;border-bottom-left-radius:4px}
-.typing .dots span{width:7px;height:7px;background:#b0bec5;border-radius:50%;animation:bounce 1.2s infinite}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:32px;height:32px;border-radius:50%;background:#1a3a4a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:white;font-family:Georgia,serif}
+.bub{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;max-width:100%}
+.msg.bot .bub{background:#f0f2f5;color:#1a2332;border-bottom-left-radius:4px}
+.msg.user .bub{background:#1a3a4a;color:white;border-bottom-right-radius:4px}
+
+/* Typing */
+.typing{display:flex;gap:8px;align-self:flex-start;opacity:0;animation:msgIn .35s ease forwards}
+.typing .dots{display:flex;gap:4px;padding:12px 16px;background:#f0f2f5;border-radius:18px;border-bottom-left-radius:4px}
+.typing .dots span{width:6px;height:6px;background:#8a9baa;border-radius:50%;animation:bounce 1.2s infinite}
 .typing .dots span:nth-child(2){animation-delay:.15s}
 .typing .dots span:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-.gc{background:white;border:1px solid #e0e8ef;border-radius:14px;overflow:hidden;margin-top:8px;box-shadow:0 2px 8px rgba(27,107,147,0.06)}
-.gc-h{padding:14px 18px;background:linear-gradient(135deg,#f0f7fa,#e6f3f8);border-bottom:1px solid #e0e8ef;display:flex;align-items:center;gap:8px}
-.gc-icon{width:28px;height:28px;background:#1B6B93;border-radius:8px;display:flex;align-items:center;justify-content:center}
-.gc-icon svg{width:16px;height:16px;fill:white}
-.gc-icon.green{background:#27ae60}
-.gc-h h4{font-size:14px;font-weight:600;color:#1a2332}
-.gc-b{padding:16px 18px}
-.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.sg-i{text-align:center;padding:12px 8px;background:#f8fafb;border-radius:10px}
-.sg-n{font-size:20px;font-weight:700;color:#1B6B93}
-.sg-l{font-size:10px;color:#7a8a9a;margin-top:2px}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px 4px 2px 0}
-.badge-red{background:#ffeaea;color:#c0392b}
-.badge-green{background:#e8f8f0;color:#1a6b42}
-.badge-blue{background:#e6f3f8;color:#1B6B93}
-.badge-orange{background:#fff3e0;color:#e67e22}
-.fl{font-size:12px;font-weight:600;color:#5a6b7b;margin-bottom:8px;margin-top:14px}
-.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.field{padding:6px 0}
-.field-l{font-size:10px;font-weight:600;color:#7a8a9a;text-transform:uppercase;letter-spacing:.5px}
-.field-v{font-size:13px;color:#1a2332;margin-top:2px}
-.wellness-score{display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafb;border-radius:10px;margin:8px 0}
-.ws-circle{width:52px;height:52px;border-radius:50%;border:4px solid #e67e22;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#e67e22;flex-shrink:0}
-.ws-label{font-size:12px;color:#5a6b7b}
-.sms-mock{background:#1a1a2e;border-radius:20px;padding:16px;max-width:300px;margin:0 auto}
-.sms-hdr{text-align:center;color:#8a8a9a;font-size:11px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #2a2a3e}
-.sms-b{padding:10px 14px;border-radius:16px;font-size:12px;line-height:1.5;margin-bottom:8px;max-width:85%}
-.sms-b.out{background:#1B6B93;color:white;margin-left:auto;border-bottom-right-radius:4px}
-.sms-b.in{background:#2a2a3e;color:#e0e0e0;border-bottom-left-radius:4px}
-.appt-item{display:flex;gap:12px;padding:12px;background:#f8fafb;border-radius:10px;margin-bottom:8px;align-items:flex-start}
-.appt-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.appt-icon svg{width:18px;height:18px}
-.appt-det h5{font-size:13px;font-weight:600;color:#1a2332}
-.appt-det p{font-size:12px;color:#5a6b7b;margin-top:2px}
-.roadmap{position:relative;padding-left:24px;margin-top:8px}
-.roadmap::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:#e0e8ef}
-.rm-step{position:relative;padding:10px 0 10px 16px;font-size:13px}
-.rm-step::before{content:'';position:absolute;left:-20px;top:14px;width:12px;height:12px;border-radius:50%;border:2px solid #4FC0D0;background:white;z-index:1}
-.rm-step.next::before{background:#4FC0D0;box-shadow:0 0 0 4px rgba(79,192,208,0.2)}
-.rm-step h5{font-size:13px;font-weight:600;color:#1a2332}
-.rm-step p{font-size:11px;color:#5a6b7b;margin-top:2px}
-.compare-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-top:8px}
-.compare-col{text-align:center;padding:16px;border-radius:12px}
-.compare-col.old{background:#ffeaea}
-.compare-col.new{background:#e8f8f0}
-.compare-col h5{font-size:12px;font-weight:600;margin-bottom:10px}
-.compare-col .cv{font-size:22px;font-weight:700;margin-bottom:4px}
-.compare-col .cl{font-size:11px;color:#5a6b7b}
-.compare-col.old .cv{color:#c0392b}
-.compare-col.new .cv{color:#27ae60}
-.compare-arrow{font-size:24px;color:#4FC0D0;font-weight:700}
-.impact-bar{background:linear-gradient(135deg,#e8f8f0,#d4f0e2);border-radius:10px;padding:14px;margin-top:14px;font-size:13px;color:#1a6b42}
-.start-overlay{position:absolute;inset:0;background:rgba(248,250,251,0.95);display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px)}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Suggested Actions */
+.actions{display:flex;flex-direction:column;gap:8px;align-self:flex-end;max-width:88%;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px)}
+.action-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#1a3a4a;color:white;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-end}
+.action-btn .icon{font-size:12px;opacity:0.7}
+
+/* GenUI Cards */
+.card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;overflow:hidden;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);max-width:100%;align-self:flex-start}
+.card-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;padding:14px 16px 0}
+
+/* Assessment Card */
+.assess-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.assess-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.assess-title{font-size:16px;font-weight:700;color:#1a2332;margin-bottom:6px}
+.assess-badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#fff3e0;color:#e67e22;margin-bottom:12px}
+.assess-section{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 8px}
+.assess-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;color:#1a2332}
+.assess-check{width:20px;height:20px;border-radius:50%;background:#27ae60;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0}
+
+/* Provider Card */
+.provider-card{background:white;border:2px solid #e8ecf0;border-radius:16px;padding:14px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;position:relative}
+.provider-card.selected{border-color:#1a3a4a}
+.provider-top{display:flex;gap:10px;align-items:flex-start}
+.provider-photo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1a3a4a,#2d6b7a);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:600;flex-shrink:0}
+.provider-info{flex:1}
+.provider-name{font-size:15px;font-weight:700;color:#1a2332}
+.provider-spec{font-size:12px;color:#5a6b7b;margin-top:1px}
+.provider-rating{display:flex;align-items:center;gap:4px;margin-top:4px}
+.stars{color:#e67e22;font-size:12px}
+.rating-num{font-size:13px;font-weight:600;color:#1a2332}
+.rating-count{font-size:11px;color:#8a9baa}
+.tier-badge{font-size:11px;font-weight:600;color:#27ae60;margin-left:auto}
+.provider-check{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;background:#1a3a4a;display:flex;align-items:center;justify-content:center;color:white;font-size:12px}
+.provider-meta{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.provider-meta span{font-size:11px;color:#5a6b7b}
+
+/* Filter Tabs */
+.filter-tabs{display:flex;gap:8px;padding:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start}
+.filter-tab{padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.filter-tab.active{background:#1a3a4a;color:white}
+
+/* Time Slots */
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.slot{padding:6px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b}
+.slot.selected{background:#1a3a4a;color:white}
+
+/* Input Bar */
+.input-bar{padding:10px 16px 28px;background:#fff;border-top:1px solid #f0f2f5;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.input-field{flex:1;padding:10px 16px;border-radius:24px;border:1px solid #e0e4e8;font-size:14px;color:#8a9baa;background:#f8f9fb;font-family:'Inter',sans-serif}
+.send-btn{width:36px;height:36px;border-radius:50%;background:#1a3a4a;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.send-btn svg{width:16px;height:16px;fill:white}
+
+/* Start Overlay */
+.start-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.97);display:flex;align-items:center;justify-content:center;z-index:60;border-radius:50px}
 .start-overlay.hidden{display:none}
-.start-btn{padding:16px 40px;background:linear-gradient(135deg,#1B6B93,#4FC0D0);color:white;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(27,107,147,0.3);transition:transform .2s,box-shadow .2s}
-.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(27,107,147,0.4)}
-.start-content{text-align:center}
-.start-content h2{font-size:24px;color:#1a2332;margin-bottom:8px}
-.start-content p{font-size:14px;color:#5a6b7b;margin-bottom:24px;max-width:440px}
+.start-content{text-align:center;padding:40px}
+.start-content h2{font-size:22px;color:#1a2332;margin-bottom:6px;font-weight:700}
+.start-content p{font-size:13px;color:#5a6b7b;margin-bottom:20px;line-height:1.5}
+.start-btn{padding:14px 36px;background:#1a3a4a;color:white;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .2s}
+.start-btn:hover{transform:scale(1.04)}
+
+/* UC label */
+.uc-badge{display:inline-block;background:#1a3a4a;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;margin-bottom:10px;letter-spacing:0.5px}
+
+/* Wellness Score Card */
+.wellness-card{background:linear-gradient(135deg,#1a3a4a,#2d6b7a);border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%;color:white}
+.wellness-score{font-size:48px;font-weight:700;text-align:center;margin:8px 0}
+.wellness-label{text-align:center;font-size:12px;opacity:0.7;margin-bottom:12px}
+.wellness-bar{height:6px;background:rgba(255,255,255,0.2);border-radius:3px;margin-bottom:12px}
+.wellness-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,#e67e22,#27ae60)}
+.wellness-items{display:flex;flex-direction:column;gap:6px}
+.wellness-item{display:flex;justify-content:space-between;font-size:12px;padding:4px 0}
+.wellness-item .done{color:#27ae60;font-weight:600}
+.wellness-item .pending{color:#e67e22;font-weight:600}
+
+/* Screening Card */
+.screening-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.screening-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eef2f5}
+.screening-row:last-child{border-bottom:none}
+.screening-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.screening-icon.urgent{background:#fde8e8;color:#c0392b}
+.screening-icon.soon{background:#fff3e0;color:#e67e22}
+.screening-icon.ok{background:#e8f8f0;color:#27ae60}
+.screening-info{flex:1}
+.screening-name{font-size:13px;font-weight:600;color:#1a2332}
+.screening-detail{font-size:11px;color:#8a9baa}
+.screening-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:8px}
+.screening-status.overdue{background:#fde8e8;color:#c0392b}
+.screening-status.due{background:#fff3e0;color:#e67e22}
+.screening-status.complete{background:#e8f8f0;color:#27ae60}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
-  <h1>Pager — Wellness Engagement</h1>
-  <span class="header-sub">Cambia Health Solutions</span>
-</header>
-<div class="layout">
-  <aside class="sidebar">
-    <div class="sidebar-title">Wellness Campaign Dashboard</div>
-    <div class="stat-card"><h3>Eligible Members</h3><div class="stat-val">47,320</div><div class="stat-sub">Across all LOBs</div></div>
-    <div class="stat-card"><h3>Engaged Members</h3><div class="stat-val green">14,890</div><div class="stat-sub">31.5% engagement rate</div></div>
-    <div class="stat-card"><h3>Screenings Scheduled</h3><div class="stat-val">8,240</div><div class="stat-sub">Q1 2026</div></div>
-    <div class="stat-card"><h3>Program Enrollments</h3><div class="stat-val">3,670</div><div class="stat-sub">Wellness + condition programs</div></div>
-    <div style="margin-top:16px">
-      <div class="sidebar-title">By Line of Business</div>
-      <div class="lob-row"><span class="lob-name">Regence Commercial</span><span class="lob-pct">34% engaged</span></div>
-      <div class="lob-row"><span class="lob-name">Asuris MA</span><span class="lob-pct">38% engaged</span></div>
-      <div class="lob-row"><span class="lob-name">BridgeSpan ACA</span><span class="lob-pct">27% engaged</span></div>
-      <div class="lob-row"><span class="lob-name">BCBSND</span><span class="lob-pct">29% engaged</span></div>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">9:00</span>
+    <span class="icons"><span>5G</span> <span>&#9679;</span></span>
+  </div>
+  <div class="chat-header">
+    <span class="back">&#8249;</span>
+    <h1>Your Regence Companion</h1>
+  </div>
+  <div class="chat-body" id="chat"></div>
+  <div class="input-bar">
+    <input class="input-field" placeholder="Type a message..." readonly>
+    <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-content">
+      <div class="uc-badge">USE CASE 5</div>
+      <h2>Wellness Engagement</h2>
+      <p>Proactive outreach-first wellness — personalized nudges, screening scheduling, home test kits, and rewards tracking.</p>
+      <button class="start-btn" onclick="startDemo()">Start Demo</button>
     </div>
-    <div style="margin-top:16px">
-      <div class="sidebar-title">Channel Performance</div>
-      <div class="channel-row"><span class="channel-name">SMS</span><span class="channel-val">42% response</span></div>
-      <div class="channel-row"><span class="channel-name">App Push</span><span class="channel-val">24% response</span></div>
-      <div class="channel-row"><span class="channel-name">Email</span><span class="channel-val">18% response</span></div>
-    </div>
-  </aside>
-  <main class="chat-area">
-    <div class="start-overlay" id="startOverlay">
-      <div class="start-content">
-        <h2>Wellness Engagement</h2>
-        <p>Watch Pager flip from portal-first to outreach-first — finding members where they are, personalizing nudges, and scheduling preventive services in one conversation.</p>
-        <button class="start-btn" onclick="startDemo()">Start Demo</button>
-      </div>
-    </div>
-    <div class="chat-messages" id="chat"></div>
-  </main>
+  </div>
 </div>
+
 <script>
-const chat=document.getElementById('chat');let si=0;
+const chat=document.getElementById('chat');
+let si=0;
+
 function sb(){chat.scrollTop=chat.scrollHeight}
-function at(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML=`<div class="avatar">P</div><div class="dots"><span></span><span></span><span></span></div>`;chat.appendChild(d);sb()}
-function rt(){const t=document.getElementById('typing');if(t)t.remove()}
-function am(html){rt();const d=document.createElement('div');d.className='message aria';d.innerHTML=`<div class="avatar">P</div><div class="bubble">${html}</div>`;chat.appendChild(d);sb()}
+
+function addEl(html,cls=''){
+  const d=document.createElement('div');
+  if(cls)d.className=cls;
+  d.innerHTML=html;
+  chat.appendChild(d);
+  sb();
+  return d;
+}
+
+function addTyping(){
+  const d=document.createElement('div');d.className='typing';d.id='typing';
+  d.innerHTML=`<div class="avatar">R</div><div class="dots"><span></span><span></span><span></span></div>`;
+  chat.appendChild(d);sb();
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+function botMsg(text){
+  removeTyping();
+  addEl(`<div class="avatar">R</div><div class="bub">${text}</div>`,'msg bot');
+}
+function userMsg(text){
+  addEl(`<div class="bub">${text}</div>`,'msg user');
+}
+function actionBtn(text){
+  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
+}
 
 const steps=[
-{delay:800,action:()=>at()},
-{delay:2200,action:()=>{
-am(`Good morning! I've completed the Q1 wellness outreach analysis across all lines of business:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div><h4>Q1 Wellness Outreach Summary</h4></div>
-  <div class="gc-b">
-    <div class="sg">
-      <div class="sg-i"><div class="sg-n">47,320</div><div class="sg-l">Eligible</div></div>
-      <div class="sg-i"><div class="sg-n" style="color:#27ae60">14,890</div><div class="sg-l">Engaged (31.5%)</div></div>
-      <div class="sg-i"><div class="sg-n">8,240</div><div class="sg-l">Screenings</div></div>
-      <div class="sg-i"><div class="sg-n">3,670</div><div class="sg-l">Enrolled</div></div>
-    </div>
-    <div class="fl">Engagement by LOB</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="background:#f8fafb;border-radius:8px;padding:10px"><div style="font-size:13px;font-weight:600">Regence Commercial</div><div style="font-size:11px;color:#5a6b7b">22,140 eligible · <strong style="color:#1B6B93">34%</strong> engaged</div></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px"><div style="font-size:13px;font-weight:600">Asuris MA</div><div style="font-size:11px;color:#5a6b7b">8,470 eligible · <strong style="color:#27ae60">38%</strong> engaged</div></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px"><div style="font-size:13px;font-weight:600">BridgeSpan ACA</div><div style="font-size:11px;color:#5a6b7b">11,280 eligible · <strong style="color:#1B6B93">27%</strong> engaged</div></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px"><div style="font-size:13px;font-weight:600">BCBSND</div><div style="font-size:11px;color:#5a6b7b">5,430 eligible · <strong style="color:#1B6B93">29%</strong> engaged</div></div>
-    </div>
-    <div class="fl">Channel Performance</div>
-    <div style="display:flex;gap:12px">
-      <span class="badge badge-green">SMS: 42% response</span>
-      <span class="badge badge-blue">App Push: 24%</span>
-      <span class="badge badge-blue">Email: 18%</span>
-    </div>
-  </div>
-</div>`)}},
+// 1. Timestamp
+{delay:500,action:()=>{addEl('Today 9:00 AM','timestamp')}},
 
-{delay:2500,action:()=>at()},
-{delay:4000,action:()=>{
-am(`Let me show you a live outreach example. I've identified a member due for preventive services:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><h4>Member Wellness Profile</h4></div>
-  <div class="gc-b">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-      <div><div style="font-size:18px;font-weight:700">Sarah Kim</div><div style="font-size:12px;color:#5a6b7b">Age 42 · Female · Regence Commercial PPO</div></div>
-    </div>
-    <div class="wellness-score">
-      <div class="ws-circle">62</div>
-      <div><div style="font-size:14px;font-weight:600">Wellness Score: 62/100</div><div class="ws-label">Below target — 4 preventive services due</div></div>
-    </div>
-    <div class="field-grid">
-      <div class="field"><div class="field-l">PCP</div><div class="field-v">Dr. Amy Chen — Overlake Medical</div></div>
-      <div class="field"><div class="field-l">BMI</div><div class="field-v">28.4</div></div>
-    </div>
-    <div class="fl">Services Due</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="badge badge-red">Annual wellness visit — 11 months overdue</span>
-      <span class="badge badge-red">Mammogram — age-eligible, never completed</span>
-      <span class="badge badge-orange">Flu shot — current season</span>
-      <span class="badge badge-blue">Colon cancer screening education (approaching 45)</span>
-    </div>
-    <div class="fl">Risk Factors</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="badge badge-orange">Sedentary lifestyle flag</span>
-      <span class="badge badge-red">Family history: breast cancer</span>
-    </div>
-  </div>
-</div>`)}},
+// 2. Bot: proactive outreach
+{delay:800,action:()=>{botMsg("Good morning Lisa! &#127807; This is your Regence Health Companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?")}},
 
-{delay:2500,action:()=>at()},
-{delay:4000,action:()=>{
-am(`Sarah's risk profile makes mammogram screening high priority. Reaching out with a personalized nudge:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><h4>SMS Outreach — Sarah Kim</h4></div>
-  <div class="gc-b" style="padding:0">
-    <div class="sms-mock">
-      <div class="sms-hdr">Pager Wellness · SMS</div>
-      <div class="sms-b out">Hi Sarah! This is Pager from Regence. It's been almost a year since your last wellness visit, and based on your age and family history, a mammogram screening is now recommended. Both are covered at $0 — would you like help scheduling?</div>
-      <div class="sms-b in">I've been meaning to do that but keep putting it off 😅</div>
-      <div class="sms-b out">Totally normal! I can make it easy — I'll book your wellness visit and mammogram on the same day so it's just one trip. Your PCP Dr. Chen and the Overlake Breast Center are in the same building. Any day preference?</div>
-      <div class="sms-b in">That would be amazing, can you do a Saturday?</div>
-      <div class="sms-b out">Yes! Saturday April 4 has openings. I'll book wellness at 9 AM and mammogram at 10:15 AM. You can also get your flu shot at the wellness visit — all $0 copay. Sound good?</div>
-      <div class="sms-b in">Perfect, book it!</div>
-    </div>
-  </div>
-</div>`)}},
+// 3. User responds
+{delay:2000,action:()=>{userMsg("I've been meaning to schedule those but keep putting it off. What do I need?")}},
 
-{delay:3000,action:()=>at()},
-{delay:4500,action:()=>{
-am(`Sarah's all set! Here's everything booked:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><h4>Appointments & Enrollments</h4></div>
-  <div class="gc-b">
-    <div class="appt-item">
-      <div class="appt-icon" style="background:#e8f8f0"><svg style="fill:#27ae60" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg></div>
-      <div class="appt-det"><h5>Annual Wellness Visit</h5><p>Dr. Amy Chen · Saturday April 4 at 9:00 AM · <strong style="color:#27ae60">$0 copay</strong></p></div>
-    </div>
-    <div class="appt-item">
-      <div class="appt-icon" style="background:#f0e6f8"><svg style="fill:#8e44ad" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
-      <div class="appt-det"><h5>Mammogram Screening</h5><p>Overlake Breast Health Center · Saturday April 4 at 10:15 AM · <strong style="color:#27ae60">$0 copay</strong></p></div>
-    </div>
-    <div class="appt-item">
-      <div class="appt-icon" style="background:#e6f3f8"><svg style="fill:#1B6B93" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
-      <div class="appt-det"><h5>Flu Shot</h5><p>Available at wellness visit — added to visit checklist · <strong style="color:#27ae60">$0 copay</strong></p></div>
-    </div>
-    <div class="appt-item">
-      <div class="appt-icon" style="background:#fff3e0"><svg style="fill:#e67e22" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
-      <div class="appt-det"><h5>"Healthy Habits" 12-Week Program</h5><p>Enrolled — starts April 6 · Personalized wellness plan sent to Sarah's phone</p></div>
-    </div>
-  </div>
-</div>`)}},
+// 4. Bot typing then message
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("No worries — let me show you where you stand:")}},
 
-{delay:2500,action:()=>at()},
-{delay:3500,action:()=>{
-am(`Here's Sarah's personalized wellness roadmap for the next 12 months:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div><h4>Wellness Roadmap — Sarah Kim</h4></div>
-  <div class="gc-b">
-    <div class="roadmap">
-      <div class="rm-step next"><h5>April 2026</h5><p>Wellness visit + Mammogram + Flu shot + Healthy Habits program start</p></div>
-      <div class="rm-step"><h5>July 2026</h5><p>Program completion milestone · Wellness score reassessment</p></div>
-      <div class="rm-step"><h5>October 2026</h5><p>Flu shot reminder (next season) · BMI progress check</p></div>
-      <div class="rm-step"><h5>January 2027</h5><p>Annual wellness visit reminder · Mammogram annual</p></div>
-      <div class="rm-step"><h5>Age 45 (2029)</h5><p>Colon cancer screening conversation · Updated screening schedule</p></div>
+// 5. GenUI — Wellness Score Card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="wellness-score">64</div>
+    <div class="wellness-label">Wellness Score &middot; out of 100</div>
+    <div class="wellness-bar"><div class="wellness-fill" style="width:64%"></div></div>
+    <div class="wellness-items">
+      <div class="wellness-item"><span>Annual Physical</span><span class="done">Complete &#10003;</span></div>
+      <div class="wellness-item"><span>Mammogram</span><span class="pending">Due this month</span></div>
+      <div class="wellness-item"><span>Colorectal Screening</span><span class="pending">Overdue</span></div>
+      <div class="wellness-item"><span>Flu Vaccine</span><span class="done">Complete &#10003;</span></div>
+      <div class="wellness-item"><span>Dental Check</span><span class="pending">Due in 2 months</span></div>
     </div>
-  </div>
-</div>`)}},
+  `,'wellness-card');
+}},
 
-{delay:2500,action:()=>at()},
-{delay:3500,action:()=>{
-am(`And here's the impact — ReallyWell flips the model:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon green"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div><h4>Pager vs. ReallyWell (Portal-First)</h4></div>
-  <div class="gc-b">
-    <div class="compare-grid">
-      <div class="compare-col old">
-        <h5>ReallyWell (Portal-First)</h5>
-        <div class="cv">18%</div><div class="cl">Engagement Rate</div>
-        <div style="margin-top:12px"><div class="cv">4,200</div><div class="cl">Screenings/Quarter</div></div>
-        <div style="margin-top:12px;font-size:11px;color:#7a3a3a">Members must log in</div>
+// 6. Bot: score explanation
+{delay:1800,action:()=>{botMsg("You're at 64 out of 100 — completing your overdue screenings would bump you to 88. Here's the breakdown:")}},
+
+// 7. GenUI — Screening Details Card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="assess-label">PREVENTIVE SCREENINGS</div>
+    <div class="screening-row">
+      <div class="screening-icon urgent">&#128308;</div>
+      <div class="screening-info">
+        <div class="screening-name">Colorectal Screening</div>
+        <div class="screening-detail">Overdue by 3 months</div>
       </div>
-      <div class="compare-arrow">→</div>
-      <div class="compare-col new">
-        <h5>Pager (Outreach-First)</h5>
-        <div class="cv">31.5%</div><div class="cl">Engagement Rate</div>
-        <div style="margin-top:12px"><div class="cv">8,240</div><div class="cl">Screenings/Quarter</div></div>
-        <div style="margin-top:12px;font-size:11px;color:#1a6b42">AI finds members where they are</div>
+      <span class="screening-status overdue">OVERDUE</span>
+    </div>
+    <div class="screening-row">
+      <div class="screening-icon soon">&#128992;</div>
+      <div class="screening-info">
+        <div class="screening-name">Mammogram</div>
+        <div class="screening-detail">Due by Apr 30</div>
+      </div>
+      <span class="screening-status due">DUE</span>
+    </div>
+    <div class="screening-row">
+      <div class="screening-icon ok">&#128994;</div>
+      <div class="screening-info">
+        <div class="screening-name">Annual Physical</div>
+        <div class="screening-detail">Completed Jan 15</div>
+      </div>
+      <span class="screening-status complete">COMPLETE</span>
+    </div>
+    <div class="screening-row">
+      <div class="screening-icon ok">&#128994;</div>
+      <div class="screening-info">
+        <div class="screening-name">Flu Vaccine</div>
+        <div class="screening-detail">Completed Oct 2025</div>
+      </div>
+      <span class="screening-status complete">COMPLETE</span>
+    </div>
+  `,'screening-card');
+}},
+
+// 8. Bot: colorectal priority
+{delay:2000,action:()=>{botMsg("The colorectal screening is the priority — you're 3 months overdue. The good news? You can do a Cologuard home test kit, no prep or office visit needed. Want me to order one?")}},
+
+// 9. User action
+{delay:1500,action:()=>{actionBtn("Yes, order the home kit")}},
+
+// 10. Bot typing then confirmation
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("Cologuard kit ordered — it'll arrive at your home in 3-5 business days with instructions. Now let's tackle that mammogram.")}},
+
+// 11. Bot: imaging centers
+{delay:1500,action:()=>{botMsg("Here are the top-rated imaging centers near you:")}},
+
+// 12. Filter tabs
+{delay:800,action:()=>{
+  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`,'filter-tabs');
+}},
+
+// 13. Provider card 1 (selected)
+{delay:800,action:()=>{
+  addEl(`
+    <div class="provider-check">&#10003;</div>
+    <div class="provider-top">
+      <div class="provider-photo">PB</div>
+      <div class="provider-info">
+        <div class="provider-name">Providence Breast Health Center</div>
+        <div class="provider-spec">Imaging &middot; Mammography</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.8</span><span class="rating-count">(312)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="impact-bar">
-      <strong>Impact:</strong> +75% engagement · +96% screenings · Projected <strong>+0.3 Stars</strong> across preventive measures · One platform for Regence, Asuris, BridgeSpan, BCBSND
+    <div class="provider-meta"><span>&#128205; 1.9 miles</span><span>&#128176; $0 copay (preventive)</span></div>
+    <div class="slots">
+      <span class="slot selected">Apr 10 &middot; 8:30 AM</span>
+      <span class="slot">Apr 12 &middot; 10:00 AM</span>
+      <span class="slot">Apr 14 &middot; 2:15 PM</span>
     </div>
-  </div>
-</div>`)}},
+  `,'provider-card selected');
+}},
 
-{delay:2500,action:()=>at()},
-{delay:3500,action:()=>{
-am(`To power this experience, Pager needs the following data from Cambia:
-<div class="gc" style="margin-top:12px">
-  <div class="gc-h"><div class="gc-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg></div><h4>Cambia Data Dependencies</h4></div>
-  <div class="gc-b">
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Dx; medical, Rx, lab claims</strong></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Care &amp; wellness program catalog + enrollment API/MCP</strong></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Member info</strong> <span style="color:#5a6b7b">(ID, name, contact, language, PCP)</span></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Member comms prefs</strong> <span style="color:#5a6b7b">(SMS, channel, language)</span></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Provider directory data or API/MCP</strong> <span style="color:#5a6b7b">(incl cost/quality tiers)</span></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Benefit plan details &amp; MRF data</strong> <span style="color:#5a6b7b">for OOP estimation</span></div>
-      <div style="background:#f8fafb;border-radius:8px;padding:10px;font-size:13px"><strong style="color:#1B6B93">Services outside defined benefit</strong> <span style="color:#5a6b7b">(e.g., telemedicine)</span></div>
+// 14. Provider card 2
+{delay:600,action:()=>{
+  addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">OI</div>
+      <div class="provider-info">
+        <div class="provider-name">OHSU Imaging Center</div>
+        <div class="provider-spec">Imaging &middot; Mammography</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.7</span><span class="rating-count">(245)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
     </div>
-  </div>
-</div>`)}},
+    <div class="provider-meta"><span>&#128205; 4.1 miles</span><span>&#128176; $0 copay</span></div>
+  `,'provider-card');
+}},
+
+// 15. User action: book
+{delay:1200,action:()=>{actionBtn("Book Apr 10 8:30 AM")}},
+
+// 16. Bot: booked + rewards
+{delay:1200,action:()=>addTyping()},
+{delay:2500,action:()=>{botMsg("Booked! One more thing — completing these screenings earns you rewards through the Regence wellness program:")}},
+
+// 17. GenUI — Rewards card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="assess-label">WELLNESS REWARDS</div>
+    <div class="assess-title">$75 in Rewards Available</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Colorectal screening — $25 reward</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — $25 reward</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Complete wellness profile — $25 reward</div>
+  `,'assess-card');
+}},
+
+// 18. User action: wellness profile
+{delay:1500,action:()=>{actionBtn("Tell me about the wellness profile")}},
+
+// 19. Bot typing then response
+{delay:1200,action:()=>addTyping()},
+{delay:2800,action:()=>{botMsg("It's a quick online health assessment — takes about 5 minutes. You'll get personalized health insights plus the $25 reward. Want me to send you the link?")}},
+
+// 20. User action: send link
+{delay:1500,action:()=>{actionBtn("Yes, send me the link")}},
+
+// 21. Confirmation card
+{delay:1200,action:()=>{
+  addEl(`
+    <div class="assess-label">WELLNESS PLAN</div>
+    <div class="assess-title">3 Actions Scheduled</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Cologuard Kit — Shipping in 3-5 days</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — Apr 10, 8:30 AM at Providence</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Health Assessment — Link sent via text</div>
+    <div style="text-align:center;margin-top:12px;font-size:14px;font-weight:700;color:#1a2332">Projected Score: <span style="color:#8a9baa">64</span> <span style="color:#8a9baa">&rarr;</span> <span style="color:#27ae60">88</span></div>
+  `,'assess-card');
+}},
+
+// 22. Bot: closing
+{delay:1500,action:()=>{botMsg("You're taking great steps for your health! I'll send reminders before each appointment and follow up when the Cologuard kit arrives. Here's to hitting 88! &#128154;")}},
 ];
 
-function rs(){if(si>=steps.length)return;const s=steps[si];si++;setTimeout(()=>{s.action();rs()},s.delay)}
-function startDemo(){document.getElementById('startOverlay').classList.add('hidden');rs()}
+function runStep(){
+  if(si>=steps.length)return;
+  const s=steps[si];si++;
+  setTimeout(()=>{s.action();runStep()},s.delay);
+}
+function startDemo(){
+  document.getElementById('startOverlay').classList.add('hidden');
+  runStep();
+}
 </script>
 </body>
 </html>
