@@ -160,7 +160,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
   </div>
   <div class="chat-header">
     <span class="back">&#8249;</span>
-    <h1>Your Regence Companion</h1>
+    <h1>ARIA Health Companion</h1>
   </div>
   <div class="chat-body" id="chat"></div>
   <div class="input-bar">
@@ -194,14 +194,14 @@ function addEl(html,cls=''){
 
 function addTyping(){
   const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">R</div><div class="dots"><span></span><span></span><span></span></div>`;
+  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
   chat.appendChild(d);sb();
 }
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 
 function botMsg(text){
   removeTyping();
-  addEl(`<div class="avatar">R</div><div class="bub">${text}</div>`,'msg bot');
+  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
 }
 function userMsg(text){
   addEl(`<div class="bub">${text}</div>`,'msg user');
@@ -215,7 +215,7 @@ const steps=[
 {delay:500,action:()=>{addEl('Today 9:00 AM','timestamp')}},
 
 // 2. Bot: proactive outreach
-{delay:800,action:()=>{botMsg("Good morning Lisa! &#127807; This is your Regence Health Companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?")}},
+{delay:800,action:()=>{botMsg("Good morning Lisa! &#127807; This is ARIA, your health companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?")}},
 
 // 3. User responds
 {delay:2000,action:()=>{userMsg("I've been meaning to schedule those but keep putting it off. What do I need?")}},
@@ -347,7 +347,7 @@ const steps=[
 
 // 16. Bot: booked + rewards
 {delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Booked! One more thing — completing these screenings earns you rewards through the Regence wellness program:")}},
+{delay:2500,action:()=>{botMsg("Booked! One more thing — completing these screenings earns you rewards through your wellness program:")}},
 
 // 17. GenUI — Rewards card
 {delay:1200,action:()=>{
@@ -382,11 +382,11 @@ const steps=[
   `,'assess-card');
 }},
 
-// 21b. Enrollment Success Card — Regence Empower
+// 21b. Enrollment Success Card
 {delay:1200,action:()=>{
   addEl(`
     <div class="enroll-emoji">&#127881;</div>
-    <div class="enroll-title">Enrolled in Regence Empower</div>
+    <div class="enroll-title">Enrolled in Wellness Rewards</div>
     <div class="enroll-subtitle">Your personalized wellness program is active</div>
     <div class="enroll-chips">
       <span class="enroll-chip">Screenings</span>

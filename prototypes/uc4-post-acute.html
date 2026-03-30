@@ -183,7 +183,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
   </div>
   <div class="chat-header">
     <span class="back">&#8249;</span>
-    <h1>Your Regence Companion</h1>
+    <h1>ARIA Health Companion</h1>
   </div>
   <div class="chat-body" id="chat"></div>
   <div class="input-bar">
@@ -217,14 +217,14 @@ function addEl(html,cls=''){
 
 function addTyping(){
   const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">R</div><div class="dots"><span></span><span></span><span></span></div>`;
+  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
   chat.appendChild(d);sb();
 }
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 
 function botMsg(text){
   removeTyping();
-  addEl(`<div class="avatar">R</div><div class="bub">${text}</div>`,'msg bot');
+  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
 }
 function userMsg(text){
   addEl(`<div class="bub">${text}</div>`,'msg user');
@@ -247,7 +247,7 @@ const steps=[
 
 // 3. Bot greeting
 {delay:1500,action:()=>addTyping()},
-{delay:3000,action:()=>{botMsg("Hi Robert, this is your Regence Health Companion. I see you were discharged yesterday from Providence Portland after your hip replacement. How are you doing at home?")}},
+{delay:3000,action:()=>{botMsg("Hi Robert, this is ARIA, your health companion. I see you were discharged yesterday from Providence Portland after your hip replacement. How are you doing at home?")}},
 
 // 4. User response
 {delay:1500,action:()=>{userMsg("I'm doing okay but pretty sore. Having trouble remembering all my medications.")}},

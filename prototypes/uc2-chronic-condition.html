@@ -214,7 +214,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
   </div>
   <div class="chat-header">
     <span class="back">&#8249;</span>
-    <h1>Your Regence Companion</h1>
+    <h1>ARIA Health Companion</h1>
   </div>
   <div class="chat-body" id="chat"></div>
   <div class="input-bar">
@@ -248,14 +248,14 @@ function addEl(html,cls=''){
 
 function addTyping(){
   const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">R</div><div class="dots"><span></span><span></span><span></span></div>`;
+  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
   chat.appendChild(d);sb();
 }
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 
 function botMsg(text){
   removeTyping();
-  addEl(`<div class="avatar">R</div><div class="bub">${text}</div>`,'msg bot');
+  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
 }
 function userMsg(text){
   addEl(`<div class="bub">${text}</div>`,'msg user');
@@ -269,7 +269,7 @@ const steps=[
 {delay:500,action:()=>{addEl('Today 2:30 PM','timestamp')}},
 
 // 2. Bot greeting
-{delay:800,action:()=>{botMsg("Hi David, this is your Regence Health Companion. I'm reaching out because your care team wants to make sure you're staying on track with your diabetes management. How are you feeling today?")}},
+{delay:800,action:()=>{botMsg("Hi David, this is ARIA, your health companion. I'm reaching out because your care team wants to make sure you're staying on track with your diabetes management. How are you feeling today?")}},
 
 // 3. User response
 {delay:2000,action:()=>{userMsg("Honestly, not great. I've been running out of my Metformin and my energy has been low.")}},
@@ -340,13 +340,13 @@ const steps=[
 {delay:2500,action:()=>{botMsg("Refill requested at Walgreens SE Division. It should be ready by 5 PM today.")}},
 
 // 11. Bot recommends program
-{delay:1500,action:()=>{botMsg("David, given your current numbers, I'd also like to recommend enrolling in the Regence Diabetes Care Program. It includes:")}},
+{delay:1500,action:()=>{botMsg("David, given your current numbers, I'd also like to recommend enrolling in the Diabetes Care Program. It includes:")}},
 
 // 12. Program Card
 {delay:1200,action:()=>{
   addEl(`
     <div class="assess-label">RECOMMENDED PROGRAM</div>
-    <div class="assess-title">Regence Diabetes Care Program</div>
+    <div class="assess-title">Diabetes Care Program</div>
     <div class="assess-badge green">No Additional Cost</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Monthly A1C monitoring</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Nutritionist consultations</div>
@@ -365,7 +365,7 @@ const steps=[
   addEl(`
     <div class="enroll-emoji">🎉</div>
     <div class="enroll-title">You're enrolled!</div>
-    <div class="enroll-subtitle">Welcome to Regence Diabetes Care Program</div>
+    <div class="enroll-subtitle">Welcome to Diabetes Care Program</div>
     <div class="enroll-chips"><span class="enroll-chip">📊 A1C Monitoring</span><span class="enroll-chip">🥗 Nutrition</span><span class="enroll-chip">💊 Rx Management</span><span class="enroll-chip">📱 Connected Glucose</span></div>
     <div class="enroll-text">All yours at <strong>no additional cost</strong> — your care team will reach out within 48 hours to get started.</div>
   `,'enroll-card');
