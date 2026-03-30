@@ -223,90 +223,81 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 
 <script>
 const chat=document.getElementById('chat');
-let si=0;
-
 function sb(){chat.scrollTop=chat.scrollHeight}
-
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
-  chat.appendChild(d);
-  sb();
-  return d;
-}
-
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
-}
+function addEl(html,cls=''){const d=document.createElement('div');if(cls)d.className=cls;d.innerHTML=html;chat.appendChild(d);sb();return d}
+function addTyping(){const d=document.createElement('div');d.className='typing';d.id='typing';d.innerHTML='<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>';chat.appendChild(d);sb()}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+function botMsg(text){removeTyping();return addEl('<div class="avatar">A</div><div class="bub">'+text+'</div>','msg bot')}
+function userMsg(text){return addEl('<div class="bub">'+text+'</div>','msg user')}
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.style.opacity='0.5';d.style.pointerEvents='none';resolve(text)})})}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+async function typing(ms){addTyping();await wait(ms);removeTyping()}
+function addLoading(text){return addEl('<div class="spinner"></div> '+text,'loading-state')}
 
-function botMsg(text){
-  removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
-}
+async function runDemo(){
+  addEl('Today 11:45 PM','timestamp');
+  await wait(500);
 
-const steps=[
-// 1. Timestamp
-{delay:500,action:()=>{addEl('Today 11:45 PM','timestamp')}},
+  // User's initial message
+  userMsg("My 4-year-old has had a fever of 102.5 for the past few hours and he's really fussy. Should I take him to the ER?");
+  await wait(800);
 
-// 2. User message
-{delay:800,action:()=>{userMsg("My 4-year-old has had a fever of 102.5 for the past few hours and he's really fussy. Should I take him to the ER?")}},
+  await typing(1500);
+  botMsg("I understand your concern — a fever in a young child can be scary. Let me ask a few important questions to help determine the best next step.");
+  await wait(600);
+  botMsg("First, besides the fever, is Tyler experiencing any of these symptoms?");
+  await wait(400);
 
-// 3. Typing then bot
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("I understand your concern — a fever in a young child can be scary. Let me ask a few important questions to help determine the best next step.")}},
-
-// 4. Bot asks about symptoms
-{delay:1500,action:()=>{botMsg("First, besides the fever, is Tyler experiencing any of these symptoms?")}},
-
-// 5. Symptom chips
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">SYMPTOMS REPORTED</div>
+  // Interactive symptom chips
+  const symptomCard=addEl(`
+    <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">TAP TO SELECT SYMPTOMS</div>
     <div class="symptom-chips">
-      <span class="chip">Rash</span>
-      <span class="chip selected">Vomiting</span>
-      <span class="chip">Difficulty breathing</span>
-      <span class="chip">Stiff neck</span>
-      <span class="chip selected">Ear pain</span>
-      <span class="chip selected">Cough</span>
-      <span class="chip">Diarrhea</span>
-      <span class="chip">Lethargy</span>
+      <span class="chip" data-chip>Rash</span>
+      <span class="chip" data-chip>Vomiting</span>
+      <span class="chip" data-chip>Difficulty breathing</span>
+      <span class="chip" data-chip>Stiff neck</span>
+      <span class="chip" data-chip>Ear pain</span>
+      <span class="chip" data-chip>Cough</span>
+      <span class="chip" data-chip>Diarrhea</span>
+      <span class="chip" data-chip>Lethargy</span>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <span class="action-btn" id="symptomDone" style="display:inline-flex;cursor:pointer;font-size:12px;padding:8px 20px">Done &#10003;</span>
     </div>
   `,'symptom-card');
-}},
+  symptomCard.querySelectorAll('[data-chip]').forEach(c=>{c.style.cursor='pointer';c.addEventListener('click',()=>c.classList.toggle('selected'))});
+  await new Promise(resolve=>{document.getElementById('symptomDone').addEventListener('click',resolve)});
+  symptomCard.style.pointerEvents='none';symptomCard.style.opacity='0.85';
 
-// 6. Bot asks about duration and fluids
-{delay:1500,action:()=>{botMsg("How long has he had the fever? And has he been able to keep fluids down?")}},
+  const selected=[...symptomCard.querySelectorAll('[data-chip].selected')].map(c=>c.textContent);
+  if(selected.length)userMsg(selected.join(', '));
+  await wait(400);
 
-// 7. User responds
-{delay:1500,action:()=>{userMsg("About 5 hours. He vomited once but has been drinking a little water since.")}},
+  await typing(1200);
+  botMsg("How long has he had the fever? And has he been able to keep fluids down?");
 
-// 8. Typing then bot asks vaccinations
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Thank you. Let me also check — is Tyler up to date on his vaccinations, and has he been around anyone who's been sick recently?")}},
+  // USER CLICK
+  await actionBtn("About 5 hours. Vomited once but drinking water.");
+  userMsg("About 5 hours. He vomited once but has been drinking a little water since.");
+  await wait(400);
 
-// 9. User responds
-{delay:1500,action:()=>{userMsg("Yes, vaccinations are current. A few kids at daycare had a cold last week.")}},
+  await typing(1200);
+  botMsg("Thank you. Let me also check — is Tyler up to date on his vaccinations, and has he been around anyone who's been sick recently?");
 
-// 10. Typing then assessment intro
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Based on what you've described, here's my assessment:")}},
+  // USER CLICK
+  await actionBtn("Yes, vaccines current. Daycare cold last week.");
+  userMsg("Yes, vaccinations are current. A few kids at daycare had a cold last week.");
+  await wait(400);
 
-// 10b. Loading state — analyzing symptoms
-{delay:1000,action:()=>{addEl('<div class="spinner"></div> Analyzing symptoms ...','loading-state')}},
+  await typing(1200);
+  botMsg("Based on what you've described, here's my assessment:");
+  await wait(400);
 
-// 11. Acuity Card
-{delay:1500,action:()=>{
+  const loader=addLoading('Analyzing symptoms ...');
+  await wait(1800);
+  loader.remove();
+
+  // Acuity Card
   addEl(`
     <div class="assess-label">TRIAGE ASSESSMENT</div>
     <div class="assess-title">Upper Respiratory Infection with Fever</div>
@@ -324,16 +315,17 @@ const steps=[
     <div class="assess-row"><span class="assess-check">&#10003;</span>Ear pain suggests possible otitis media</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Daycare exposure consistent with viral URI</div>
   `,'acuity-card');
-}},
+  await wait(800);
 
-// 12. Bot explains assessment
-{delay:2000,action:()=>{botMsg("Tyler's symptoms suggest a viral upper respiratory infection, possibly with an ear infection. This doesn't require an ER visit tonight, but I'd recommend a pediatrician visit tomorrow. Given the ear pain, I want to connect you with a nurse to discuss this further.")}},
+  await typing(1500);
+  botMsg("Tyler's symptoms suggest a viral upper respiratory infection, possibly with an ear infection. This doesn't require an ER visit tonight, but I'd recommend a pediatrician visit tomorrow. Given the ear pain, I want to connect you with a nurse to discuss this further.");
+  await wait(600);
 
-// 13. Bot announces handoff
-{delay:2000,action:()=>{botMsg("Let me transfer you to Nurse Sarah — she specializes in pediatric care. I'll share everything we've discussed so you won't need to repeat anything.")}},
+  await typing(1200);
+  botMsg("Let me transfer you to Nurse Sarah — she specializes in pediatric care. I'll share everything we've discussed so you won't need to repeat anything.");
+  await wait(500);
 
-// 14. Handoff Card
-{delay:1500,action:()=>{
+  // Handoff Card
   addEl(`
     <div class="handoff-header">
       <div class="handoff-photo">&#129681;</div>
@@ -352,16 +344,15 @@ const steps=[
       <div class="handoff-item">&#129302; Moderate acuity — URI + possible otitis media</div>
     </div>
   `,'handoff-card');
-}},
+  await wait(800);
 
-// 15. Nurse Sarah greeting
-{delay:2000,action:()=>{botMsg("Hi Jennifer, this is Nurse Sarah. I've reviewed everything your health companion gathered. Tyler's symptoms are consistent with what we've been seeing from daycare this season.")}},
+  await typing(1500);
+  botMsg("Hi Jennifer, this is Nurse Sarah. I've reviewed everything your health companion gathered. Tyler's symptoms are consistent with what we've been seeing from daycare this season.");
+  await wait(600);
+  botMsg("For tonight, here's what I recommend:");
+  await wait(400);
 
-// 16. Nurse recommends
-{delay:1800,action:()=>{botMsg("For tonight, here's what I recommend:")}},
-
-// 17. Self-Care Card
-{delay:1200,action:()=>{
+  // Self-Care Card
   addEl(`
     <div class="selfcare-title">Tonight's Care Plan for Tyler</div>
     <div class="selfcare-item"><span class="selfcare-icon">&#127777;&#65039;</span>Children's Tylenol (acetaminophen) per package dosing for his weight</div>
@@ -369,14 +360,14 @@ const steps=[
     <div class="selfcare-item"><span class="selfcare-icon">&#128705;</span>Lukewarm bath if fever rises above 103&deg;F</div>
     <div class="selfcare-item"><span class="selfcare-icon">&#128564;</span>Keep him comfortable — light clothing, cool room</div>
   `,'selfcare-card');
-}},
+  await wait(800);
 
-// 18. Bot offers appointment
-{delay:2000,action:()=>{botMsg("I'd also like to get him seen by his pediatrician tomorrow for the ear pain. Let me find available appointments:")}},
+  await typing(1200);
+  botMsg("I'd also like to get him seen by his pediatrician tomorrow for the ear pain. Let me find available appointments:");
+  await wait(400);
 
-// 19. Provider Card — Dr. Amy Lin
-{delay:1500,action:()=>{
-  addEl(`
+  // Provider card with clickable slots
+  const slotCard=addEl(`
     <div class="provider-check">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">AL</div>
@@ -388,30 +379,39 @@ const steps=[
     </div>
     <div class="provider-meta"><span>&#128118; Tyler's pediatrician</span><span>&#128176; $20 copay</span></div>
     <div class="slots">
-      <span class="slot selected">Tomorrow &middot; 8:30 AM</span>
-      <span class="slot">Tomorrow &middot; 10:15 AM</span>
-      <span class="slot">Tomorrow &middot; 2:00 PM</span>
+      <span class="slot" data-slot>Tomorrow &middot; 8:30 AM</span>
+      <span class="slot" data-slot>Tomorrow &middot; 10:15 AM</span>
+      <span class="slot" data-slot>Tomorrow &middot; 2:00 PM</span>
     </div>
   `,'provider-card selected');
-}},
 
-// 20. User action — book
-{delay:1500,action:()=>{actionBtn("Book 8:30 AM")}},
+  const chosenSlot=await new Promise(resolve=>{
+    slotCard.querySelectorAll('[data-slot]').forEach(s=>{
+      s.style.cursor='pointer';
+      s.addEventListener('click',()=>{slotCard.querySelectorAll('[data-slot]').forEach(x=>x.classList.remove('selected'));s.classList.add('selected');resolve(s.textContent)});
+    });
+  });
+  slotCard.style.pointerEvents='none';
+  await wait(300);
 
-// 20b. Call Summary Card
-{delay:1500,action:()=>{
+  await actionBtn('Book '+chosenSlot);
+  userMsg('Book '+chosenSlot);
+  await wait(400);
+
+  await typing(1200);
+
+  // Call Summary Card
   addEl(`
     <div class="call-summary-label">CALL SUMMARY</div>
     <div class="call-summary-item"><span class="bullet"></span>Confirmed viral URI with possible otitis media<span class="time">0:42</span></div>
     <div class="call-summary-item"><span class="bullet"></span>Tylenol dosing reviewed for weight<span class="time">2:15</span></div>
     <div class="call-summary-item"><span class="bullet"></span>Hydration and comfort measures discussed<span class="time">3:45</span></div>
-    <div class="call-summary-item"><span class="bullet"></span>Dr. Lin appointment booked for 8:30 AM<span class="time">5:10</span></div>
+    <div class="call-summary-item"><span class="bullet"></span>Dr. Lin appointment booked — `+chosenSlot+`<span class="time">5:10</span></div>
     <div class="call-summary-note">Summarized from 6:30 consultation</div>
   `,'call-summary');
-}},
+  await wait(600);
 
-// 21. Safety card
-{delay:1500,action:()=>{
+  // Safety card
   addEl(`
     <h5>Go to the ER or call 911 if Tyler experiences:</h5>
     <div class="safety-item">&#9888; Fever rises above 104&deg;F</div>
@@ -420,22 +420,14 @@ const steps=[
     <div class="safety-item">&#9888; Develops a rash that doesn't blanch with pressure</div>
     <div class="safety-item">&#9888; Stops drinking fluids entirely</div>
   `,'safety-card');
-}},
+  await wait(500);
 
-// 22. Final bot message
-{delay:1500,action:()=>{
-  botMsg("You're doing a great job, Jennifer. Dr. Lin's office will see Tyler at 8:30 AM tomorrow. I'll send a text reminder in the morning. If anything changes tonight, text us back anytime — we're here 24/7. &#128154;");
-}},
-];
-
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
+  botMsg("You're doing a great job, Jennifer. Dr. Lin's office will see Tyler at "+chosenSlot+". I'll send a text reminder in the morning. If anything changes tonight, text us back anytime — we're here 24/7. &#128154;");
 }
+
 function startDemo(){
   document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  runDemo();
 }
 </script>
 </body>
