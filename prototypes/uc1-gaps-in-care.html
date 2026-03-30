@@ -173,228 +173,204 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-let si=0;
-
-function sb(){chat.scrollTop=chat.scrollHeight}
-
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
-  chat.appendChild(d);
-  sb();
-  return d;
+const chat = document.getElementById('chat');
+function sb() { chat.scrollTop = chat.scrollHeight; }
+function addEl(html, cls) { const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; chat.appendChild(d); sb(); return d; }
+function addTyping() { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>'; chat.appendChild(d); sb(); }
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
+function userMsg(text) { return addEl('<div class="bub">' + text + '</div>', 'msg user'); }
+function actionBtn(text) {
+  return new Promise(resolve => {
+    const d = addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>' + text + '</div>', 'actions');
+    d.addEventListener('click', () => { d.style.opacity = '0.5'; d.style.pointerEvents = 'none'; resolve(text); });
+  });
 }
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
+function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
 
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
-}
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+async function runDemo() {
+  addEl('Today 10:15 AM', 'timestamp');
+  await wait(500);
 
-function botMsg(text){
-  removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
-}
+  await typing(1500);
+  botMsg("Hi Margaret! &#128075; This is ARIA, your health companion. I noticed you have some important preventive screenings coming due. Mind if I walk you through them?");
 
-const steps=[
-// 1. Timestamp
-{delay:500,action:()=>{addEl('Today 10:15 AM','timestamp')}},
+  // USER CLICK: agree to review screenings
+  await actionBtn("Sure, what screenings?");
+  userMsg("Sure, what screenings?");
+  await wait(400);
 
-// 2. Bot initiates outreach
-{delay:800,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Hi Margaret! &#128075; This is ARIA, your health companion. I noticed you have some important preventive screenings coming due. Mind if I walk you through them?")}},
+  await typing(1500);
+  botMsg("Great! Based on your care plan, I've flagged three priority items:");
+  await wait(400);
 
-// 3. User action
-{delay:1500,action:()=>{actionBtn("Sure, what screenings?")}},
-
-// 4. Bot response
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Great! Based on your care plan, I've flagged three priority items:")}},
-
-// 5. GenUI Card — Member Profile with Gaps
-{delay:1200,action:()=>{
+  // Care gaps card
   addEl(`
     <div class="assess-label">CARE GAPS IDENTIFIED</div>
     <div class="assess-title">Margaret Chen — 3 Open Gaps</div>
     <div class="assess-badge">High Priority</div>
-    <div class="assess-section">OPEN SCREENINGS</div>
-    <div class="assess-row"><span class="assess-check" style="background:#e67e22">!</span><strong>CDC-LDL</strong>&nbsp;— LDL cholesterol screening <span style="color:#c0392b;font-size:12px;margin-left:auto">(overdue 4 months)</span></div>
-    <div class="assess-row"><span class="assess-check" style="background:#e67e22">!</span><strong>BCS-E</strong>&nbsp;— Breast cancer screening <span style="color:#e67e22;font-size:12px;margin-left:auto">(due this month)</span></div>
-    <div class="assess-row"><span class="assess-check" style="background:#27ae60">&#8226;</span><strong>CBP</strong>&nbsp;— Blood pressure check <span style="color:#5a6b7b;font-size:12px;margin-left:auto">(due in 2 weeks)</span></div>
-  `,'assess-card');
-}},
+    <div class="assess-section">OVERDUE / UPCOMING</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>CDC-LDL: Cholesterol screening (overdue 4 months)</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>BCS-E: Breast cancer screening (due this month)</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>CBP: Blood pressure check (due in 2 weeks)</div>
+  `, 'assess-card');
+  await wait(600);
 
-// 6. Bot explains priority
-{delay:2000,action:()=>addTyping()},
-{delay:3000,action:()=>{botMsg("Your LDL screening is the most overdue. Getting this done helps keep your diabetes management on track. Would you like me to find lab locations nearby?")}},
+  await typing(1200);
+  botMsg("Your LDL screening is the most overdue. Getting this done helps keep your diabetes management on track. Would you like me to find lab locations nearby?");
 
-// 7. User action
-{delay:1500,action:()=>{actionBtn("Yes, find me a lab")}},
+  // USER CLICK
+  await actionBtn("Yes, find me a lab");
+  userMsg("Yes, find me a lab");
+  await wait(400);
 
-// 8. Loading state — provider directory
-{delay:1200,action:()=>{addEl('<div class="spinner"></div> Pulling in provider directory ...','loading-state')}},
-{delay:2000,action:()=>addTyping()},
-{delay:3000,action:()=>{
-  removeTyping();
+  addLoading('Pulling in provider directory ...');
+  await wait(1500);
+
+  await typing(1200);
   botMsg("Here are the closest in-network options:");
-}},
+  await wait(400);
 
-// 9. Filter tabs
-{delay:800,action:()=>{
-  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`,'filter-tabs');
-}},
+  // Filter tabs
+  addEl('<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>', 'filter-tabs');
+  await wait(300);
 
-// 10. Provider card 1 (selected) — Quest Diagnostics
-{delay:800,action:()=>{
+  // Provider 1
   addEl(`
     <div class="provider-check">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">QD</div>
       <div class="provider-info">
-        <div class="provider-name">Quest Diagnostics</div>
-        <div class="provider-spec">Clinical Lab &middot; Lloyd Center</div>
+        <div class="provider-name">Quest Diagnostics — Lloyd Center</div>
+        <div class="provider-spec">Clinical Lab</div>
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.7</span><span class="rating-count">(245)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="provider-meta"><span>&#128205; 1.8 miles away</span><span>&#128176; $0 copay (preventive)</span><span style="color:#27ae60;font-weight:600">Walk-ins welcome</span></div>
+    <div class="provider-meta"><span>&#128205; 1.8 miles</span><span>&#128176; $0 copay (preventive)</span></div>
     <div class="provider-desc">Walk-in lab. No appointment needed for basic blood work.</div>
-  `,'provider-card selected');
-}},
+  `, 'provider-card selected');
+  await wait(300);
 
-// 11. Provider card 2 — LabCorp
-{delay:600,action:()=>{
+  // Provider 2
   addEl(`
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">LC</div>
       <div class="provider-info">
-        <div class="provider-name">LabCorp</div>
-        <div class="provider-spec">Clinical Lab &middot; SE Portland</div>
+        <div class="provider-name">LabCorp — SE Portland</div>
+        <div class="provider-spec">Clinical Lab</div>
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.4</span><span class="rating-count">(178)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="provider-meta"><span>&#128205; 3.2 miles away</span><span>&#128176; $0 copay</span></div>
-  `,'provider-card');
-}},
+    <div class="provider-meta"><span>&#128205; 3.2 miles</span><span>&#128176; $0 copay</span></div>
+  `, 'provider-card');
+  await wait(600);
 
-// 12. Bot suggests bundling mammogram
-{delay:1500,action:()=>addTyping()},
-{delay:3000,action:()=>{botMsg("Quest is closest and highly rated. I also see you're due for a mammogram. I can schedule both on the same trip. Want me to check availability at Providence Breast Health nearby?")}},
+  await typing(1200);
+  botMsg("Quest is closest and highly rated. I also see you're due for a mammogram. I can schedule both on the same trip. Want me to check availability at Providence Breast Health nearby?");
 
-// 13. User action
-{delay:1500,action:()=>{actionBtn("Yes, schedule both")}},
+  // USER CLICK
+  await actionBtn("Yes, schedule both");
+  userMsg("Yes, schedule both");
+  await wait(400);
 
-// 14. Schedule preference card
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="schedule-label">SCHEDULING PREFERENCE</div>
+  // Schedule card with day/time picker (interactive)
+  const schedCard = addEl(`
+    <div class="schedule-label">DAYS</div>
     <div class="day-chips">
-      <span class="day-chip">Mon</span>
-      <span class="day-chip">Tue</span>
-      <span class="day-chip">Wed</span>
-      <span class="day-chip selected">Thu</span>
-      <span class="day-chip selected">Fri</span>
-      <span class="day-chip">Sat</span>
-      <span class="day-chip">Sun</span>
+      <span class="day-chip" data-day>Mon</span><span class="day-chip" data-day>Tue</span><span class="day-chip" data-day>Wed</span><span class="day-chip selected" data-day>Thu</span><span class="day-chip" data-day>Fri</span><span class="day-chip" data-day>Sat</span><span class="day-chip" data-day>Sun</span>
     </div>
-    <div class="schedule-label">PREFERRED TIME</div>
+    <div class="schedule-label">TIME OF DAY</div>
     <div class="time-chips">
-      <span class="time-chip">Morning</span>
-      <span class="time-chip selected">Afternoon</span>
-      <span class="time-chip">Evening</span>
+      <span class="time-chip" data-time>Morning</span><span class="time-chip selected" data-time>Afternoon</span><span class="time-chip" data-time>Evening</span>
     </div>
-    <button class="find-times-btn">Find available times</button>
-  `,'schedule-card');
-}},
+    <button class="find-times-btn" id="findTimesBtn" style="cursor:pointer;background:#1a3a4a;color:white">Find Available Times &rarr;</button>
+  `, 'schedule-card');
+  schedCard.querySelectorAll('[data-day]').forEach(d => { d.style.cursor='pointer'; d.addEventListener('click', () => d.classList.toggle('selected')); });
+  schedCard.querySelectorAll('[data-time]').forEach(t => { t.style.cursor='pointer'; t.addEventListener('click', () => { schedCard.querySelectorAll('[data-time]').forEach(x => x.classList.remove('selected')); t.classList.add('selected'); }); });
+  await new Promise(resolve => { document.getElementById('findTimesBtn').addEventListener('click', resolve); });
+  schedCard.style.pointerEvents='none'; schedCard.style.opacity='0.85';
 
-// 14b. Loading state — checking availability
-{delay:1500,action:()=>{addEl('<div class="spinner"></div> Checking appointment availability ...','loading-state')}},
+  addLoading('Checking appointment availability ...');
+  await wait(1500);
 
-// 14c. Bot typing then appointment options
-{delay:2000,action:()=>addTyping()},
-{delay:2500,action:()=>{
-  removeTyping();
-  botMsg("Perfect — here are available times:");
-}},
+  await typing(1200);
+  botMsg("Perfect — here are available times at Providence Breast Health:");
+  await wait(400);
 
-// 15. Provider card with time slots — Providence
-{delay:800,action:()=>{
-  addEl(`
+  // Provider with time slots (clickable)
+  const slotCard = addEl(`
     <div class="provider-top">
-      <div class="provider-photo" style="background:linear-gradient(135deg,#5a3a7a,#7a5a9a)">PB</div>
+      <div class="provider-photo" style="background:linear-gradient(135deg,#8e44ad,#9b59b6)">PB</div>
       <div class="provider-info">
         <div class="provider-name">Providence Breast Health Center</div>
-        <div class="provider-spec">Imaging &middot; 2.4 mi from Quest</div>
+        <div class="provider-spec">Imaging Center</div>
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.8</span><span class="rating-count">(189)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
     <div class="slots">
-      <span class="slot">Thu 10:00 AM</span>
-      <span class="slot selected">Thu 2:30 PM</span>
-      <span class="slot">Fri 9:15 AM</span>
+      <span class="slot" data-slot>Thu &middot; 10:00 AM</span>
+      <span class="slot" data-slot>Thu &middot; 2:30 PM</span>
+      <span class="slot" data-slot>Fri &middot; 9:15 AM</span>
     </div>
-  `,'provider-card selected');
-}},
+  `, 'provider-card selected');
+  const chosenSlot = await new Promise(resolve => {
+    slotCard.querySelectorAll('[data-slot]').forEach(s => {
+      s.style.cursor='pointer';
+      s.addEventListener('click', () => { slotCard.querySelectorAll('[data-slot]').forEach(x=>x.classList.remove('selected')); s.classList.add('selected'); resolve(s.textContent); });
+    });
+  });
+  slotCard.style.pointerEvents='none';
+  await wait(300);
 
-// 16. User action — book slot
-{delay:1200,action:()=>{actionBtn("Book Thu 2:30 PM")}},
+  await actionBtn("Book " + chosenSlot);
+  userMsg("Book " + chosenSlot);
+  await wait(400);
 
-// 17. Bot asks about transportation
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("I noticed you've mentioned transportation can be difficult. Would you like me to arrange a ride?")}},
+  await typing(1000);
+  botMsg("I noticed you've mentioned transportation can be difficult. Would you like me to arrange a ride?");
+  await wait(400);
 
-// 18. GenUI card — Transportation (symptom-card dark style)
-{delay:1200,action:()=>{
-  addEl(`
+  // Transportation card (interactive chips)
+  const transCard = addEl(`
     <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">TRANSPORTATION</div>
     <div class="symptom-chips">
-      <span class="chip selected">RideHealth (Free)</span>
-      <span class="chip">Lyft ($8)</span>
-      <span class="chip">I'll drive myself</span>
+      <span class="chip" data-trans style="cursor:pointer">RideHealth (Free)</span>
+      <span class="chip" data-trans style="cursor:pointer">Lyft ($8)</span>
+      <span class="chip" data-trans style="cursor:pointer">I'll drive myself</span>
     </div>
-  `,'symptom-card');
-}},
+  `, 'symptom-card');
+  const chosenTrans = await new Promise(resolve => {
+    transCard.querySelectorAll('[data-trans]').forEach(c => {
+      c.addEventListener('click', () => { transCard.querySelectorAll('[data-trans]').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); setTimeout(()=>resolve(c.textContent), 300); });
+    });
+  });
+  transCard.style.pointerEvents='none';
+  userMsg(chosenTrans);
+  await wait(400);
 
-// 19. Bot typing then confirmation
-{delay:1500,action:()=>addTyping()},
-{delay:3000,action:()=>{
-  removeTyping();
+  await typing(1500);
   botMsg("All set! Here's your care plan:");
-}},
+  await wait(400);
 
-// 20. Confirmation card
-{delay:1200,action:()=>{
   addEl(`
     <div class="assess-label">APPOINTMENTS CONFIRMED</div>
     <div class="assess-title">2 Gaps Addressed</div>
-    <div class="assess-section">YOUR SCHEDULE</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><strong>Quest Diagnostics</strong>&nbsp;— LDL Draw &middot; Today walk-in</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><strong>Providence Mammogram</strong>&nbsp;— Thu 2:30 PM</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><strong>RideHealth</strong>&nbsp;— Pickup Thu 2:00 PM</div>
-    <div class="assess-row"><span class="assess-check" style="background:#e67e22">&#8226;</span><strong>Blood Pressure</strong>&nbsp;— PCP follow-up in 2 weeks</div>
-  `,'assess-card');
-}},
+    <div class="assess-section">SCHEDULE</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Quest Diagnostics LDL Draw — Today walk-in</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Providence Mammogram — ` + chosenSlot + `</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>` + chosenTrans + ` — Pickup arranged</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Blood Pressure — PCP follow-up in 2 weeks</div>
+  `, 'assess-card');
+  await wait(600);
 
-// 21. Bot closing message
-{delay:2000,action:()=>{botMsg("I'll send you reminders before each appointment and check in after to confirm completion. Three gaps, one conversation! &#128154;")}},
-];
-
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
+  botMsg("I'll send you reminders before each appointment and check in after to confirm completion. Three gaps, one conversation! &#128154;");
 }
-function startDemo(){
+
+function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  runDemo();
 }
 </script>
 </body>

@@ -232,59 +232,36 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-let si=0;
+const chat = document.getElementById('chat');
+function sb() { chat.scrollTop = chat.scrollHeight; }
+function addEl(html, cls) { const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; chat.appendChild(d); sb(); return d; }
+function addTyping() { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>'; chat.appendChild(d); sb(); }
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
+function userMsg(text) { return addEl('<div class="bub">' + text + '</div>', 'msg user'); }
+function actionBtn(text) { return new Promise(resolve => { const d = addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>' + text + '</div>', 'actions'); d.addEventListener('click', () => { d.style.opacity='0.5'; d.style.pointerEvents='none'; resolve(text); }); }); }
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
+function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
 
-function sb(){chat.scrollTop=chat.scrollHeight}
+async function runDemo() {
+  addEl('Today 2:30 PM', 'timestamp');
+  await wait(500);
 
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
-  chat.appendChild(d);
-  sb();
-  return d;
-}
+  await typing(1500);
+  botMsg("Hi David, this is ARIA, your health companion. I'm reaching out because your care team wants to make sure you're staying on track with your diabetes management. How are you feeling today?");
 
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
-}
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+  await actionBtn("Not great — running out of Metformin");
+  userMsg("Honestly, not great. I've been running out of my Metformin and my energy has been low.");
+  await wait(400);
 
-function botMsg(text){
-  removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
-}
+  addLoading('Pulling in clinical records ...');
+  await wait(1500);
 
-const steps=[
-// 1. Timestamp
-{delay:500,action:()=>{addEl('Today 2:30 PM','timestamp')}},
+  await typing(1500);
+  botMsg("I'm sorry to hear that. Let me pull up your current health snapshot:");
+  await wait(400);
 
-// 2. Bot greeting
-{delay:800,action:()=>{botMsg("Hi David, this is ARIA, your health companion. I'm reaching out because your care team wants to make sure you're staying on track with your diabetes management. How are you feeling today?")}},
-
-// 3. User response
-{delay:2000,action:()=>{userMsg("Honestly, not great. I've been running out of my Metformin and my energy has been low.")}},
-
-// 4. Typing
-{delay:1200,action:()=>addTyping()},
-
-// 4. Bot responds
-{delay:2800,action:()=>{botMsg("I'm sorry to hear that. Let me pull up your current health snapshot:")}},
-
-// 5a. Loading state for clinical records
-{delay:1500,action:()=>{addEl('<div class="spinner"></div> Pulling in clinical records ...','loading-state')}},
-
-// 5. Clinical Summary Card
-{delay:1200,action:()=>{
   addEl(`
     <div class="clinical-label">CLINICAL SUMMARY</div>
     <div class="clinical-title">David Washington</div>
@@ -295,90 +272,74 @@ const steps=[
       <div class="metric"><div class="metric-val warn">138/88</div><div class="metric-label">BP</div></div>
     </div>
     <div class="metric-row">
-      <div class="metric"><div class="metric-val">4 mo</div><div class="metric-label">Last PCP Visit</div></div>
+      <div class="metric"><div class="metric-val">4 mo</div><div class="metric-label">Last PCP</div></div>
       <div class="metric"><div class="metric-val danger">62%</div><div class="metric-label">Rx Adherence</div></div>
-      <div class="metric"><div class="metric-val danger">Overdue</div><div class="metric-label">Next Lab Due</div></div>
+      <div class="metric"><div class="metric-val warn">Overdue</div><div class="metric-label">Next Lab</div></div>
     </div>
-  `,'clinical-card');
-}},
+  `, 'clinical-card');
+  await wait(600);
 
-// 6. Bot comment on numbers
-{delay:1500,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("I see your A1C has been climbing and your LDL is elevated. The Metformin gap could be a factor. Let me check on your medications:")}},
+  await typing(1200);
+  botMsg("I see your A1C has been climbing and your LDL is elevated. The Metformin gap could be a factor. Let me check your medications:");
+  await wait(400);
 
-// 7. Medications list
-{delay:1200,action:()=>{
   addEl(`
     <div class="assess-label">CURRENT MEDICATIONS</div>
-    <div class="med-card">
-      <div class="med-icon">&#128138;</div>
-      <div class="med-info"><div class="med-name">Metformin 1000mg</div><div class="med-detail">Twice daily</div></div>
-      <span class="med-status overdue">OVERDUE</span>
-    </div>
-    <div class="med-card">
-      <div class="med-icon">&#128138;</div>
-      <div class="med-info"><div class="med-name">Atorvastatin 40mg</div><div class="med-detail">Once daily</div></div>
-      <span class="med-status adherent">ADHERENT</span>
-    </div>
-    <div class="med-card">
-      <div class="med-icon">&#128138;</div>
-      <div class="med-info"><div class="med-name">Lisinopril 10mg</div><div class="med-detail">Once daily</div></div>
-      <span class="med-status due">DUE</span>
-    </div>
-  `,'assess-card');
-}},
+    <div class="med-card"><div class="med-icon">&#128138;</div><div class="med-info"><div class="med-name">Metformin 1000mg</div><div class="med-detail">Twice daily</div></div><div class="med-status overdue">OVERDUE</div></div>
+    <div class="med-card"><div class="med-icon">&#128138;</div><div class="med-info"><div class="med-name">Atorvastatin 40mg</div><div class="med-detail">Once daily</div></div><div class="med-status adherent">ADHERENT</div></div>
+    <div class="med-card"><div class="med-icon">&#128138;</div><div class="med-info"><div class="med-name">Lisinopril 10mg</div><div class="med-detail">Once daily</div></div><div class="med-status due">DUE</div></div>
+  `, 'assess-card');
+  await wait(600);
 
-// 8. Bot offers refill
-{delay:1500,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Your Metformin prescription expired 12 days ago. I can request a refill through your pharmacy right now. Would you like me to do that?")}},
+  await typing(1200);
+  botMsg("Your Metformin prescription expired 12 days ago. I can request a refill through your pharmacy right now. Would you like me to do that?");
 
-// 9. User action
-{delay:1200,action:()=>{actionBtn("Yes, refill my Metformin")}},
+  await actionBtn("Yes, refill my Metformin");
+  userMsg("Yes, refill my Metformin");
+  await wait(400);
 
-// 10. Typing and refill confirmation
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Refill requested at Walgreens SE Division. It should be ready by 5 PM today.")}},
+  await typing(1500);
+  botMsg("Refill requested at Walgreens SE Division. It should be ready by 5 PM today.");
+  await wait(600);
 
-// 11. Bot recommends program
-{delay:1500,action:()=>{botMsg("David, given your current numbers, I'd also like to recommend enrolling in the Diabetes Care Program. It includes:")}},
+  await typing(1200);
+  botMsg("David, given your current numbers, I'd also like to recommend enrolling in the Diabetes Care Program. It includes:");
+  await wait(400);
 
-// 12. Program Card
-{delay:1200,action:()=>{
   addEl(`
     <div class="assess-label">RECOMMENDED PROGRAM</div>
     <div class="assess-title">Diabetes Care Program</div>
-    <div class="assess-badge green">No Additional Cost</div>
+    <div class="assess-badge">No Additional Cost</div>
+    <div class="assess-section">PROGRAM INCLUDES</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Monthly A1C monitoring</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Nutritionist consultations</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Connected glucose monitor</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Medication management support</div>
-  `,'assess-card');
-}},
+  `, 'assess-card');
+  await wait(600);
 
-// 13. User enrolls
-{delay:1500,action:()=>{actionBtn("Enroll me in the program")}},
+  await actionBtn("Enroll me in the program");
+  userMsg("Enroll me in the program");
+  await wait(400);
 
-// 14. Bot confirms enrollment with rich card
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{
-  removeTyping();
+  await typing(1500);
   addEl(`
-    <div class="enroll-emoji">🎉</div>
+    <div class="enroll-emoji">&#127881;</div>
     <div class="enroll-title">You're enrolled!</div>
     <div class="enroll-subtitle">Welcome to Diabetes Care Program</div>
-    <div class="enroll-chips"><span class="enroll-chip">📊 A1C Monitoring</span><span class="enroll-chip">🥗 Nutrition</span><span class="enroll-chip">💊 Rx Management</span><span class="enroll-chip">📱 Connected Glucose</span></div>
-    <div class="enroll-text">All yours at <strong>no additional cost</strong> — your care team will reach out within 48 hours to get started.</div>
-  `,'enroll-card');
-}},
-{delay:1500,action:()=>{botMsg("Let's also get you scheduled for blood work and a PCP visit. Here are available providers:")}},
+    <div class="enroll-chips"><span class="enroll-chip">&#128202; A1C Monitoring</span><span class="enroll-chip">&#129367; Nutrition</span><span class="enroll-chip">&#128138; Rx Management</span><span class="enroll-chip">&#128241; Connected Glucose</span></div>
+    <div class="enroll-text">All yours at <strong>no additional cost</strong> — your care team will reach out within 48 hours.</div>
+  `, 'enroll-card');
+  await wait(600);
 
-// 14b. Loading state for provider search
-{delay:1500,action:()=>{addEl('<div class="spinner"></div> Searching provider directory ...','loading-state')}},
+  await typing(1200);
+  botMsg("Let's also get you scheduled for blood work and a PCP visit:");
+  await wait(400);
 
-// 15. Provider card
-{delay:1000,action:()=>{
-  addEl(`
-    <div class="provider-check">&#10003;</div>
+  addLoading('Searching provider directory ...');
+  await wait(1500);
+
+  const slotCard = addEl(`
     <div class="provider-top">
       <div class="provider-photo">RK</div>
       <div class="provider-info">
@@ -387,44 +348,49 @@ const steps=[
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.8</span><span class="rating-count">(267)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="provider-meta"><span>&#128205; 2.4 miles away</span><span>&#128176; $25 copay</span><span style="color:#27ae60;font-weight:600">Accepting patients</span></div>
+    <div class="provider-meta"><span>&#128205; 2.4 miles</span><span>&#128176; $25 copay</span></div>
     <div class="slots">
-      <span class="slot selected">Tue 10:00 AM</span>
-      <span class="slot">Wed 2:15 PM</span>
-      <span class="slot">Thu 11:30 AM</span>
+      <span class="slot" data-slot>Tue &middot; 10:00 AM</span>
+      <span class="slot" data-slot>Wed &middot; 2:15 PM</span>
+      <span class="slot" data-slot>Thu &middot; 11:30 AM</span>
     </div>
-  `,'provider-card selected');
-}},
+  `, 'provider-card selected');
 
-// 16. User books
-{delay:1500,action:()=>{actionBtn("Book Tue 10:00 AM")}},
+  const chosenSlot = await new Promise(resolve => {
+    slotCard.querySelectorAll('[data-slot]').forEach(s => {
+      s.style.cursor = 'pointer';
+      s.addEventListener('click', () => {
+        slotCard.querySelectorAll('[data-slot]').forEach(x => x.classList.remove('selected'));
+        s.classList.add('selected');
+        resolve(s.textContent);
+      });
+    });
+  });
+  slotCard.style.pointerEvents = 'none';
+  await wait(300);
 
-// 17. Confirmation card
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{
-  removeTyping();
+  await actionBtn("Book " + chosenSlot);
+  userMsg("Book " + chosenSlot);
+  await wait(400);
+
+  await typing(1200);
   addEl(`
     <div class="assess-label">CARE PLAN CONFIRMED</div>
     <div class="assess-title">3 Actions Taken</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span><strong>Metformin Refill</strong> &mdash; Ready by 5 PM today</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span><strong>Lab Work</strong> &mdash; Quest Diagnostics walk-in</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span><strong>PCP Visit</strong> &mdash; Dr. Kim Tue 10:00 AM</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span><strong>Diabetes Program</strong> &mdash; Enrolled</span></div>
-  `,'assess-card');
-}},
+    <div class="assess-section">SCHEDULE</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Metformin Refill — Ready by 5 PM today</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Lab Work — Quest Diagnostics walk-in</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>PCP Visit — Dr. Kim ` + chosenSlot + `</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Diabetes Program — Enrolled</div>
+  `, 'assess-card');
+  await wait(500);
 
-// 18. Final bot message
-{delay:1500,action:()=>{botMsg("I'll check in weekly to track your progress and medication adherence. Together we'll get those numbers heading in the right direction. &#128154;")}},
-];
-
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
+  botMsg("I'll check in weekly to track your progress and medication adherence. Together we'll get those numbers heading in the right direction. &#128154;");
 }
-function startDemo(){
+
+function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  runDemo();
 }
 </script>
 </body>

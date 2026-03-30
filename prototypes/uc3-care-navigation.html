@@ -209,53 +209,72 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-let si=0;
+const chat = document.getElementById('chat');
 
-function sb(){chat.scrollTop=chat.scrollHeight}
+function sb() { chat.scrollTop = chat.scrollHeight; }
 
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
+function addEl(html, cls) {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.innerHTML = html;
   chat.appendChild(d);
   sb();
   return d;
 }
 
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
+function addTyping() {
+  const d = document.createElement('div');
+  d.className = 'typing'; d.id = 'typing';
+  d.innerHTML = '<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>';
+  chat.appendChild(d); sb();
 }
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 
-function botMsg(text){
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+function botMsg(text) {
   removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
+  return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot');
 }
 
-const steps=[
-// Timestamp
-{delay:500,action:()=>{addEl('Today 9:47 AM','timestamp')}},
+function userMsg(text) {
+  return addEl('<div class="bub">' + text + '</div>', 'msg user');
+}
 
-// User message
-{delay:800,action:()=>{userMsg("I've had a really bad headache for 2 days and my neck feels stiff. Should I go to the ER?")}},
+function actionBtn(text) {
+  return new Promise(resolve => {
+    const d = addEl('<div class="action-btn"><span class="icon">&#8618;</span>' + text + '</div>', 'actions');
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', () => {
+      d.style.opacity = '0.5';
+      d.style.pointerEvents = 'none';
+      resolve(text);
+    });
+  });
+}
 
-// Typing
-{delay:1200,action:()=>addTyping()},
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// Bot responds
-{delay:2800,action:()=>{botMsg("I'm sorry you're dealing with this. Let me ask a few quick questions to help you get the right care.<br><br>On a scale of 1-10, how would you rate the pain right now?")}},
+async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
 
-// Pain level card
-{delay:1500,action:()=>{
+function addLoading(text) {
+  return addEl('<div class="spinner"></div> ' + text, 'loading-state');
+}
+
+async function runDemo() {
+  // Timestamp
+  addEl('Today 9:47 AM', 'timestamp');
+  await wait(500);
+
+  // User's initial message
+  userMsg("I've had a really bad headache for 2 days and my neck feels stiff. Should I go to the ER?");
+  await wait(800);
+
+  // Bot responds
+  await typing(1500);
+  botMsg("I'm sorry you're dealing with this. Let me ask a few quick questions to help you get the right care.<br><br>On a scale of 1-10, how would you rate the pain right now?");
+  await wait(600);
+
+  // Pain level card
   addEl(`
     <div class="pain-header">PAIN LEVEL</div>
     <div class="pain-row"><span class="pain-badge">Moderate</span><span class="pain-num">7</span></div>
@@ -264,45 +283,58 @@ const steps=[
       <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div>
       <div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-  `,'pain-card');
-}},
+  `, 'pain-card');
+  await wait(800);
 
-// Bot asks symptoms
-{delay:1500,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("Can you describe the pain?")}},
+  await typing(1200);
+  botMsg("Can you describe the pain?");
+  await wait(600);
 
-// Symptom chips
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">SYMPTOMS SELECTED</div>
+  // Symptom chips — interactive
+  const symptomCard = addEl(`
+    <div class="card-label" style="color:rgba(255,255,255,0.6);padding:0 0 8px">TAP TO SELECT SYMPTOMS</div>
     <div class="symptom-chips">
-      <span class="chip">Burning</span>
-      <span class="chip selected">Throbbing</span>
-      <span class="chip">Stiffness</span>
-      <span class="chip selected">Neck stiffness</span>
-      <span class="chip selected">Persistent</span>
-      <span class="chip">Numbness</span>
+      <span class="chip" data-chip>Burning</span>
+      <span class="chip" data-chip>Throbbing</span>
+      <span class="chip" data-chip>Stiffness</span>
+      <span class="chip" data-chip>Neck stiffness</span>
+      <span class="chip" data-chip>Persistent</span>
+      <span class="chip" data-chip>Numbness</span>
     </div>
-  `,'symptom-card');
-}},
+    <div style="margin-top:10px;text-align:center">
+      <span class="action-btn" id="symptomDone" style="display:inline-flex;cursor:pointer;font-size:12px;padding:8px 20px">Done &#10003;</span>
+    </div>
+  `, 'symptom-card');
 
-// Bot asks duration & fever
-{delay:1500,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("How long have you had the headache? And do you have a fever, vision changes, or recent head injury?")}},
+  // Make chips toggleable
+  symptomCard.querySelectorAll('[data-chip]').forEach(chip => {
+    chip.style.cursor = 'pointer';
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
 
-// User responds
-{delay:1500,action:()=>{userMsg("2 days. No fever, no vision changes, no injury. OTC meds aren't helping.")}},
+  // Wait for Done click
+  await new Promise(resolve => {
+    document.getElementById('symptomDone').addEventListener('click', resolve);
+  });
 
-// Typing for assessment
-{delay:1200,action:()=>addTyping()},
+  // Disable the symptom card after clicking
+  symptomCard.style.pointerEvents = 'none';
+  symptomCard.style.opacity = '0.85';
+  await wait(400);
 
-// Assessment card
-{delay:3500,action:()=>{
-  removeTyping();
+  await typing(1200);
+  botMsg("How long have you had the headache? And do you have a fever, vision changes, or recent head injury?");
+
+  // User responds — clickable
+  await actionBtn("2 days. No fever, no vision changes, no injury.");
+  userMsg("2 days. No fever, no vision changes, no injury. OTC meds aren't helping.");
+  await wait(600);
+
+  // Assessment
+  await typing(2000);
   botMsg("Based on your symptoms, this looks like a tension or cervicogenic headache. The neck stiffness <strong>without fever or vision changes</strong> is reassuring.");
-}},
+  await wait(500);
 
-{delay:1500,action:()=>{
   addEl(`
     <div class="assess-label">ASSESSMENT</div>
     <div class="assess-title">Tension / Cervicogenic Headache</div>
@@ -310,40 +342,35 @@ const steps=[
     <div class="assess-section">SUGGESTED CARE</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Urgent Care Visit</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Primary Care Follow-up</div>
-  `,'assess-card');
-  addEl('<span class="calc-time" style="display:block;text-align:center;font-size:11px;color:#8a9baa;margin:4px 0">Calculated in 3 seconds</span>','');
-}},
+  `, 'assess-card');
+  addEl('<span style="display:block;text-align:center;font-size:11px;color:#8a9baa;margin:4px 0">Calculated in 3 seconds</span>', '');
+  await wait(800);
 
-// Bot asks next step
-{delay:2000,action:()=>addTyping()},
-{delay:3000,action:()=>{botMsg("I'd recommend an urgent care visit today rather than the ER. Can I help you find the right providers, or would you like to do something else?")}},
+  await typing(1200);
+  botMsg("I'd recommend an urgent care visit today rather than the ER. Can I help you find the right providers, or would you like to do something else?");
 
-// Action buttons
-{delay:1000,action:()=>{actionBtn("Find the best providers for me")}},
+  // User clicks to find providers
+  await actionBtn("Find the best providers for me");
+  userMsg("Find the best providers for me");
+  await wait(400);
 
-// Typing
-{delay:1500,action:()=>addTyping()},
+  // Loading state
+  addLoading('Pulling in provider directory ...');
+  await wait(1500);
 
-// Loading state
-{delay:1500,action:()=>{addEl('<div class="spinner"></div> Pulling in provider directory ...','loading-state')}},
-
-// Provider results
-{delay:3000,action:()=>{
-  removeTyping();
+  await typing(1500);
   botMsg("I've found several in-network urgent care and primary care options near you. Take a look at these providers:");
-}},
+  await wait(400);
 
-// Filter tabs
-{delay:800,action:()=>{
-  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`,'filter-tabs');
-}},
+  // Filter tabs
+  addEl('<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>', 'filter-tabs');
+  await wait(400);
 
-// Provider 1
-{delay:800,action:()=>{
+  // Provider 1 (selected)
   addEl(`
     <div class="provider-check">&#10003;</div>
     <div class="provider-top">
-      <div class="provider-photo">MT</div>
+      <div class="provider-photo">KP</div>
       <div class="provider-info">
         <div class="provider-name">Dr. Karen Patel, MD</div>
         <div class="provider-spec">Urgent Care &middot; CityMD Lloyd Center</div>
@@ -351,15 +378,14 @@ const steps=[
       </div>
     </div>
     <div class="provider-meta"><span>&#128205; 2.1 miles away</span><span>&#128176; $35 est. copay</span><span style="color:#27ae60;font-weight:600">Accepting patients</span></div>
-    <div class="provider-desc">Board-certified family medicine. Experienced with headache and musculoskeletal evaluation. Typically available same day.</div>
-  `,'provider-card selected');
-}},
+    <div class="provider-desc">Board-certified family medicine. Experienced with headache and musculoskeletal evaluation.</div>
+  `, 'provider-card selected');
+  await wait(300);
 
-// Provider 2
-{delay:600,action:()=>{
+  // Provider 2
   addEl(`
     <div class="provider-top">
-      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">ZC</div>
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">JL</div>
       <div class="provider-info">
         <div class="provider-name">Dr. James Liu, MD</div>
         <div class="provider-spec">Urgent Care &middot; ZoomCare Division</div>
@@ -367,11 +393,10 @@ const steps=[
       </div>
     </div>
     <div class="provider-meta"><span>&#128205; 3.4 miles away</span><span>&#128176; $35 est. copay</span></div>
-  `,'provider-card');
-}},
+  `, 'provider-card');
+  await wait(300);
 
-// Provider 3
-{delay:600,action:()=>{
+  // Provider 3
   addEl(`
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#5a3a7a,#7a5a9a)">TD</div>
@@ -382,46 +407,61 @@ const steps=[
       </div>
     </div>
     <div class="provider-meta"><span>&#128187; Available now</span><span>&#128176; $0 copay</span></div>
-  `,'provider-card');
-}},
+  `, 'provider-card');
+  await wait(600);
 
-// Action: find appointments
-{delay:1200,action:()=>{actionBtn("Find available appointments")}},
+  // User clicks find appointments
+  await actionBtn("Find available appointments");
+  userMsg("Find available appointments");
+  await wait(400);
 
-// Bot asks availability
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("What days and times work best for you?")}},
+  await typing(1000);
+  botMsg("What days and times work best for you?");
+  await wait(400);
 
-// Day/Time picker card
-{delay:1200,action:()=>{
-  addEl(`
+  // Day/Time picker — interactive
+  const schedCard = addEl(`
     <div class="schedule-label">DAYS</div>
     <div class="day-chips">
-      <div class="day-chip selected">Mon</div><div class="day-chip">Tue</div><div class="day-chip">Wed</div><div class="day-chip">Thu</div><div class="day-chip">Fri</div><div class="day-chip">Sat</div><div class="day-chip">Sun</div>
+      <span class="day-chip" data-day>Mon</span><span class="day-chip" data-day>Tue</span><span class="day-chip" data-day>Wed</span><span class="day-chip" data-day>Thu</span><span class="day-chip" data-day>Fri</span><span class="day-chip" data-day>Sat</span><span class="day-chip" data-day>Sun</span>
     </div>
     <div class="schedule-label">TIME OF DAY</div>
     <div class="time-chips">
-      <div class="time-chip">Morning</div><div class="time-chip selected">Afternoon</div><div class="time-chip">Evening</div>
+      <span class="time-chip" data-time>Morning</span><span class="time-chip" data-time>Afternoon</span><span class="time-chip" data-time>Evening</span>
     </div>
-    <button class="find-times-btn">Find Available Times &rarr;</button>
-  `,'schedule-card');
-}},
+    <button class="find-times-btn" id="findTimesBtn" style="cursor:pointer;background:#1a3a4a;color:white">Find Available Times &rarr;</button>
+  `, 'schedule-card');
 
-// User picks
-{delay:1200,action:()=>{actionBtn("Today &middot; Afternoon")}},
+  schedCard.querySelectorAll('[data-day]').forEach(d => {
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', () => d.classList.toggle('selected'));
+  });
+  schedCard.querySelectorAll('[data-time]').forEach(t => {
+    t.style.cursor = 'pointer';
+    t.addEventListener('click', () => {
+      schedCard.querySelectorAll('[data-time]').forEach(x => x.classList.remove('selected'));
+      t.classList.add('selected');
+    });
+  });
 
-// Typing
-{delay:1200,action:()=>addTyping()},
+  await new Promise(resolve => {
+    document.getElementById('findTimesBtn').addEventListener('click', resolve);
+  });
+  schedCard.style.pointerEvents = 'none';
+  schedCard.style.opacity = '0.85';
 
-// Appointment options
-{delay:3000,action:()=>{
-  removeTyping();
-  botMsg("Great news — CityMD Lloyd Center has openings today. Pick a time:");
-}},
+  // Show selected as user message
+  const selectedDays = [...schedCard.querySelectorAll('[data-day].selected')].map(d => d.textContent).join(', ') || 'Today';
+  const selectedTime = schedCard.querySelector('[data-time].selected')?.textContent || 'Afternoon';
+  userMsg(selectedDays + ' \u00b7 ' + selectedTime);
+  await wait(400);
 
-// Provider with slots
-{delay:800,action:()=>{
-  addEl(`
+  await typing(1500);
+  botMsg("Great news \u2014 CityMD Lloyd Center has openings today. Pick a time:");
+  await wait(400);
+
+  // Provider with time slots — clickable
+  const slotCard = addEl(`
     <div class="provider-top">
       <div class="provider-photo">KP</div>
       <div class="provider-info">
@@ -431,24 +471,36 @@ const steps=[
       </div>
     </div>
     <div class="slots">
-      <span class="slot selected">Today &middot; 2:45 PM</span>
-      <span class="slot">Today &middot; 3:30 PM</span>
-      <span class="slot">Today &middot; 4:15 PM</span>
+      <span class="slot" data-slot>Today &middot; 2:45 PM</span>
+      <span class="slot" data-slot>Today &middot; 3:30 PM</span>
+      <span class="slot" data-slot>Today &middot; 4:15 PM</span>
     </div>
-  `,'provider-card selected');
-}},
+  `, 'provider-card selected');
 
-// Action: request appointment
-{delay:1200,action:()=>{actionBtn("Request this appointment")}},
+  const chosenSlot = await new Promise(resolve => {
+    slotCard.querySelectorAll('[data-slot]').forEach(s => {
+      s.style.cursor = 'pointer';
+      s.addEventListener('click', () => {
+        slotCard.querySelectorAll('[data-slot]').forEach(x => x.classList.remove('selected'));
+        s.classList.add('selected');
+        resolve(s.textContent);
+      });
+    });
+  });
+  slotCard.style.pointerEvents = 'none';
+  await wait(300);
 
-// Confirmation
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{
-  botMsg("You're all set! I'll confirm the appointment and send you a text. Your estimated copay is <strong>$35</strong> — that's <strong>$215 less</strong> than the ER.");
-}},
+  // User confirms
+  await actionBtn("Request this appointment");
+  userMsg("Book " + chosenSlot);
+  await wait(400);
 
-// Deductible & Cost card
-{delay:1200,action:()=>{
+  // Confirmation
+  await typing(1500);
+  botMsg("You're all set! I'll confirm the appointment and send you a text. Your estimated copay is <strong>$35</strong> \u2014 that's <strong>$215 less</strong> than the ER.");
+  await wait(500);
+
+  // Deductible card
   addEl(`
     <div class="deductible-label">DEDUCTIBLE AND COST</div>
     <div class="deductible-amount"><span class="big">$1,250</span><span class="of">of $3,000</span></div>
@@ -456,35 +508,26 @@ const steps=[
     <div class="deductible-bar"><div class="deductible-fill" style="width:42%"></div></div>
     <div class="deductible-text">Your plan has a <strong>Co-Pay of $35</strong> for urgent care visits with <strong>80% co-insurance</strong> before you've met your deductible.</div>
     <div class="deductible-oop"><div class="label">Estimated out of pocket cost</div><div class="amount">$35</div></div>
-  `,'deductible-card');
-}},
+  `, 'deductible-card');
+  await wait(800);
 
-// Safety net
-{delay:2000,action:()=>addTyping()},
-{delay:3000,action:()=>{
-  removeTyping();
+  // Safety net
+  await typing(1500);
   addEl(`
     <h5>Go to the ER or call 911 if you experience:</h5>
     <div class="safety-item">&#9888; Fever above 101&deg;F</div>
     <div class="safety-item">&#9888; Sudden vision changes or double vision</div>
-    <div class="safety-item">&#9888; "Worst headache of your life" — sudden onset</div>
+    <div class="safety-item">&#9888; "Worst headache of your life" \u2014 sudden onset</div>
     <div class="safety-item">&#9888; Confusion, difficulty speaking, or weakness</div>
-  `,'safety-card');
-}},
+  `, 'safety-card');
+  await wait(500);
 
-{delay:1000,action:()=>{
   botMsg("I'll check in with you tomorrow to see how you're feeling. Feel better! &#128154;");
-}},
-];
-
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
 }
-function startDemo(){
+
+function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  runDemo();
 }
 </script>
 </body>
