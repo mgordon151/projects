@@ -201,205 +201,187 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-let si=0;
+const chat = document.getElementById('chat');
+function sb() { chat.scrollTop = chat.scrollHeight; }
+function addEl(html, cls) { const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; chat.appendChild(d); sb(); return d; }
+function addTyping() { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>'; chat.appendChild(d); sb(); }
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
+function userMsg(text) { return addEl('<div class="bub">' + text + '</div>', 'msg user'); }
+function actionBtn(text) { return new Promise(resolve => { const d = addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>' + text + '</div>', 'actions'); d.addEventListener('click', () => { d.style.opacity='0.5'; d.style.pointerEvents='none'; resolve(text); }); }); }
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
+function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
 
-function sb(){chat.scrollTop=chat.scrollHeight}
+async function runDemo() {
+  // 1. Timestamp
+  await wait(500);
+  addEl('Today 11:30 AM', 'timestamp');
 
-function addEl(html,cls=''){
-  const d=document.createElement('div');
-  if(cls)d.className=cls;
-  d.innerHTML=html;
-  chat.appendChild(d);
-  sb();
-  return d;
-}
+  // 2. ADT alert banner
+  await wait(800);
+  addEl('<h5>&#9888; ADT ALERT</h5><p>Robert Martinez discharged from Providence Portland Medical Center &mdash; Hip Replacement (ICD-10: Z96.641). Follow-up protocol initiated.</p>', 'alert-banner');
 
-function addTyping(){
-  const d=document.createElement('div');d.className='typing';d.id='typing';
-  d.innerHTML=`<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>`;
-  chat.appendChild(d);sb();
-}
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+  // 3. Bot greeting
+  await typing(1500);
+  botMsg("Hi Robert, this is ARIA, your health companion. I see you were discharged yesterday from Providence Portland after your hip replacement. How are you doing at home?");
 
-function botMsg(text){
-  removeTyping();
-  addEl(`<div class="avatar">A</div><div class="bub">${text}</div>`,'msg bot');
-}
-function userMsg(text){
-  addEl(`<div class="bub">${text}</div>`,'msg user');
-}
-function actionBtn(text){
-  addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`,'actions');
-}
+  // 4. USER CLICK: "I'm doing okay but pretty sore"
+  await actionBtn("I'm doing okay but pretty sore");
+  userMsg("I'm doing okay but pretty sore. Having trouble remembering all my medications.");
 
-const steps=[
-// 1. Timestamp
-{delay:500,action:()=>{addEl('Today 11:30 AM','timestamp')}},
+  // 5. Bot reviews discharge plan
+  await typing(1500);
+  botMsg("That's completely normal after a procedure like this. Let me review your discharge plan:");
 
-// 2. Alert banner
-{delay:800,action:()=>{
-  addEl(`
-    <h5>&#9888; ADT ALERT</h5>
-    <p>Robert Martinez discharged from Providence Portland Medical Center &mdash; Hip Replacement (ICD-10: Z96.641). Follow-up protocol initiated.</p>
-  `,'alert-banner');
-}},
+  // 5b. Loading: pulling discharge records
+  var loader = addLoading('Pulling in discharge records ...');
+  await wait(1500);
+  loader.remove();
 
-// 3. Bot greeting
-{delay:1500,action:()=>addTyping()},
-{delay:3000,action:()=>{botMsg("Hi Robert, this is ARIA, your health companion. I see you were discharged yesterday from Providence Portland after your hip replacement. How are you doing at home?")}},
+  // 6. Discharge card with checklist
+  addEl(
+    '<div class="discharge-header"><div class="discharge-icon">&#128203;</div><div><div class="discharge-title">Discharge Summary</div><div class="discharge-date">Discharged Mar 29, 2026</div></div></div>' +
+    '<div class="checklist">' +
+    '<div class="check-item"><div class="check-box done">&#10003;</div>Pain management protocol received</div>' +
+    '<div class="check-item"><div class="check-box done">&#10003;</div>Physical therapy referral placed</div>' +
+    '<div class="check-item"><div class="check-box missed">&#10007;</div>Follow-up with orthopedic surgeon &mdash; <strong>NOT YET SCHEDULED</strong></div>' +
+    '<div class="check-item"><div class="check-box missed">&#10007;</div>Prescription pickup &mdash; <strong>NOT CONFIRMED</strong></div>' +
+    '</div>',
+    'discharge-card'
+  );
 
-// 4. User response
-{delay:1500,action:()=>{userMsg("I'm doing okay but pretty sore. Having trouble remembering all my medications.")}},
+  // 7. Bot checks prescriptions, shows medication list
+  await wait(800);
+  botMsg("I see two items need attention. Let me check on your prescriptions first. Your discharge includes:");
 
-// 5. Bot typing then response
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("That's completely normal after a procedure like this. Let me review your discharge plan:")}},
+  await wait(1000);
+  addEl(
+    '<div class="assess-label">POST-DISCHARGE MEDICATIONS</div>' +
+    '<div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Oxycodone 5mg</strong> &mdash; Every 6 hours as needed</span><span style="background:#fff3e0;color:#e67e22;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">NEW</span></div>' +
+    '<div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Aspirin 81mg</strong> &mdash; Daily, DVT prevention</span><span style="background:#fff3e0;color:#e67e22;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">NEW</span></div>' +
+    '<div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Lisinopril 20mg</strong> &mdash; Continue existing</span><span style="background:#e8f5e9;color:#27ae60;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">ONGOING</span></div>' +
+    '<div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Metoprolol 25mg</strong> &mdash; Continue existing</span><span style="background:#e8f5e9;color:#27ae60;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">ONGOING</span></div>',
+    'assess-card'
+  );
 
-// 5b. Loading state — discharge records
-{delay:1000,action:()=>{addEl('<div class="spinner"></div> Pulling in discharge records ...','loading-state')}},
+  // 8. Bot asks about prescription pickup
+  await wait(800);
+  botMsg("Have you been able to pick up your new prescriptions?");
 
-// 6. Discharge Summary Card
-{delay:1500,action:()=>{
-  addEl(`
-    <div class="discharge-header">
-      <div class="discharge-icon">&#128203;</div>
-      <div>
-        <div class="discharge-title">Discharge Summary</div>
-        <div class="discharge-date">Discharged Mar 29, 2026</div>
-      </div>
-    </div>
-    <div class="checklist">
-      <div class="check-item"><div class="check-box done">&#10003;</div>Pain management protocol received</div>
-      <div class="check-item"><div class="check-box done">&#10003;</div>Physical therapy referral placed</div>
-      <div class="check-item"><div class="check-box missed">&#10007;</div>Follow-up with orthopedic surgeon &mdash; <strong>NOT YET SCHEDULED</strong></div>
-      <div class="check-item"><div class="check-box missed">&#10007;</div>Prescription pickup &mdash; <strong>NOT CONFIRMED</strong></div>
-    </div>
-  `,'discharge-card');
-}},
+  // 9. USER CLICK: "Not yet, I can't drive"
+  await actionBtn("Not yet, I can't drive");
+  userMsg("Not yet, I can't drive after the surgery");
 
-// 7. Bot notes two items
-{delay:1500,action:()=>{botMsg("I see two items need attention. Let me check on your prescriptions first. Your discharge includes:")}},
+  // 10. Bot offers delivery
+  await typing(1500);
+  botMsg("No problem &mdash; I can arrange delivery. Your Walgreens on Hawthorne offers free prescription delivery for post-surgical patients.");
 
-// 8. Medications card
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="assess-label">POST-DISCHARGE MEDICATIONS</div>
-    <div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Oxycodone 5mg</strong> &mdash; Every 6 hours as needed</span><span style="background:#fff3e0;color:#e67e22;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">NEW</span></div>
-    <div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Aspirin 81mg</strong> &mdash; Daily, DVT prevention</span><span style="background:#fff3e0;color:#e67e22;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">NEW</span></div>
-    <div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Lisinopril 20mg</strong> &mdash; Continue existing</span><span style="background:#e8f5e9;color:#27ae60;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">ONGOING</span></div>
-    <div class="assess-row"><span>&#128138;</span><span style="flex:1"><strong>Metoprolol 25mg</strong> &mdash; Continue existing</span><span style="background:#e8f5e9;color:#27ae60;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">ONGOING</span></div>
-  `,'assess-card');
-}},
+  // 11. USER CLICK: "Yes, arrange delivery"
+  await actionBtn("Yes, arrange delivery");
+  userMsg("Yes, arrange delivery");
 
-// 9. Bot asks about prescriptions
-{delay:1500,action:()=>{botMsg("Have you been able to pick up your new prescriptions?")}},
+  // 12. Bot confirms delivery, offers to schedule follow-up
+  await typing(1500);
+  botMsg("Delivery confirmed for today by 3 PM. Now let's get your orthopedic follow-up scheduled. Your surgeon recommends a visit within 10&ndash;14 days.");
 
-// 10. User can't drive
-{delay:1200,action:()=>{userMsg("Not yet, I can't drive after the surgery")}},
+  // 13. Loading: searching provider directory
+  var loader2 = addLoading('Searching provider directory ...');
+  await wait(1500);
+  loader2.remove();
 
-// 11. Bot offers delivery
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{botMsg("No problem &mdash; I can arrange delivery. Your Walgreens on Hawthorne offers free prescription delivery for post-surgical patients.")}},
+  // 14. Provider card with clickable time slots
+  var chosenSlot = await new Promise(function(resolve) {
+    var card = addEl(
+      '<div class="provider-top">' +
+      '<div class="provider-photo">MT</div>' +
+      '<div class="provider-info">' +
+      '<div class="provider-name">Dr. Michael Torres, MD</div>' +
+      '<div class="provider-spec">Orthopedic Surgery &middot; Providence Orthopedics</div>' +
+      '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(198)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
+      '</div></div>' +
+      '<div class="provider-meta"><span>Your surgeon</span><span>&#128176; $40 copay</span></div>' +
+      '<div class="slots" id="timeSlots">' +
+      '<span class="slot" style="cursor:pointer" data-slot="Apr 8 9:00 AM">Apr 8 &middot; 9:00 AM</span>' +
+      '<span class="slot" style="cursor:pointer" data-slot="Apr 9 1:30 PM">Apr 9 &middot; 1:30 PM</span>' +
+      '<span class="slot" style="cursor:pointer" data-slot="Apr 10 11:00 AM">Apr 10 &middot; 11:00 AM</span>' +
+      '</div>',
+      'provider-card'
+    );
+    var slots = card.querySelectorAll('.slot');
+    slots.forEach(function(s) {
+      s.addEventListener('click', function() {
+        slots.forEach(function(x) { x.classList.remove('selected'); x.style.pointerEvents = 'none'; });
+        s.classList.add('selected');
+        card.classList.add('selected');
+        var checkDiv = document.createElement('div');
+        checkDiv.className = 'provider-check';
+        checkDiv.innerHTML = '&#10003;';
+        card.prepend(checkDiv);
+        resolve(s.getAttribute('data-slot'));
+      });
+    });
+  });
 
-// 12. User action
-{delay:1000,action:()=>{actionBtn("Yes, arrange delivery")}},
+  // 15-16. USER CLICK: "Book [chosen slot]"
+  await actionBtn("Book " + chosenSlot);
+  userMsg("Book " + chosenSlot);
 
-// 13. Bot confirms delivery and moves to scheduling
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Delivery confirmed for today by 3 PM. Now let's get your orthopedic follow-up scheduled. Your surgeon recommends a visit within 10&ndash;14 days.")}},
+  // 17. Bot asks about pain level
+  await typing(1500);
+  botMsg("Perfect. I also want to check &mdash; how is your pain level right now?");
 
-// 13b. Loading state — provider directory
-{delay:1000,action:()=>{addEl('<div class="spinner"></div> Searching provider directory ...','loading-state')}},
+  // 18. Pain card (display only, level 6)
+  await wait(800);
+  addEl(
+    '<div class="pain-header">PAIN LEVEL</div>' +
+    '<div class="pain-row"><span class="pain-badge">Moderate</span><span class="pain-num">6</span></div>' +
+    '<div class="pain-dots">' +
+    '<div class="dot active"></div><div class="dot active"></div><div class="dot active"></div>' +
+    '<div class="dot active"></div><div class="dot active"></div><div class="dot current"></div>' +
+    '<div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>' +
+    '</div>',
+    'pain-card'
+  );
 
-// 14. Provider card with slots
-{delay:1500,action:()=>{
-  addEl(`
-    <div class="provider-check">&#10003;</div>
-    <div class="provider-top">
-      <div class="provider-photo">MT</div>
-      <div class="provider-info">
-        <div class="provider-name">Dr. Michael Torres, MD</div>
-        <div class="provider-spec">Orthopedic Surgery &middot; Providence Orthopedics</div>
-        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(198)</span><span class="tier-badge">Tier 1 In-Network</span></div>
-      </div>
-    </div>
-    <div class="provider-meta"><span>Your surgeon</span><span>&#128176; $40 copay</span></div>
-    <div class="slots">
-      <span class="slot">Apr 8 &middot; 9:00 AM</span>
-      <span class="slot selected">Apr 9 &middot; 1:30 PM</span>
-      <span class="slot">Apr 10 &middot; 11:00 AM</span>
-    </div>
-  `,'provider-card selected');
-}},
+  // 19. Bot pain management advice
+  await wait(800);
+  botMsg("That's within expected range for day 2. Remember to take your Oxycodone on schedule and use ice for 20 minutes every 2 hours.");
 
-// 15. User books appointment
-{delay:1200,action:()=>{actionBtn("Book Apr 9 1:30 PM")}},
-
-// 16. Bot asks about pain
-{delay:1200,action:()=>addTyping()},
-{delay:2500,action:()=>{botMsg("Perfect. I also want to check &mdash; how is your pain level right now?")}},
-
-// 17. Pain card — level 6, Moderate
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="pain-header">PAIN LEVEL</div>
-    <div class="pain-row"><span class="pain-badge">Moderate</span><span class="pain-num">6</span></div>
-    <div class="pain-dots">
-      <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div>
-      <div class="dot active"></div><div class="dot active"></div><div class="dot current"></div>
-      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-    </div>
-  `,'pain-card');
-}},
-
-// 18. Bot pain guidance
-{delay:1500,action:()=>{botMsg("That's within expected range for day 2. Remember to take your Oxycodone on schedule and use ice for 20 minutes every 2 hours.")}},
-
-// 19. Bot typing then care plan
-{delay:1200,action:()=>addTyping()},
-{delay:2800,action:()=>{
-  removeTyping();
+  // 20. Confirmation card with 4 items tracked
+  await typing(1500);
   botMsg("Here's your complete post-discharge care plan:");
-}},
 
-// 20. Care plan card
-{delay:1200,action:()=>{
-  addEl(`
-    <div class="assess-label">POST-DISCHARGE CARE PLAN</div>
-    <div class="assess-title">4 Items Tracked</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Rx Delivery</strong></span><span style="font-size:12px;color:#5a6b7b">Today by 3 PM</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Surgeon Follow-up</strong></span><span style="font-size:12px;color:#5a6b7b">Apr 9, 1:30 PM</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Physical Therapy</strong></span><span style="font-size:12px;color:#5a6b7b">Starts Apr 7 (referral sent)</span></div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Daily Check-ins</strong></span><span style="font-size:12px;color:#5a6b7b">Automated for 30 days</span></div>
-  `,'assess-card');
-}},
+  await wait(800);
+  addEl(
+    '<div class="assess-label">POST-DISCHARGE CARE PLAN</div>' +
+    '<div class="assess-title">4 Items Tracked</div>' +
+    '<div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Rx Delivery</strong></span><span style="font-size:12px;color:#5a6b7b">Today by 3 PM</span></div>' +
+    '<div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Surgeon Follow-up</strong></span><span style="font-size:12px;color:#5a6b7b">' + chosenSlot + '</span></div>' +
+    '<div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Physical Therapy</strong></span><span style="font-size:12px;color:#5a6b7b">Starts Apr 7 (referral sent)</span></div>' +
+    '<div class="assess-row"><span class="assess-check">&#10003;</span><span style="flex:1"><strong>Daily Check-ins</strong></span><span style="font-size:12px;color:#5a6b7b">Automated for 30 days</span></div>',
+    'assess-card'
+  );
 
-// 21. Safety card
-{delay:1500,action:()=>{
-  addEl(`
-    <h5>Contact your care team or call 911 if:</h5>
-    <div class="safety-item">&#9888; Fever above 101.5&deg;F</div>
-    <div class="safety-item">&#9888; Increased redness, swelling, or drainage at incision</div>
-    <div class="safety-item">&#9888; Sudden chest pain or difficulty breathing</div>
-    <div class="safety-item">&#9888; Calf pain or swelling (possible DVT)</div>
-  `,'safety-card');
-}},
+  // 21. Safety card
+  await wait(800);
+  addEl(
+    '<h5>Contact your care team or call 911 if:</h5>' +
+    '<div class="safety-item">&#9888; Fever above 101.5&deg;F</div>' +
+    '<div class="safety-item">&#9888; Increased redness, swelling, or drainage at incision</div>' +
+    '<div class="safety-item">&#9888; Sudden chest pain or difficulty breathing</div>' +
+    '<div class="safety-item">&#9888; Calf pain or swelling (possible DVT)</div>',
+    'safety-card'
+  );
 
-// 22. Bot closing
-{delay:1500,action:()=>{
+  // 22. Bot closing message about 30-day check-ins
+  await wait(800);
   botMsg("I'll check in with you every day for the next 30 days. Your nurse care manager Sarah is also available if you need to speak with someone. Stay safe, Robert! &#128154;");
-}},
-];
-
-function runStep(){
-  if(si>=steps.length)return;
-  const s=steps[si];si++;
-  setTimeout(()=>{s.action();runStep()},s.delay);
 }
-function startDemo(){
+
+function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
-  runStep();
+  runDemo();
 }
 </script>
 </body>
