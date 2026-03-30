@@ -208,7 +208,7 @@ function addTyping() { const d = document.createElement('div'); d.className = 't
 function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
 function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
 function userMsg(text) { return addEl('<div class="bub">' + text + '</div>', 'msg user'); }
-function actionBtn(text) { return new Promise(resolve => { const d = addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>' + text + '</div>', 'actions'); d.addEventListener('click', () => { d.style.opacity='0.5'; d.style.pointerEvents='none'; resolve(text); }); }); }
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
 function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
@@ -228,7 +228,6 @@ async function runDemo() {
 
   // 4. USER CLICK: "I'm doing okay but pretty sore"
   await actionBtn("I'm doing okay but pretty sore");
-  userMsg("I'm doing okay but pretty sore. Having trouble remembering all my medications.");
 
   // 5. Bot reviews discharge plan
   await typing(1500);
@@ -271,7 +270,6 @@ async function runDemo() {
 
   // 9. USER CLICK: "Not yet, I can't drive"
   await actionBtn("Not yet, I can't drive");
-  userMsg("Not yet, I can't drive after the surgery");
 
   // 10. Bot offers delivery
   await typing(1500);
@@ -279,7 +277,6 @@ async function runDemo() {
 
   // 11. USER CLICK: "Yes, arrange delivery"
   await actionBtn("Yes, arrange delivery");
-  userMsg("Yes, arrange delivery");
 
   // 12. Bot confirms delivery, offers to schedule follow-up
   await typing(1500);
@@ -325,7 +322,6 @@ async function runDemo() {
 
   // 15-16. USER CLICK: "Book [chosen slot]"
   await actionBtn("Book " + chosenSlot);
-  userMsg("Book " + chosenSlot);
 
   // 17. Bot asks about pain level
   await typing(1500);

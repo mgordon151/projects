@@ -239,7 +239,7 @@ function addTyping() { const d = document.createElement('div'); d.className = 't
 function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
 function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
 function userMsg(text) { return addEl('<div class="bub">' + text + '</div>', 'msg user'); }
-function actionBtn(text) { return new Promise(resolve => { const d = addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>' + text + '</div>', 'actions'); d.addEventListener('click', () => { d.style.opacity='0.5'; d.style.pointerEvents='none'; resolve(text); }); }); }
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
 function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
@@ -252,7 +252,6 @@ async function runDemo() {
   botMsg("Hi David, this is ARIA, your health companion. I'm reaching out because your care team wants to make sure you're staying on track with your diabetes management. How are you feeling today?");
 
   await actionBtn("Not great — running out of Metformin");
-  userMsg("Honestly, not great. I've been running out of my Metformin and my energy has been low.");
   await wait(400);
 
   addLoading('Pulling in clinical records ...');
@@ -295,7 +294,6 @@ async function runDemo() {
   botMsg("Your Metformin prescription expired 12 days ago. I can request a refill through your pharmacy right now. Would you like me to do that?");
 
   await actionBtn("Yes, refill my Metformin");
-  userMsg("Yes, refill my Metformin");
   await wait(400);
 
   await typing(1500);
@@ -319,7 +317,6 @@ async function runDemo() {
   await wait(600);
 
   await actionBtn("Enroll me in the program");
-  userMsg("Enroll me in the program");
   await wait(400);
 
   await typing(1500);
@@ -370,7 +367,6 @@ async function runDemo() {
   await wait(300);
 
   await actionBtn("Book " + chosenSlot);
-  userMsg("Book " + chosenSlot);
   await wait(400);
 
   await typing(1200);

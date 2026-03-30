@@ -202,16 +202,7 @@ function userMsg(text) {
   return addEl(`<div class="bub">${text}</div>`, 'msg user');
 }
 
-function actionBtn(text) {
-  return new Promise(resolve => {
-    const el = addEl(`<div class="action-btn"><span class="icon">&#8618;</span>${text}</div>`, 'actions');
-    el.querySelector('.action-btn').addEventListener('click', () => {
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0.5';
-      resolve(text);
-    });
-  });
-}
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
 
 function addLoading(text) {
   return addEl(`<div class="spinner"></div> ${text}`, 'loading-state');
@@ -239,7 +230,6 @@ async function startDemo() {
 
   // 3. USER CLICK: "What do I need?"
   await actionBtn("What do I need?");
-  userMsg("I've been meaning to schedule those but keep putting it off. What do I need?");
 
   // 4. Loading: "Pulling your wellness data..."
   await typing(1000);
@@ -318,7 +308,6 @@ async function startDemo() {
 
   // 10. USER CLICK: "Yes, order the home kit"
   await actionBtn("Yes, order the home kit");
-  userMsg("Yes, order the home kit");
 
   // 11. Bot: confirms kit ordered, moves to mammogram
   await typing(1400);
@@ -379,7 +368,6 @@ async function startDemo() {
 
   // 16. USER CLICK: "Book [slot]"
   await actionBtn(`Book ${selectedSlot}`);
-  userMsg(`Book ${selectedSlot}`);
 
   // 17. Bot: mentions rewards
   await typing(1400);
@@ -397,7 +385,6 @@ async function startDemo() {
 
   // 19. USER CLICK: "Tell me about the wellness profile"
   await actionBtn("Tell me about the wellness profile");
-  userMsg("Tell me about the wellness profile");
 
   // 20. Bot: explains wellness profile
   await typing(1400);
@@ -405,7 +392,6 @@ async function startDemo() {
 
   // 21. USER CLICK: "Yes, send me the link"
   await actionBtn("Yes, send me the link");
-  userMsg("Yes, send me the link");
 
   // 22. Enrollment card (Wellness Rewards)
   await typing(1000);

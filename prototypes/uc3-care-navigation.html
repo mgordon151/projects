@@ -240,17 +240,7 @@ function userMsg(text) {
   return addEl('<div class="bub">' + text + '</div>', 'msg user');
 }
 
-function actionBtn(text) {
-  return new Promise(resolve => {
-    const d = addEl('<div class="action-btn"><span class="icon">&#8618;</span>' + text + '</div>', 'actions');
-    d.style.cursor = 'pointer';
-    d.addEventListener('click', () => {
-      d.style.opacity = '0.5';
-      d.style.pointerEvents = 'none';
-      resolve(text);
-    });
-  });
-}
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -327,7 +317,6 @@ async function runDemo() {
 
   // User responds — clickable
   await actionBtn("2 days. No fever, no vision changes, no injury.");
-  userMsg("2 days. No fever, no vision changes, no injury. OTC meds aren't helping.");
   await wait(600);
 
   // Assessment
@@ -351,7 +340,6 @@ async function runDemo() {
 
   // User clicks to find providers
   await actionBtn("Find the best providers for me");
-  userMsg("Find the best providers for me");
   await wait(400);
 
   // Loading state
@@ -412,7 +400,6 @@ async function runDemo() {
 
   // User clicks find appointments
   await actionBtn("Find available appointments");
-  userMsg("Find available appointments");
   await wait(400);
 
   await typing(1000);
@@ -492,7 +479,6 @@ async function runDemo() {
 
   // User confirms
   await actionBtn("Request this appointment");
-  userMsg("Book " + chosenSlot);
   await wait(400);
 
   // Confirmation

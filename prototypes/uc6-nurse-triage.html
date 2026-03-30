@@ -229,7 +229,7 @@ function addTyping(){const d=document.createElement('div');d.className='typing';
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 function botMsg(text){removeTyping();return addEl('<div class="avatar">A</div><div class="bub">'+text+'</div>','msg bot')}
 function userMsg(text){return addEl('<div class="bub">'+text+'</div>','msg user')}
-function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.style.opacity='0.5';d.style.pointerEvents='none';resolve(text)})})}
+function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 async function typing(ms){addTyping();await wait(ms);removeTyping()}
 function addLoading(text){return addEl('<div class="spinner"></div> '+text,'loading-state')}
@@ -278,7 +278,6 @@ async function runDemo(){
 
   // USER CLICK
   await actionBtn("About 5 hours. Vomited once but drinking water.");
-  userMsg("About 5 hours. He vomited once but has been drinking a little water since.");
   await wait(400);
 
   await typing(1200);
@@ -286,7 +285,6 @@ async function runDemo(){
 
   // USER CLICK
   await actionBtn("Yes, vaccines current. Daycare cold last week.");
-  userMsg("Yes, vaccinations are current. A few kids at daycare had a cold last week.");
   await wait(400);
 
   await typing(1200);
@@ -395,7 +393,6 @@ async function runDemo(){
   await wait(300);
 
   await actionBtn('Book '+chosenSlot);
-  userMsg('Book '+chosenSlot);
   await wait(400);
 
   await typing(1200);
