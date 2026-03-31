@@ -187,8 +187,6 @@ function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 
 
 async function runDemo() {
   addEl('Today 10:15 AM', 'timestamp');
-  await wait(500);
-
   await typing(1500);
   botMsg("Hi Margaret! &#128075; This is ARIA, your health companion. I noticed you have some important preventive screenings coming due. Mind if I walk you through them?");
 

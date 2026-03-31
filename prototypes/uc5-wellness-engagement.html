@@ -221,14 +221,13 @@ async function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
 
   // 1. Timestamp
-  await wait(500);
   addEl('Today 9:00 AM', 'timestamp');
 
-  // 2. Bot: greeting about preventive care
+  // Bot: greeting about preventive care
   await typing(1000);
   botMsg("Good morning Lisa! &#127807; This is ARIA, your health companion. It's a great time to check in on your preventive care. Did you know you have a few screenings coming up that can help you stay ahead?");
 
-  // 3. USER CLICK: "What do I need?"
+  // 4. USER CLICK: "What do I need?"
   await actionBtn("What do I need?");
 
   // 4. Loading: "Pulling your wellness data..."

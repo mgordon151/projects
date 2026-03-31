@@ -215,18 +215,17 @@ function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 
 
 async function runDemo() {
   // 1. Timestamp
-  await wait(500);
   addEl('Today 11:30 AM', 'timestamp');
 
-  // 2. ADT alert banner
-  await wait(800);
+  // ADT alert banner
   addEl('<h5>&#9888; ADT ALERT</h5><p>Robert Martinez discharged from Providence Portland Medical Center &mdash; Hip Replacement (ICD-10: Z96.641). Follow-up protocol initiated.</p>', 'alert-banner');
+  await wait(600);
 
-  // 3. Bot greeting
+  // 4. Bot greeting
   await typing(1500);
   botMsg("Hi Robert, this is ARIA, your health companion. I see you were discharged yesterday from Providence Portland after your hip replacement. How are you doing at home?");
 
-  // 4. USER CLICK: "I'm doing okay but pretty sore"
+  // 5. USER CLICK: "I'm doing okay but pretty sore"
   await actionBtn("I'm doing okay but pretty sore");
 
   // 5. Bot reviews discharge plan
