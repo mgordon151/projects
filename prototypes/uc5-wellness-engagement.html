@@ -202,7 +202,7 @@ function userMsg(text) {
   return addEl(`<div class="bub">${text}</div>`, 'msg user');
 }
 
-function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class="action-btn" style="cursor:pointer"><span class="icon">&#8618;</span>'+text+'</div>','actions');d.addEventListener('click',()=>{d.remove();userMsg(text);resolve(text)})})}
+function actionBtn(text){return new Promise(resolve=>{const hint=addEl('<div style="text-align:center;font-size:12px;color:#b0bcc8;padding:8px 0;cursor:pointer">Tap to continue&hellip;</div>','tap-hint');const handler=(e)=>{if(e.target.closest('.schedule-card,.symptom-card,.provider-card'))return;hint.remove();chat.removeEventListener('click',handler);userMsg(text);resolve(text)};chat.addEventListener('click',handler)})}
 
 function addLoading(text) {
   return addEl(`<div class="spinner"></div> ${text}`, 'loading-state');
@@ -217,14 +217,11 @@ async function typing(ms = 1200) {
   d.remove();
 }
 
-function tapToContinue(){return new Promise(resolve=>{const hint=addEl('<div style="text-align:center;font-size:12px;color:#b0bcc8;padding:8px 0;cursor:pointer">Tap to continue&hellip;</div>','tap-hint');const handler=()=>{hint.remove();chat.removeEventListener('click',handler);resolve()};chat.addEventListener('click',handler)})}
-
 async function startDemo() {
   document.getElementById('startOverlay').classList.add('hidden');
 
   // 1. Timestamp
   addEl('Today 9:00 AM', 'timestamp');
-  await tapToContinue();
 
   // Bot: greeting about preventive care
   await typing(1000);
