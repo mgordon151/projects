@@ -238,9 +238,9 @@ async function runDemo(){
   addEl('Today 11:45 PM','timestamp');
   await wait(500);
 
-  // User's initial message
-  userMsg("My 4-year-old has had a fever of 102.5 for the past few hours and he's really fussy. Should I take him to the ER?");
-  await wait(800);
+  // User clicks to start the conversation
+  await actionBtn("My 4-year-old has a fever of 102.5 and he's really fussy. Should I take him to the ER?");
+  await wait(400);
 
   await typing(1500);
   botMsg("I understand your concern — a fever in a young child can be scary. Let me ask a few important questions to help determine the best next step.");
