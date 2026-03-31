@@ -249,10 +249,12 @@ async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
 function addLoading(text) {
   return addEl('<div class="spinner"></div> ' + text, 'loading-state');
 }
+function tapToContinue(){return new Promise(resolve=>{const hint=addEl('<div style="text-align:center;font-size:12px;color:#b0bcc8;padding:8px 0;cursor:pointer">Tap to continue&hellip;</div>','tap-hint');const handler=()=>{hint.remove();chat.removeEventListener('click',handler);resolve()};chat.addEventListener('click',handler)})}
 
 async function runDemo() {
   // Timestamp
   addEl('Today 9:47 AM', 'timestamp');
+  await tapToContinue();
 
   // User clicks to start the conversation
   await actionBtn("I've had a bad headache for 2 days and my neck is stiff. Should I go to the ER?");

@@ -184,9 +184,11 @@ function actionBtn(text){return new Promise(resolve=>{const d=addEl('<div class=
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function typing(ms) { addTyping(); await wait(ms); removeTyping(); }
 function addLoading(text) { return addEl('<div class="spinner"></div> ' + text, 'loading-state'); }
+function tapToContinue(){return new Promise(resolve=>{const hint=addEl('<div style="text-align:center;font-size:12px;color:#b0bcc8;padding:8px 0;cursor:pointer">Tap to continue&hellip;</div>','tap-hint');const handler=()=>{hint.remove();chat.removeEventListener('click',handler);resolve()};chat.addEventListener('click',handler)})}
 
 async function runDemo() {
   addEl('Today 10:15 AM', 'timestamp');
+  await tapToContinue();
   await typing(1500);
   botMsg("Hi Margaret! &#128075; This is ARIA, your health companion. I noticed you have some important preventive screenings coming due. Mind if I walk you through them?");
 
