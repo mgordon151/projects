@@ -52,6 +52,17 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .action-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#1a3a4a;color:white;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-end}
 .action-btn .icon{font-size:12px;opacity:0.7}
 
+/* Schedule Card */
+.schedule-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.schedule-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.day-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.day-chip{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.day-chip.selected{background:#1a3a4a;color:white}
+.time-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.time-chip{padding:8px 16px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.time-chip.selected{background:#1a3a4a;color:white}
+.find-times-btn{width:100%;padding:10px;border-radius:12px;background:#1a3a4a;color:white;font-size:13px;font-weight:600;text-align:center;border:none;font-family:'Inter',sans-serif;cursor:pointer}
+
 /* GenUI Cards */
 .card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;overflow:hidden;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);max-width:100%;align-self:flex-start}
 .card-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;padding:14px 16px 0}
@@ -365,44 +376,21 @@ async function startDemo() {
 
   // 16. Day/time picker card
   await wait(400);
-  const pickerCard = addEl(`
-    <div style="padding:14px">
-      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">SELECT DAYS</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-        <span class="slot day-chip" data-day="Mon">Mon</span>
-        <span class="slot day-chip" data-day="Tue">Tue</span>
-        <span class="slot day-chip" data-day="Wed">Wed</span>
-        <span class="slot day-chip" data-day="Thu">Thu</span>
-        <span class="slot day-chip" data-day="Fri">Fri</span>
-        <span class="slot day-chip" data-day="Sat">Sat</span>
-        <span class="slot day-chip" data-day="Sun">Sun</span>
-      </div>
-      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED TIME</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-        <span class="slot time-chip" data-time="Morning">Morning</span>
-        <span class="slot time-chip" data-time="Afternoon">Afternoon</span>
-        <span class="slot time-chip" data-time="Evening">Evening</span>
-      </div>
-      <div class="find-times-btn" style="background:#1a3a4a;color:white;text-align:center;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">Find Available Times &rarr;</div>
+  const schedCard = addEl(`
+    <div class="schedule-label">DAYS</div>
+    <div class="day-chips">
+      <span class="day-chip" data-day>Mon</span><span class="day-chip" data-day>Tue</span><span class="day-chip" data-day>Wed</span><span class="day-chip selected" data-day>Thu</span><span class="day-chip" data-day>Fri</span><span class="day-chip" data-day>Sat</span><span class="day-chip" data-day>Sun</span>
     </div>
-  `, 'card');
-
-  // Day chips: toggleable
-  pickerCard.querySelectorAll('.day-chip').forEach(chip => {
-    chip.addEventListener('click', () => chip.classList.toggle('selected'));
-  });
-  // Time chips: single-select
-  pickerCard.querySelectorAll('.time-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      pickerCard.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-    });
-  });
-
-  // Wait for "Find Available Times" click
-  await new Promise(resolve => {
-    pickerCard.querySelector('.find-times-btn').addEventListener('click', resolve);
-  });
+    <div class="schedule-label">TIME OF DAY</div>
+    <div class="time-chips">
+      <span class="time-chip" data-time>Morning</span><span class="time-chip selected" data-time>Afternoon</span><span class="time-chip" data-time>Evening</span>
+    </div>
+    <button class="find-times-btn" id="findTimesBtn">Find Available Times &rarr;</button>
+  `, 'schedule-card');
+  schedCard.querySelectorAll('[data-day]').forEach(d => { d.addEventListener('click', () => d.classList.toggle('selected')); });
+  schedCard.querySelectorAll('[data-time]').forEach(t => { t.addEventListener('click', () => { schedCard.querySelectorAll('[data-time]').forEach(x => x.classList.remove('selected')); t.classList.add('selected'); }); });
+  await new Promise(resolve => { document.getElementById('findTimesBtn').addEventListener('click', resolve); });
+  schedCard.style.pointerEvents='none'; schedCard.style.opacity='0.85';
 
   // 17. Async calling
   await typing(1200);
