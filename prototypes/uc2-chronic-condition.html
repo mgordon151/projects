@@ -204,6 +204,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .enroll-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
 .enroll-chip{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;background:rgba(255,255,255,0.15);color:white}
 .enroll-text{font-size:12px;opacity:0.8;line-height:1.4}
+
+.provider-check-toggle{width:28px;height:28px;border-radius:50%;border:2px solid #c8d0d8;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;cursor:pointer;transition:all .2s;position:absolute;top:12px;right:12px}
+.provider-check-toggle.selected{background:#1a3a4a;border-color:#1a3a4a;color:white}
 </style>
 </head>
 <body>
@@ -334,7 +337,9 @@ async function runDemo() {
   addLoading('Searching provider directory ...');
   await wait(1500);
 
-  const slotCard = addEl(`
+  // Provider card 1: Dr. Rachel Kim
+  const provCard1 = addEl(`
+    <div class="provider-check-toggle selected">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">RK</div>
       <div class="provider-info">
@@ -344,28 +349,150 @@ async function runDemo() {
       </div>
     </div>
     <div class="provider-meta"><span>&#128205; 2.4 miles</span><span>&#128176; $25 copay</span></div>
-    <div class="slots">
-      <span class="slot" data-slot>Tue &middot; 10:00 AM</span>
-      <span class="slot" data-slot>Wed &middot; 2:15 PM</span>
-      <span class="slot" data-slot>Thu &middot; 11:30 AM</span>
-    </div>
-  `, 'provider-card selected');
+  `, 'provider-card');
+  await wait(300);
 
+  // Provider card 2: Dr. Sarah Mitchell
+  const provCard2 = addEl(`
+    <div class="provider-check-toggle selected">&#10003;</div>
+    <div class="provider-top">
+      <div class="provider-photo">SM</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. Sarah Mitchell, MD</div>
+        <div class="provider-spec">Internal Medicine &middot; Providence Medical Group</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.6</span><span class="rating-count">(183)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="provider-meta"><span>&#128205; 3.8 miles</span><span>&#128176; $25 copay</span></div>
+  `, 'provider-card');
+  await wait(200);
+
+  // Toggle checkmarks on click
+  [provCard1, provCard2].forEach(card => {
+    const toggle = card.querySelector('.provider-check-toggle');
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('selected');
+      toggle.innerHTML = toggle.classList.contains('selected') ? '&#10003;' : '';
+    });
+  });
+
+  await actionBtn("Find available appointments");
+  await wait(400);
+
+  // Day/time picker
+  await typing(1000);
+  botMsg("What days and times work best for you?");
+  await wait(400);
+
+  const pickerCard = addEl(`
+    <div style="padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED DAYS</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="dayChips">
+        <span class="chip" data-day="Mon" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Mon</span>
+        <span class="chip" data-day="Tue" style="cursor:pointer;background:#1a3a4a;color:white">Tue</span>
+        <span class="chip" data-day="Wed" style="cursor:pointer;background:#1a3a4a;color:white">Wed</span>
+        <span class="chip" data-day="Thu" style="cursor:pointer;background:#1a3a4a;color:white">Thu</span>
+        <span class="chip" data-day="Fri" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Fri</span>
+        <span class="chip" data-day="Sat" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Sat</span>
+        <span class="chip" data-day="Sun" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Sun</span>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED TIME</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="timeChips">
+        <span class="chip" data-time="Morning" style="cursor:pointer;background:#1a3a4a;color:white">Morning</span>
+        <span class="chip" data-time="Afternoon" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Afternoon</span>
+        <span class="chip" data-time="Evening" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Evening</span>
+      </div>
+      <div id="findTimesBtn" style="background:#1a3a4a;color:white;text-align:center;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">Find Available Times &rarr;</div>
+    </div>
+  `, 'card');
+
+  // Day chip toggle
+  pickerCard.querySelectorAll('#dayChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const isOn = chip.style.background === 'rgb(26, 58, 74)';
+      chip.style.background = isOn ? '#f0f2f5' : '#1a3a4a';
+      chip.style.color = isOn ? '#5a6b7b' : 'white';
+    });
+  });
+  // Time chip single-select
+  pickerCard.querySelectorAll('#timeChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      pickerCard.querySelectorAll('#timeChips .chip').forEach(c => { c.style.background = '#f0f2f5'; c.style.color = '#5a6b7b'; });
+      chip.style.background = '#1a3a4a';
+      chip.style.color = 'white';
+    });
+  });
+
+  // Wait for Find Times button
+  await new Promise(resolve => {
+    pickerCard.querySelector('#findTimesBtn').addEventListener('click', resolve);
+  });
+  pickerCard.style.pointerEvents = 'none';
+  pickerCard.querySelector('#findTimesBtn').style.opacity = '0.6';
+  await wait(400);
+
+  // Async calling
+  await typing(1200);
+  botMsg("Perfect. Let me call their offices to check availability. I'll text you in about 10\u201315 minutes once I have some options for you.");
+
+  await actionBtn("I'll wait for the message");
+  await wait(400);
+
+  // Time skip
+  addEl('Today 2:47 PM', 'timestamp');
+  await wait(400);
+
+  // Bot returns with results
+  await typing(1200);
+  botMsg("I heard back from the offices. Here's what's available this week. Go ahead and pick a time that works for you.");
+  await wait(400);
+
+  // Per-provider availability cards
+  const availCard = addEl(`
+    <div style="padding:14px 16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div class="provider-photo" style="width:32px;height:32px;font-size:12px">RK</div>
+        <div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Rachel Kim</div><div style="font-size:11px;color:#5a6b7b">Internal Medicine</div></div>
+      </div>
+      <div class="slots" data-provider="kim">
+        <span class="slot" style="cursor:pointer">Tue &middot; 10:00 AM</span>
+        <span class="slot" style="cursor:pointer">Wed &middot; 2:15 PM</span>
+        <span class="slot" style="cursor:pointer">Thu &middot; 11:30 AM</span>
+      </div>
+      <div style="height:1px;background:#e8ecf0;margin:12px 0"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div class="provider-photo" style="width:32px;height:32px;font-size:12px">SM</div>
+        <div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Sarah Mitchell</div><div style="font-size:11px;color:#5a6b7b">Internal Medicine</div></div>
+      </div>
+      <div class="slots" data-provider="mitchell">
+        <span class="slot" style="cursor:pointer">Tue &middot; 1:00 PM</span>
+        <span class="slot" style="cursor:pointer">Wed &middot; 9:30 AM</span>
+        <span class="slot" style="cursor:pointer">Thu &middot; 3:00 PM</span>
+      </div>
+    </div>
+  `, 'card');
+
+  // Slot selection across both providers
+  const allSlots = availCard.querySelectorAll('.slot');
   const chosenSlot = await new Promise(resolve => {
-    slotCard.querySelectorAll('[data-slot]').forEach(s => {
-      s.style.cursor = 'pointer';
+    allSlots.forEach(s => {
       s.addEventListener('click', () => {
-        slotCard.querySelectorAll('[data-slot]').forEach(x => x.classList.remove('selected'));
+        allSlots.forEach(x => x.classList.remove('selected'));
         s.classList.add('selected');
         resolve(s.textContent);
       });
     });
   });
-  slotCard.style.pointerEvents = 'none';
+  availCard.style.pointerEvents = 'none';
   await wait(300);
 
-  await actionBtn("Book " + chosenSlot);
+  await actionBtn("Request this appointment");
   await wait(400);
+
+  // Async confirmation
+  await typing(1200);
+  botMsg("Perfect, I'll call the office and book the appointment and send you a text when it's confirmed.");
+  await wait(600);
 
   await typing(1200);
   addEl(`

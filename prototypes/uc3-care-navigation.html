@@ -181,6 +181,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
 .loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.provider-check-toggle{width:28px;height:28px;border-radius:50%;border:2px solid #c8d0d8;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;cursor:pointer;transition:all .2s;position:absolute;top:12px;right:12px}
+.provider-check-toggle.selected{background:#1a3a4a;border-color:#1a3a4a;color:white}
 </style>
 </head>
 <body>
@@ -353,9 +356,9 @@ async function runDemo() {
   addEl('<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>', 'filter-tabs');
   await wait(400);
 
-  // Provider 1 (selected)
-  addEl(`
-    <div class="provider-check">&#10003;</div>
+  // Provider 1 (pre-selected)
+  const prov1 = addEl(`
+    <div class="provider-check-toggle selected">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">KP</div>
       <div class="provider-info">
@@ -367,10 +370,15 @@ async function runDemo() {
     <div class="provider-meta"><span>&#128205; 2.1 miles away</span><span>&#128176; $35 est. copay</span><span style="color:#27ae60;font-weight:600">Accepting patients</span></div>
     <div class="provider-desc">Board-certified family medicine. Experienced with headache and musculoskeletal evaluation.</div>
   `, 'provider-card selected');
+  prov1.querySelector('.provider-check-toggle').addEventListener('click', function(){
+    this.classList.toggle('selected');
+    prov1.classList.toggle('selected', this.classList.contains('selected'));
+  });
   await wait(300);
 
   // Provider 2
-  addEl(`
+  const prov2 = addEl(`
+    <div class="provider-check-toggle">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">JL</div>
       <div class="provider-info">
@@ -381,10 +389,15 @@ async function runDemo() {
     </div>
     <div class="provider-meta"><span>&#128205; 3.4 miles away</span><span>&#128176; $35 est. copay</span></div>
   `, 'provider-card');
+  prov2.querySelector('.provider-check-toggle').addEventListener('click', function(){
+    this.classList.toggle('selected');
+    prov2.classList.toggle('selected', this.classList.contains('selected'));
+  });
   await wait(300);
 
   // Provider 3
-  addEl(`
+  const prov3 = addEl(`
+    <div class="provider-check-toggle">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#5a3a7a,#7a5a9a)">TD</div>
       <div class="provider-info">
@@ -395,17 +408,21 @@ async function runDemo() {
     </div>
     <div class="provider-meta"><span>&#128187; Available now</span><span>&#128176; $0 copay</span></div>
   `, 'provider-card');
+  prov3.querySelector('.provider-check-toggle').addEventListener('click', function(){
+    this.classList.toggle('selected');
+    prov3.classList.toggle('selected', this.classList.contains('selected'));
+  });
   await wait(600);
 
-  // User clicks find appointments
+  // Step 2: "Find available appointments"
   await actionBtn("Find available appointments");
   await wait(400);
 
+  // Step 3: Day/time picker
   await typing(1000);
   botMsg("What days and times work best for you?");
   await wait(400);
 
-  // Day/Time picker — interactive
   const schedCard = addEl(`
     <div class="schedule-label">DAYS</div>
     <div class="day-chips">
@@ -436,24 +453,37 @@ async function runDemo() {
   schedCard.style.pointerEvents = 'none';
   schedCard.style.opacity = '0.85';
 
-  // Show selected as user message
   const selectedDays = [...schedCard.querySelectorAll('[data-day].selected')].map(d => d.textContent).join(', ') || 'Today';
   const selectedTime = schedCard.querySelector('[data-time].selected')?.textContent || 'Afternoon';
   userMsg(selectedDays + ' \u00b7 ' + selectedTime);
   await wait(400);
 
+  // Step 4: Async calling
   await typing(1500);
-  botMsg("Great news \u2014 CityMD Lloyd Center has openings today. Pick a time:");
+  botMsg("Perfect. Let me call their offices to check availability. I'll text you in about 10\u201315 minutes once I have some options for you.");
+  await wait(600);
+
+  // Step 5: "I'll wait for the message"
+  await actionBtn("I'll wait for the message");
   await wait(400);
 
-  // Provider with time slots — clickable
-  const slotCard = addEl(`
+  // Step 6: Time skip
+  addEl('Today 10:02 AM', 'timestamp');
+  await wait(600);
+
+  // Step 7: Bot returns with availability
+  await typing(1500);
+  botMsg("I heard back from the offices. Here's what's available this week. Go ahead and pick a time that works for you.");
+  await wait(400);
+
+  // Step 8: Per-provider availability cards
+  const slotCard1 = addEl(`
     <div class="provider-top">
       <div class="provider-photo">KP</div>
       <div class="provider-info">
         <div class="provider-name">Dr. Karen Patel</div>
         <div class="provider-spec">Urgent Care &middot; 2.1 mi</div>
-        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(312)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
     <div class="slots">
@@ -461,28 +491,73 @@ async function runDemo() {
       <span class="slot" data-slot>Today &middot; 3:30 PM</span>
       <span class="slot" data-slot>Today &middot; 4:15 PM</span>
     </div>
-  `, 'provider-card selected');
+  `, 'provider-card');
+  await wait(300);
 
+  const slotCard2 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">JL</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. James Liu</div>
+        <div class="provider-spec">Urgent Care &middot; 3.4 mi</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.5</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="slots">
+      <span class="slot" data-slot>Today &middot; 1:00 PM</span>
+      <span class="slot" data-slot>Today &middot; 2:15 PM</span>
+      <span class="slot" data-slot>Today &middot; 5:00 PM</span>
+    </div>
+  `, 'provider-card');
+  await wait(300);
+
+  const slotCard3 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#5a3a7a,#7a5a9a)">TD</div>
+      <div class="provider-info">
+        <div class="provider-name">Teladoc Virtual Visit</div>
+        <div class="provider-spec">Virtual &middot; Available now</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.3</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="slots">
+      <span class="slot" data-slot>Today &middot; Now</span>
+      <span class="slot" data-slot>Today &middot; 12:30 PM</span>
+      <span class="slot" data-slot>Today &middot; 3:00 PM</span>
+    </div>
+  `, 'provider-card');
+  await wait(400);
+
+  // Collect all slot elements across all provider cards and wait for a click on any
+  const allSlots = chat.querySelectorAll('[data-slot]');
   const chosenSlot = await new Promise(resolve => {
-    slotCard.querySelectorAll('[data-slot]').forEach(s => {
+    allSlots.forEach(s => {
       s.style.cursor = 'pointer';
       s.addEventListener('click', () => {
-        slotCard.querySelectorAll('[data-slot]').forEach(x => x.classList.remove('selected'));
+        allSlots.forEach(x => x.classList.remove('selected'));
         s.classList.add('selected');
         resolve(s.textContent);
       });
     });
   });
-  slotCard.style.pointerEvents = 'none';
+  [slotCard1, slotCard2, slotCard3].forEach(c => c.style.pointerEvents = 'none');
   await wait(300);
 
-  // User confirms
+  // Step 9: "Request this appointment"
   await actionBtn("Request this appointment");
   await wait(400);
 
-  // Confirmation
+  // Step 10: Async confirmation
   await typing(1500);
-  botMsg("You're all set! I'll confirm the appointment and send you a text. Your estimated copay is <strong>$35</strong> \u2014 that's <strong>$215 less</strong> than the ER.");
+  botMsg("Perfect, I'll call the office and book the appointment and send you a text when it's confirmed.");
+  await wait(800);
+
+  // Deductible section — triggered by tap
+  await actionBtn("See cost of upcoming appointment");
+  await wait(400);
+
+  await typing(1200);
+  botMsg("Let me pull up your benefits information...");
   await wait(500);
 
   // Deductible card
@@ -496,8 +571,11 @@ async function runDemo() {
   `, 'deductible-card');
   await wait(800);
 
+  // Cost disclaimer
+  botMsg("Your estimated copay is <strong>$35</strong> \u2014 that's <strong>$215 less</strong> than the ER.");
+  await wait(600);
+
   // Safety net
-  await typing(1500);
   addEl(`
     <h5>Go to the ER or call 911 if you experience:</h5>
     <div class="safety-item">&#9888; Fever above 101&deg;F</div>

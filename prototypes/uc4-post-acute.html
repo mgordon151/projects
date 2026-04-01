@@ -173,6 +173,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
 .loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.provider-check-toggle{width:28px;height:28px;border-radius:50%;border:2px solid #c8d0d8;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;cursor:pointer;transition:all .2s;position:absolute;top:12px;right:12px}
+.provider-check-toggle.selected{background:#1a3a4a;border-color:#1a3a4a;color:white}
 </style>
 </head>
 <body>
@@ -286,41 +289,163 @@ async function runDemo() {
   await wait(1500);
   loader2.remove();
 
-  // 14. Provider card with clickable time slots
-  var chosenSlot = await new Promise(function(resolve) {
-    var card = addEl(
-      '<div class="provider-top">' +
-      '<div class="provider-photo">MT</div>' +
-      '<div class="provider-info">' +
-      '<div class="provider-name">Dr. Michael Torres, MD</div>' +
-      '<div class="provider-spec">Orthopedic Surgery &middot; Providence Orthopedics</div>' +
-      '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(198)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
-      '</div></div>' +
-      '<div class="provider-meta"><span>Your surgeon</span><span>&#128176; $40 copay</span></div>' +
-      '<div class="slots" id="timeSlots">' +
-      '<span class="slot" style="cursor:pointer" data-slot="Apr 8 9:00 AM">Apr 8 &middot; 9:00 AM</span>' +
-      '<span class="slot" style="cursor:pointer" data-slot="Apr 9 1:30 PM">Apr 9 &middot; 1:30 PM</span>' +
-      '<span class="slot" style="cursor:pointer" data-slot="Apr 10 11:00 AM">Apr 10 &middot; 11:00 AM</span>' +
-      '</div>',
-      'provider-card'
-    );
-    var slots = card.querySelectorAll('.slot');
-    slots.forEach(function(s) {
-      s.addEventListener('click', function() {
-        slots.forEach(function(x) { x.classList.remove('selected'); x.style.pointerEvents = 'none'; });
-        s.classList.add('selected');
-        card.classList.add('selected');
-        var checkDiv = document.createElement('div');
-        checkDiv.className = 'provider-check';
-        checkDiv.innerHTML = '&#10003;';
-        card.prepend(checkDiv);
-        resolve(s.getAttribute('data-slot'));
-      });
+  // Provider card 1: Dr. Michael Torres (patient's surgeon)
+  var provCard1 = addEl(
+    '<div class="provider-check-toggle selected">&#10003;</div>' +
+    '<div class="provider-top">' +
+    '<div class="provider-photo">MT</div>' +
+    '<div class="provider-info">' +
+    '<div class="provider-name">Dr. Michael Torres, MD</div>' +
+    '<div class="provider-spec">Orthopedic Surgery &middot; Providence Orthopedics</div>' +
+    '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(198)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
+    '</div></div>' +
+    '<div class="provider-meta"><span>Your surgeon</span><span>&#128176; $40 copay</span></div>',
+    'provider-card'
+  );
+  await wait(300);
+
+  // Provider card 2: Dr. Lisa Park
+  var provCard2 = addEl(
+    '<div class="provider-check-toggle selected">&#10003;</div>' +
+    '<div class="provider-top">' +
+    '<div class="provider-photo">LP</div>' +
+    '<div class="provider-info">' +
+    '<div class="provider-name">Dr. Lisa Park, MD</div>' +
+    '<div class="provider-spec">Orthopedic Surgery &middot; OHSU Orthopedics</div>' +
+    '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.7</span><span class="rating-count">(142)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
+    '</div></div>' +
+    '<div class="provider-meta"><span>&#128205; 4.2 miles</span><span>&#128176; $40 copay</span></div>',
+    'provider-card'
+  );
+  await wait(200);
+
+  // Toggle checkmarks on click
+  [provCard1, provCard2].forEach(function(card) {
+    var toggle = card.querySelector('.provider-check-toggle');
+    toggle.addEventListener('click', function() {
+      toggle.classList.toggle('selected');
+      toggle.innerHTML = toggle.classList.contains('selected') ? '&#10003;' : '';
     });
   });
 
-  // 15-16. USER CLICK: "Book [chosen slot]"
-  await actionBtn("Book " + chosenSlot);
+  await actionBtn("Find available appointments");
+  await wait(400);
+
+  // Day/time picker
+  await typing(1000);
+  botMsg("What days and times work best for you?");
+  await wait(400);
+
+  var pickerCard = addEl(
+    '<div style="padding:14px 16px;">' +
+    '<div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED DAYS</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="dayChips">' +
+    '<span class="chip" data-day="Mon" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Mon</span>' +
+    '<span class="chip" data-day="Tue" style="cursor:pointer;background:#1a3a4a;color:white">Tue</span>' +
+    '<span class="chip" data-day="Wed" style="cursor:pointer;background:#1a3a4a;color:white">Wed</span>' +
+    '<span class="chip" data-day="Thu" style="cursor:pointer;background:#1a3a4a;color:white">Thu</span>' +
+    '<span class="chip" data-day="Fri" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Fri</span>' +
+    '<span class="chip" data-day="Sat" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Sat</span>' +
+    '<span class="chip" data-day="Sun" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Sun</span>' +
+    '</div>' +
+    '<div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED TIME</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="timeChips">' +
+    '<span class="chip" data-time="Morning" style="cursor:pointer;background:#1a3a4a;color:white">Morning</span>' +
+    '<span class="chip" data-time="Afternoon" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Afternoon</span>' +
+    '<span class="chip" data-time="Evening" style="cursor:pointer;background:#f0f2f5;color:#5a6b7b">Evening</span>' +
+    '</div>' +
+    '<div id="findTimesBtn" style="background:#1a3a4a;color:white;text-align:center;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">Find Available Times &rarr;</div>' +
+    '</div>',
+    'card'
+  );
+
+  // Day chip toggle
+  pickerCard.querySelectorAll('#dayChips .chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var isOn = chip.style.background === 'rgb(26, 58, 74)';
+      chip.style.background = isOn ? '#f0f2f5' : '#1a3a4a';
+      chip.style.color = isOn ? '#5a6b7b' : 'white';
+    });
+  });
+  // Time chip single-select
+  pickerCard.querySelectorAll('#timeChips .chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      pickerCard.querySelectorAll('#timeChips .chip').forEach(function(c) { c.style.background = '#f0f2f5'; c.style.color = '#5a6b7b'; });
+      chip.style.background = '#1a3a4a';
+      chip.style.color = 'white';
+    });
+  });
+
+  // Wait for Find Times button
+  await new Promise(function(resolve) {
+    pickerCard.querySelector('#findTimesBtn').addEventListener('click', resolve);
+  });
+  pickerCard.style.pointerEvents = 'none';
+  pickerCard.querySelector('#findTimesBtn').style.opacity = '0.6';
+  await wait(400);
+
+  // Async calling
+  await typing(1200);
+  botMsg("Perfect. Let me call their offices to check availability. I\u2019ll text you in about 10\u201315 minutes once I have some options for you.");
+
+  await actionBtn("I'll wait for the message");
+  await wait(400);
+
+  // Time skip
+  addEl('Today 11:48 AM', 'timestamp');
+  await wait(400);
+
+  // Bot returns with results
+  await typing(1200);
+  botMsg("I heard back from the offices. Here\u2019s what\u2019s available this week. Go ahead and pick a time that works for you.");
+  await wait(400);
+
+  // Per-provider availability cards
+  var availCard = addEl(
+    '<div style="padding:14px 16px;">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+    '<div class="provider-photo" style="width:32px;height:32px;font-size:12px">MT</div>' +
+    '<div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Michael Torres</div><div style="font-size:11px;color:#5a6b7b">Orthopedic Surgery &middot; Your surgeon</div></div>' +
+    '</div>' +
+    '<div class="slots" data-provider="torres">' +
+    '<span class="slot" style="cursor:pointer">Apr 8 &middot; 9:00 AM</span>' +
+    '<span class="slot" style="cursor:pointer">Apr 9 &middot; 1:30 PM</span>' +
+    '<span class="slot" style="cursor:pointer">Apr 10 &middot; 11:00 AM</span>' +
+    '</div>' +
+    '<div style="height:1px;background:#e8ecf0;margin:12px 0"></div>' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+    '<div class="provider-photo" style="width:32px;height:32px;font-size:12px">LP</div>' +
+    '<div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Lisa Park</div><div style="font-size:11px;color:#5a6b7b">Orthopedic Surgery</div></div>' +
+    '</div>' +
+    '<div class="slots" data-provider="park">' +
+    '<span class="slot" style="cursor:pointer">Apr 8 &middot; 2:00 PM</span>' +
+    '<span class="slot" style="cursor:pointer">Apr 9 &middot; 10:30 AM</span>' +
+    '<span class="slot" style="cursor:pointer">Apr 11 &middot; 9:00 AM</span>' +
+    '</div>' +
+    '</div>',
+    'card'
+  );
+
+  // Slot selection across both providers
+  var allSlots = availCard.querySelectorAll('.slot');
+  var chosenSlot = await new Promise(function(resolve) {
+    allSlots.forEach(function(s) {
+      s.addEventListener('click', function() {
+        allSlots.forEach(function(x) { x.classList.remove('selected'); });
+        s.classList.add('selected');
+        resolve(s.textContent);
+      });
+    });
+  });
+  availCard.style.pointerEvents = 'none';
+  await wait(300);
+
+  await actionBtn("Request this appointment");
+  await wait(400);
+
+  // Async confirmation
+  await typing(1200);
+  botMsg("Perfect, I\u2019ll call the office and book the appointment and send you a text when it\u2019s confirmed.");
 
   // 17. Bot asks about pain level
   await typing(1500);

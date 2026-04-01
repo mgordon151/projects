@@ -194,6 +194,20 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .loading-state{display:flex;align-items:center;gap:8px;padding:8px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;font-size:13px;color:#8a9baa}
 .loading-state .spinner{width:16px;height:16px;border:2px solid #e8ecf0;border-top:2px solid #1a3a4a;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.provider-check-toggle{width:28px;height:28px;border-radius:50%;border:2px solid #c8d0d8;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;cursor:pointer;transition:all .2s;position:absolute;top:12px;right:12px}
+.provider-check-toggle.selected{background:#1a3a4a;border-color:#1a3a4a;color:white}
+
+/* Day/Time Picker */
+.schedule-card{background:#f8f9fb;border:1px solid #e8ecf0;border-radius:16px;padding:16px;margin:4px 0;animation:msgIn .35s ease forwards;opacity:0;transform:translateY(8px);align-self:flex-start;max-width:88%}
+.schedule-label{font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.day-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.day-chip{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.day-chip.selected{background:#1a3a4a;color:white}
+.time-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.time-chip{padding:8px 16px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f2f5;color:#5a6b7b;cursor:pointer}
+.time-chip.selected{background:#1a3a4a;color:white}
+.find-times-btn{width:100%;padding:10px;border-radius:12px;background:#e8ecf0;color:#8a9baa;font-size:13px;font-weight:500;text-align:center;border:none;font-family:'Inter',sans-serif}
 </style>
 </head>
 <body>
@@ -360,12 +374,12 @@ async function runDemo(){
   await wait(800);
 
   await typing(1200);
-  botMsg("I'd also like to get him seen by his pediatrician tomorrow for the ear pain. Let me find available appointments:");
+  botMsg("I'd also like to get him seen by his pediatrician tomorrow for the ear pain. Let me find available providers:");
   await wait(400);
 
-  // Provider card with clickable slots
-  const slotCard=addEl(`
-    <div class="provider-check">&#10003;</div>
+  // Provider 1 — Dr. Amy Lin (pre-selected)
+  const prov1=addEl(`
+    <div class="provider-check-toggle selected">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">AL</div>
       <div class="provider-info">
@@ -375,26 +389,152 @@ async function runDemo(){
       </div>
     </div>
     <div class="provider-meta"><span>&#128118; Tyler's pediatrician</span><span>&#128176; $20 copay</span></div>
+  `,'provider-card selected');
+  prov1.querySelector('.provider-check-toggle').addEventListener('click',function(){
+    this.classList.toggle('selected');
+    prov1.classList.toggle('selected',this.classList.contains('selected'));
+  });
+  await wait(300);
+
+  // Provider 2 — Dr. James Park
+  const prov2=addEl(`
+    <div class="provider-check-toggle">&#10003;</div>
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">JP</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. James Park, MD</div>
+        <div class="provider-spec">Pediatrics &middot; Children's Health Group</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.7</span><span class="rating-count">(218)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="provider-meta"><span>&#128205; 3.1 miles</span><span>&#128176; $20 copay</span></div>
+  `,'provider-card');
+  prov2.querySelector('.provider-check-toggle').addEventListener('click',function(){
+    this.classList.toggle('selected');
+    prov2.classList.toggle('selected',this.classList.contains('selected'));
+  });
+  await wait(600);
+
+  // Step 2: "Find available appointments"
+  await actionBtn("Find available appointments");
+  await wait(400);
+
+  // Step 3: Day/time picker
+  await typing(1000);
+  botMsg("What days and times work best for you?");
+  await wait(400);
+
+  const schedCard=addEl(`
+    <div class="schedule-label">DAYS</div>
+    <div class="day-chips">
+      <span class="day-chip" data-day>Mon</span><span class="day-chip" data-day>Tue</span><span class="day-chip" data-day>Wed</span><span class="day-chip" data-day>Thu</span><span class="day-chip" data-day>Fri</span><span class="day-chip" data-day>Sat</span><span class="day-chip" data-day>Sun</span>
+    </div>
+    <div class="schedule-label">TIME OF DAY</div>
+    <div class="time-chips">
+      <span class="time-chip" data-time>Morning</span><span class="time-chip" data-time>Afternoon</span><span class="time-chip" data-time>Evening</span>
+    </div>
+    <button class="find-times-btn" id="findTimesBtn" style="cursor:pointer;background:#1a3a4a;color:white">Find Available Times &rarr;</button>
+  `,'schedule-card');
+
+  schedCard.querySelectorAll('[data-day]').forEach(d=>{
+    d.style.cursor='pointer';
+    d.addEventListener('click',()=>d.classList.toggle('selected'));
+  });
+  schedCard.querySelectorAll('[data-time]').forEach(t=>{
+    t.style.cursor='pointer';
+    t.addEventListener('click',()=>{
+      schedCard.querySelectorAll('[data-time]').forEach(x=>x.classList.remove('selected'));
+      t.classList.add('selected');
+    });
+  });
+
+  await new Promise(resolve=>{
+    document.getElementById('findTimesBtn').addEventListener('click',resolve);
+  });
+  schedCard.style.pointerEvents='none';
+  schedCard.style.opacity='0.85';
+
+  const selectedDays=[...schedCard.querySelectorAll('[data-day].selected')].map(d=>d.textContent).join(', ')||'Tomorrow';
+  const selectedTime=schedCard.querySelector('[data-time].selected')?.textContent||'Morning';
+  userMsg(selectedDays+' \u00b7 '+selectedTime);
+  await wait(400);
+
+  // Step 4: Async calling
+  await typing(1500);
+  botMsg("Perfect. Let me call their offices to check availability. I'll text you in about 10\u201315 minutes once I have some options for you.");
+  await wait(600);
+
+  // Step 5: "I'll wait for the message"
+  await actionBtn("I'll wait for the message");
+  await wait(400);
+
+  // Step 6: Time skip (late night -> next morning)
+  addEl('Tomorrow 8:15 AM','timestamp');
+  await wait(600);
+
+  // Step 7: Bot returns
+  await typing(1500);
+  botMsg("I heard back from the offices. Here's what's available this week. Go ahead and pick a time that works for you.");
+  await wait(400);
+
+  // Step 8: Per-provider availability cards
+  const slotCard1=addEl(`
+    <div class="provider-top">
+      <div class="provider-photo">AL</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. Amy Lin</div>
+        <div class="provider-spec">Pediatrics &middot; Tyler's pediatrician</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
     <div class="slots">
       <span class="slot" data-slot>Tomorrow &middot; 8:30 AM</span>
       <span class="slot" data-slot>Tomorrow &middot; 10:15 AM</span>
       <span class="slot" data-slot>Tomorrow &middot; 2:00 PM</span>
     </div>
-  `,'provider-card selected');
-
-  const chosenSlot=await new Promise(resolve=>{
-    slotCard.querySelectorAll('[data-slot]').forEach(s=>{
-      s.style.cursor='pointer';
-      s.addEventListener('click',()=>{slotCard.querySelectorAll('[data-slot]').forEach(x=>x.classList.remove('selected'));s.classList.add('selected');resolve(s.textContent)});
-    });
-  });
-  slotCard.style.pointerEvents='none';
+  `,'provider-card');
   await wait(300);
 
-  await actionBtn('Book '+chosenSlot);
+  const slotCard2=addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">JP</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. James Park</div>
+        <div class="provider-spec">Pediatrics &middot; Children's Health Group</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.7</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="slots">
+      <span class="slot" data-slot>Tomorrow &middot; 9:00 AM</span>
+      <span class="slot" data-slot>Tomorrow &middot; 11:30 AM</span>
+      <span class="slot" data-slot>Tomorrow &middot; 3:15 PM</span>
+    </div>
+  `,'provider-card');
   await wait(400);
 
+  // Collect all slots and wait for any click
+  const allSlots=chat.querySelectorAll('[data-slot]');
+  const chosenSlot=await new Promise(resolve=>{
+    allSlots.forEach(s=>{
+      s.style.cursor='pointer';
+      s.addEventListener('click',()=>{
+        allSlots.forEach(x=>x.classList.remove('selected'));
+        s.classList.add('selected');
+        resolve(s.textContent);
+      });
+    });
+  });
+  [slotCard1,slotCard2].forEach(c=>c.style.pointerEvents='none');
+  await wait(300);
+
+  // Step 9: "Request this appointment"
+  await actionBtn("Request this appointment");
+  await wait(400);
+
+  // Step 10: Async confirmation
   await typing(1200);
+  botMsg("Perfect, I'll call the office and book the appointment and send you a text when it's confirmed.");
+  await wait(600);
 
   // Call Summary Card
   addEl(`
@@ -402,7 +542,7 @@ async function runDemo(){
     <div class="call-summary-item"><span class="bullet"></span>Confirmed viral URI with possible otitis media<span class="time">0:42</span></div>
     <div class="call-summary-item"><span class="bullet"></span>Tylenol dosing reviewed for weight<span class="time">2:15</span></div>
     <div class="call-summary-item"><span class="bullet"></span>Hydration and comfort measures discussed<span class="time">3:45</span></div>
-    <div class="call-summary-item"><span class="bullet"></span>Dr. Lin appointment booked — `+chosenSlot+`<span class="time">5:10</span></div>
+    <div class="call-summary-item"><span class="bullet"></span>Appointment requested &mdash; `+chosenSlot+`<span class="time">5:10</span></div>
     <div class="call-summary-note">Summarized from 6:30 consultation</div>
   `,'call-summary');
   await wait(600);
@@ -418,7 +558,7 @@ async function runDemo(){
   `,'safety-card');
   await wait(500);
 
-  botMsg("You're doing a great job, Jennifer. Dr. Lin's office will see Tyler at "+chosenSlot+". I'll send a text reminder in the morning. If anything changes tonight, text us back anytime — we're here 24/7. &#128154;");
+  botMsg("You're doing a great job, Jennifer. I'll send you a confirmation text once the appointment is booked. If anything changes tonight, text us back anytime \u2014 we're here 24/7. &#128154;");
 }
 
 function startDemo(){

@@ -79,6 +79,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 .rating-count{font-size:11px;color:#8a9baa}
 .tier-badge{font-size:11px;font-weight:600;color:#27ae60;margin-left:auto}
 .provider-check{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;background:#1a3a4a;display:flex;align-items:center;justify-content:center;color:white;font-size:12px}
+.provider-check-toggle{width:28px;height:28px;border-radius:50%;border:2px solid #c8d0d8;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;cursor:pointer;transition:all .2s;position:absolute;top:12px;right:12px}
+.provider-check-toggle.selected{background:#1a3a4a;border-color:#1a3a4a;color:white}
 .provider-meta{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
 .provider-meta span{font-size:11px;color:#5a6b7b}
 
@@ -315,14 +317,10 @@ async function startDemo() {
   await typing(1000);
   botMsg("Here are the top-rated imaging centers near you:");
 
-  // 12. Filter tabs
-  await wait(400);
-  addEl(`<span class="filter-tab active">&#9733; Highest Rated</span><span class="filter-tab">&#128205; Distance</span><span class="filter-tab">&#36; Lowest Cost</span>`, 'filter-tabs');
-
-  // 13. Provider 1 with clickable time slots (Providence Breast Health)
+  // 12. Provider 1 with toggleable checkmark (Providence — pre-selected)
   await wait(600);
-  const provider1 = addEl(`
-    <div class="provider-check">&#10003;</div>
+  const provCard1 = addEl(`
+    <div class="provider-check-toggle selected" data-provider="providence">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo">PB</div>
       <div class="provider-info">
@@ -332,16 +330,12 @@ async function startDemo() {
       </div>
     </div>
     <div class="provider-meta"><span>&#128205; 1.9 miles</span><span>&#128176; $0 copay (preventive)</span></div>
-    <div class="slots">
-      <span class="slot" data-slot="Apr 10 &middot; 8:30 AM">Apr 10 &middot; 8:30 AM</span>
-      <span class="slot" data-slot="Apr 12 &middot; 10:00 AM">Apr 12 &middot; 10:00 AM</span>
-      <span class="slot" data-slot="Apr 14 &middot; 2:15 PM">Apr 14 &middot; 2:15 PM</span>
-    </div>
   `, 'provider-card selected');
 
-  // 14. Provider 2 (OHSU)
+  // 13. Provider 2 with toggleable checkmark (OHSU — not selected)
   await wait(400);
-  addEl(`
+  const provCard2 = addEl(`
+    <div class="provider-check-toggle" data-provider="ohsu">&#10003;</div>
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">OI</div>
       <div class="provider-info">
@@ -353,20 +347,129 @@ async function startDemo() {
     <div class="provider-meta"><span>&#128205; 4.1 miles</span><span>&#128176; $0 copay</span></div>
   `, 'provider-card');
 
-  // 15. USER CLICKS a time slot
+  // Wire up toggleable checkmarks
+  [provCard1, provCard2].forEach(card => {
+    const toggle = card.querySelector('.provider-check-toggle');
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('selected');
+      card.classList.toggle('selected', toggle.classList.contains('selected'));
+    });
+  });
+
+  // 14. USER CLICK: "Find available appointments"
+  await actionBtn("Find available appointments");
+
+  // 15. Bot: day/time picker
+  await typing(1000);
+  botMsg("What days and times work best for you?");
+
+  // 16. Day/time picker card
+  await wait(400);
+  const pickerCard = addEl(`
+    <div style="padding:14px">
+      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">SELECT DAYS</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+        <span class="slot day-chip" data-day="Mon">Mon</span>
+        <span class="slot day-chip" data-day="Tue">Tue</span>
+        <span class="slot day-chip" data-day="Wed">Wed</span>
+        <span class="slot day-chip" data-day="Thu">Thu</span>
+        <span class="slot day-chip" data-day="Fri">Fri</span>
+        <span class="slot day-chip" data-day="Sat">Sat</span>
+        <span class="slot day-chip" data-day="Sun">Sun</span>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#8a9baa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">PREFERRED TIME</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+        <span class="slot time-chip" data-time="Morning">Morning</span>
+        <span class="slot time-chip" data-time="Afternoon">Afternoon</span>
+        <span class="slot time-chip" data-time="Evening">Evening</span>
+      </div>
+      <div class="find-times-btn" style="background:#1a3a4a;color:white;text-align:center;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">Find Available Times &rarr;</div>
+    </div>
+  `, 'card');
+
+  // Day chips: toggleable
+  pickerCard.querySelectorAll('.day-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
+  // Time chips: single-select
+  pickerCard.querySelectorAll('.time-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      pickerCard.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    });
+  });
+
+  // Wait for "Find Available Times" click
+  await new Promise(resolve => {
+    pickerCard.querySelector('.find-times-btn').addEventListener('click', resolve);
+  });
+
+  // 17. Async calling
+  await typing(1200);
+  botMsg("Perfect. Let me call their offices to check availability. I'll text you in about 10&ndash;15 minutes once I have some options for you.");
+
+  // 18. USER CLICK: "I'll wait for the message"
+  await actionBtn("I'll wait for the message");
+
+  // 19. Time skip
+  await wait(800);
+  addEl('Today 9:17 AM', 'timestamp');
+
+  // 20. Bot returns with availability
+  await typing(1400);
+  botMsg("I heard back from the offices. Here's what's available this week. Go ahead and pick a time that works for you.");
+
+  // 21. Per-provider availability cards with clickable time slot pills
+  await wait(600);
+  const availCard1 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo">PB</div>
+      <div class="provider-info">
+        <div class="provider-name">Providence Breast Health Center</div>
+        <div class="provider-spec">Imaging &middot; Mammography</div>
+      </div>
+    </div>
+    <div class="slots" style="margin-top:10px">
+      <span class="slot" data-slot="Apr 10 &middot; 8:30 AM">Apr 10 &middot; 8:30 AM</span>
+      <span class="slot" data-slot="Apr 12 &middot; 10:00 AM">Apr 12 &middot; 10:00 AM</span>
+      <span class="slot" data-slot="Apr 14 &middot; 2:15 PM">Apr 14 &middot; 2:15 PM</span>
+    </div>
+  `, 'provider-card');
+
+  await wait(400);
+  const availCard2 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">OI</div>
+      <div class="provider-info">
+        <div class="provider-name">OHSU Imaging Center</div>
+        <div class="provider-spec">Imaging &middot; Mammography</div>
+      </div>
+    </div>
+    <div class="slots" style="margin-top:10px">
+      <span class="slot" data-slot="Apr 11 &middot; 9:00 AM">Apr 11 &middot; 9:00 AM</span>
+      <span class="slot" data-slot="Apr 13 &middot; 1:30 PM">Apr 13 &middot; 1:30 PM</span>
+      <span class="slot" data-slot="Apr 15 &middot; 11:00 AM">Apr 15 &middot; 11:00 AM</span>
+    </div>
+  `, 'provider-card');
+
+  // 22. Collect slot clicks across both provider cards
   const selectedSlot = await new Promise(resolve => {
-    const slots = provider1.querySelectorAll('.slot');
-    slots.forEach(slot => {
+    const allSlots = document.querySelectorAll('[data-slot]');
+    allSlots.forEach(slot => {
       slot.addEventListener('click', () => {
-        slots.forEach(s => s.classList.remove('selected'));
+        allSlots.forEach(s => s.classList.remove('selected'));
         slot.classList.add('selected');
         resolve(slot.getAttribute('data-slot'));
       });
     });
   });
 
-  // 16. USER CLICK: "Book [slot]"
-  await actionBtn(`Book ${selectedSlot}`);
+  // 23. USER CLICK: "Request this appointment"
+  await actionBtn("Request this appointment");
+
+  // 24. Async confirmation
+  await typing(1200);
+  botMsg("Perfect, I'll call the office and book the appointment and send you a text when it's confirmed.");
 
   // 17. Bot: mentions rewards
   await typing(1400);
