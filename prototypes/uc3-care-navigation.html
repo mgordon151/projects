@@ -495,6 +495,7 @@ async function runDemo() {
       <span class="slot" data-slot>Today &middot; 4:15 PM</span>
     </div>
   `, 'provider-card');
+  slotCard1.style.opacity='1';slotCard1.style.transform='translateY(0)';
   await wait(300);
 
   const slotCard2 = addEl(`
@@ -512,6 +513,7 @@ async function runDemo() {
       <span class="slot" data-slot>Today &middot; 5:00 PM</span>
     </div>
   `, 'provider-card');
+  slotCard2.style.opacity='1';slotCard2.style.transform='translateY(0)';
   await wait(300);
 
   const slotCard3 = addEl(`
@@ -529,6 +531,7 @@ async function runDemo() {
       <span class="slot" data-slot>Today &middot; 3:00 PM</span>
     </div>
   `, 'provider-card');
+  slotCard3.style.opacity='1';slotCard3.style.transform='translateY(0)';
   await wait(400);
 
   // Collect all slot elements across all provider cards and wait for a click on any

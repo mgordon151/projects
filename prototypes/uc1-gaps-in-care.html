@@ -353,6 +353,7 @@ async function runDemo() {
       <span class="slot" data-slot>Fri &middot; 9:15 AM</span>
     </div>
   `, 'provider-card');
+  slotCard.style.opacity='1';slotCard.style.transform='translateY(0)';
   const chosenSlot = await new Promise(resolve => {
     slotCard.querySelectorAll('[data-slot]').forEach(s => {
       s.style.cursor='pointer';

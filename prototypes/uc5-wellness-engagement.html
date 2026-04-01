@@ -412,7 +412,7 @@ async function startDemo() {
 
   // 21. Per-provider availability cards with clickable time slot pills
   await wait(600);
-  const availCard1 = addEl(`
+  const slotCard1 = addEl(`
     <div class="provider-top">
       <div class="provider-photo">PB</div>
       <div class="provider-info">
@@ -420,15 +420,16 @@ async function startDemo() {
         <div class="provider-spec">Imaging &middot; Mammography</div>
       </div>
     </div>
-    <div class="slots" style="margin-top:10px">
-      <span class="slot" data-slot="Apr 10 &middot; 8:30 AM">Apr 10 &middot; 8:30 AM</span>
-      <span class="slot" data-slot="Apr 12 &middot; 10:00 AM">Apr 12 &middot; 10:00 AM</span>
-      <span class="slot" data-slot="Apr 14 &middot; 2:15 PM">Apr 14 &middot; 2:15 PM</span>
+    <div class="slots">
+      <span class="slot" data-slot>Apr 10 &middot; 8:30 AM</span>
+      <span class="slot" data-slot>Apr 12 &middot; 10:00 AM</span>
+      <span class="slot" data-slot>Apr 14 &middot; 2:15 PM</span>
     </div>
   `, 'provider-card');
+  slotCard1.style.opacity='1';slotCard1.style.transform='translateY(0)';
+  await wait(300);
 
-  await wait(400);
-  const availCard2 = addEl(`
+  const slotCard2 = addEl(`
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">OI</div>
       <div class="provider-info">
@@ -436,27 +437,28 @@ async function startDemo() {
         <div class="provider-spec">Imaging &middot; Mammography</div>
       </div>
     </div>
-    <div class="slots" style="margin-top:10px">
-      <span class="slot" data-slot="Apr 11 &middot; 9:00 AM">Apr 11 &middot; 9:00 AM</span>
-      <span class="slot" data-slot="Apr 13 &middot; 1:30 PM">Apr 13 &middot; 1:30 PM</span>
-      <span class="slot" data-slot="Apr 15 &middot; 11:00 AM">Apr 15 &middot; 11:00 AM</span>
+    <div class="slots">
+      <span class="slot" data-slot>Apr 11 &middot; 9:00 AM</span>
+      <span class="slot" data-slot>Apr 13 &middot; 1:30 PM</span>
+      <span class="slot" data-slot>Apr 15 &middot; 11:00 AM</span>
     </div>
   `, 'provider-card');
+  slotCard2.style.opacity='1';slotCard2.style.transform='translateY(0)';
+  await wait(400);
 
   // 22. Collect slot clicks across both provider cards
   const allSlots = chat.querySelectorAll('[data-slot]');
-  const selectedSlot = await new Promise(resolve => {
-    allSlots.forEach(slot => {
-      slot.style.cursor = 'pointer';
-      slot.addEventListener('click', () => {
-        allSlots.forEach(s => s.classList.remove('selected'));
-        slot.classList.add('selected');
-        resolve(slot.getAttribute('data-slot'));
+  const chosenSlot = await new Promise(resolve => {
+    allSlots.forEach(s => {
+      s.style.cursor = 'pointer';
+      s.addEventListener('click', () => {
+        allSlots.forEach(x => x.classList.remove('selected'));
+        s.classList.add('selected');
+        resolve(s.textContent);
       });
     });
   });
-  availCard1.style.pointerEvents = 'none';
-  availCard2.style.pointerEvents = 'none';
+  [slotCard1, slotCard2].forEach(c => c.style.pointerEvents = 'none');
   await wait(300);
 
   // 23. USER CLICK: "Request this appointment"
@@ -510,7 +512,7 @@ async function startDemo() {
     <div class="assess-label">WELLNESS PLAN</div>
     <div class="assess-title">3 Actions Scheduled</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Cologuard Kit — Shipping in 3-5 days</div>
-    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — ${selectedSlot} at Providence</div>
+    <div class="assess-row"><span class="assess-check">&#10003;</span>Mammogram — ${chosenSlot} at Providence</div>
     <div class="assess-row"><span class="assess-check">&#10003;</span>Health Assessment — Link sent via text</div>
     <div style="text-align:center;margin-top:12px;font-size:14px;font-weight:700;color:#1a2332">Projected Score: <span style="color:#8a9baa">64</span> <span style="color:#8a9baa">&rarr;</span> <span style="color:#27ae60">88</span></div>
   `, 'assess-card');

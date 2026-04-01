@@ -438,7 +438,7 @@ async function runDemo() {
   await wait(400);
 
   // Per-provider availability cards
-  const availCard1 = addEl(`
+  const slotCard1 = addEl(`
     <div class="provider-top">
       <div class="provider-photo">RK</div>
       <div class="provider-info">
@@ -447,15 +447,16 @@ async function runDemo() {
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.8</span><span class="rating-count">(267)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="slots" style="margin-top:10px">
-      <span class="slot" data-slot="Tue &middot; 10:00 AM" style="cursor:pointer">Tue &middot; 10:00 AM</span>
-      <span class="slot" data-slot="Wed &middot; 2:15 PM" style="cursor:pointer">Wed &middot; 2:15 PM</span>
-      <span class="slot" data-slot="Thu &middot; 11:30 AM" style="cursor:pointer">Thu &middot; 11:30 AM</span>
+    <div class="slots">
+      <span class="slot" data-slot>Tue &middot; 10:00 AM</span>
+      <span class="slot" data-slot>Wed &middot; 2:15 PM</span>
+      <span class="slot" data-slot>Thu &middot; 11:30 AM</span>
     </div>
   `, 'provider-card');
+  slotCard1.style.opacity='1';slotCard1.style.transform='translateY(0)';
+  await wait(300);
 
-  await wait(400);
-  const availCard2 = addEl(`
+  const slotCard2 = addEl(`
     <div class="provider-top">
       <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">SM</div>
       <div class="provider-info">
@@ -464,12 +465,14 @@ async function runDemo() {
         <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.6</span><span class="rating-count">(189)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-    <div class="slots" style="margin-top:10px">
-      <span class="slot" data-slot="Tue &middot; 1:00 PM" style="cursor:pointer">Tue &middot; 1:00 PM</span>
-      <span class="slot" data-slot="Wed &middot; 9:30 AM" style="cursor:pointer">Wed &middot; 9:30 AM</span>
-      <span class="slot" data-slot="Thu &middot; 3:00 PM" style="cursor:pointer">Thu &middot; 3:00 PM</span>
+    <div class="slots">
+      <span class="slot" data-slot>Tue &middot; 1:00 PM</span>
+      <span class="slot" data-slot>Wed &middot; 9:30 AM</span>
+      <span class="slot" data-slot>Thu &middot; 3:00 PM</span>
     </div>
   `, 'provider-card');
+  slotCard2.style.opacity='1';slotCard2.style.transform='translateY(0)';
+  await wait(400);
 
   // Slot selection across both providers
   const allSlots = chat.querySelectorAll('[data-slot]');
@@ -483,8 +486,7 @@ async function runDemo() {
       });
     });
   });
-  availCard1.style.pointerEvents = 'none';
-  availCard2.style.pointerEvents = 'none';
+  [slotCard1, slotCard2].forEach(c => c.style.pointerEvents = 'none');
   await wait(300);
 
   await actionBtn("Request this appointment");
