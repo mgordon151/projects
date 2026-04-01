@@ -428,32 +428,41 @@ async function runDemo() {
   await wait(400);
 
   // Per-provider availability cards
-  const availCard = addEl(`
-    <div style="padding:14px 16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <div class="provider-photo" style="width:32px;height:32px;font-size:12px">RK</div>
-        <div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Rachel Kim</div><div style="font-size:11px;color:#5a6b7b">Internal Medicine</div></div>
-      </div>
-      <div class="slots" data-provider="kim">
-        <span class="slot" style="cursor:pointer">Tue &middot; 10:00 AM</span>
-        <span class="slot" style="cursor:pointer">Wed &middot; 2:15 PM</span>
-        <span class="slot" style="cursor:pointer">Thu &middot; 11:30 AM</span>
-      </div>
-      <div style="height:1px;background:#e8ecf0;margin:12px 0"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <div class="provider-photo" style="width:32px;height:32px;font-size:12px">SM</div>
-        <div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Sarah Mitchell</div><div style="font-size:11px;color:#5a6b7b">Internal Medicine</div></div>
-      </div>
-      <div class="slots" data-provider="mitchell">
-        <span class="slot" style="cursor:pointer">Tue &middot; 1:00 PM</span>
-        <span class="slot" style="cursor:pointer">Wed &middot; 9:30 AM</span>
-        <span class="slot" style="cursor:pointer">Thu &middot; 3:00 PM</span>
+  const availCard1 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo">RK</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. Rachel Kim</div>
+        <div class="provider-spec">Internal Medicine &middot; 2.4 mi</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.8</span><span class="rating-count">(267)</span><span class="tier-badge">Tier 1 In-Network</span></div>
       </div>
     </div>
-  `, 'card');
+    <div class="slots" style="margin-top:10px">
+      <span class="slot" data-slot="Tue &middot; 10:00 AM" style="cursor:pointer">Tue &middot; 10:00 AM</span>
+      <span class="slot" data-slot="Wed &middot; 2:15 PM" style="cursor:pointer">Wed &middot; 2:15 PM</span>
+      <span class="slot" data-slot="Thu &middot; 11:30 AM" style="cursor:pointer">Thu &middot; 11:30 AM</span>
+    </div>
+  `, 'provider-card');
+
+  await wait(400);
+  const availCard2 = addEl(`
+    <div class="provider-top">
+      <div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">SM</div>
+      <div class="provider-info">
+        <div class="provider-name">Dr. Sarah Mitchell</div>
+        <div class="provider-spec">Internal Medicine &middot; 3.8 mi</div>
+        <div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.6</span><span class="rating-count">(189)</span><span class="tier-badge">Tier 1 In-Network</span></div>
+      </div>
+    </div>
+    <div class="slots" style="margin-top:10px">
+      <span class="slot" data-slot="Tue &middot; 1:00 PM" style="cursor:pointer">Tue &middot; 1:00 PM</span>
+      <span class="slot" data-slot="Wed &middot; 9:30 AM" style="cursor:pointer">Wed &middot; 9:30 AM</span>
+      <span class="slot" data-slot="Thu &middot; 3:00 PM" style="cursor:pointer">Thu &middot; 3:00 PM</span>
+    </div>
+  `, 'provider-card');
 
   // Slot selection across both providers
-  const allSlots = availCard.querySelectorAll('.slot');
+  const allSlots = document.querySelectorAll('[data-slot]');
   const chosenSlot = await new Promise(resolve => {
     allSlots.forEach(s => {
       s.addEventListener('click', () => {
@@ -463,7 +472,8 @@ async function runDemo() {
       });
     });
   });
-  availCard.style.pointerEvents = 'none';
+  availCard1.style.pointerEvents = 'none';
+  availCard2.style.pointerEvents = 'none';
   await wait(300);
 
   await actionBtn("Request this appointment");

@@ -381,33 +381,41 @@ async function runDemo() {
   await wait(400);
 
   // Per-provider availability cards
-  var availCard = addEl(
-    '<div style="padding:14px 16px;">' +
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-    '<div class="provider-photo" style="width:32px;height:32px;font-size:12px">MT</div>' +
-    '<div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Michael Torres</div><div style="font-size:11px;color:#5a6b7b">Orthopedic Surgery &middot; Your surgeon</div></div>' +
-    '</div>' +
-    '<div class="slots" data-provider="torres">' +
-    '<span class="slot" style="cursor:pointer">Apr 8 &middot; 9:00 AM</span>' +
-    '<span class="slot" style="cursor:pointer">Apr 9 &middot; 1:30 PM</span>' +
-    '<span class="slot" style="cursor:pointer">Apr 10 &middot; 11:00 AM</span>' +
-    '</div>' +
-    '<div style="height:1px;background:#e8ecf0;margin:12px 0"></div>' +
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-    '<div class="provider-photo" style="width:32px;height:32px;font-size:12px">LP</div>' +
-    '<div><div style="font-size:13px;font-weight:700;color:#1a2332">Dr. Lisa Park</div><div style="font-size:11px;color:#5a6b7b">Orthopedic Surgery</div></div>' +
-    '</div>' +
-    '<div class="slots" data-provider="park">' +
-    '<span class="slot" style="cursor:pointer">Apr 8 &middot; 2:00 PM</span>' +
-    '<span class="slot" style="cursor:pointer">Apr 9 &middot; 10:30 AM</span>' +
-    '<span class="slot" style="cursor:pointer">Apr 11 &middot; 9:00 AM</span>' +
-    '</div>' +
+  var availCard1 = addEl(
+    '<div class="provider-top">' +
+    '<div class="provider-photo">MT</div>' +
+    '<div class="provider-info">' +
+    '<div class="provider-name">Dr. Michael Torres</div>' +
+    '<div class="provider-spec">Orthopedic Surgery &middot; Your surgeon</div>' +
+    '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rating-num">4.9</span><span class="rating-count">(198)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
+    '</div></div>' +
+    '<div class="slots" style="margin-top:10px">' +
+    '<span class="slot" data-slot="Apr 8 &middot; 9:00 AM" style="cursor:pointer">Apr 8 &middot; 9:00 AM</span>' +
+    '<span class="slot" data-slot="Apr 9 &middot; 1:30 PM" style="cursor:pointer">Apr 9 &middot; 1:30 PM</span>' +
+    '<span class="slot" data-slot="Apr 10 &middot; 11:00 AM" style="cursor:pointer">Apr 10 &middot; 11:00 AM</span>' +
     '</div>',
-    'card'
+    'provider-card'
+  );
+
+  await wait(400);
+  var availCard2 = addEl(
+    '<div class="provider-top">' +
+    '<div class="provider-photo" style="background:linear-gradient(135deg,#2d6b7a,#4a9aab)">LP</div>' +
+    '<div class="provider-info">' +
+    '<div class="provider-name">Dr. Lisa Park</div>' +
+    '<div class="provider-spec">Orthopedic Surgery &middot; OHSU &middot; 4.2 mi</div>' +
+    '<div class="provider-rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span><span class="rating-num">4.7</span><span class="rating-count">(156)</span><span class="tier-badge">Tier 1 In-Network</span></div>' +
+    '</div></div>' +
+    '<div class="slots" style="margin-top:10px">' +
+    '<span class="slot" data-slot="Apr 8 &middot; 2:00 PM" style="cursor:pointer">Apr 8 &middot; 2:00 PM</span>' +
+    '<span class="slot" data-slot="Apr 9 &middot; 10:30 AM" style="cursor:pointer">Apr 9 &middot; 10:30 AM</span>' +
+    '<span class="slot" data-slot="Apr 11 &middot; 9:00 AM" style="cursor:pointer">Apr 11 &middot; 9:00 AM</span>' +
+    '</div>',
+    'provider-card'
   );
 
   // Slot selection across both providers
-  var allSlots = availCard.querySelectorAll('.slot');
+  var allSlots = document.querySelectorAll('[data-slot]');
   var chosenSlot = await new Promise(function(resolve) {
     allSlots.forEach(function(s) {
       s.addEventListener('click', function() {
@@ -417,7 +425,8 @@ async function runDemo() {
       });
     });
   });
-  availCard.style.pointerEvents = 'none';
+  availCard1.style.pointerEvents = 'none';
+  availCard2.style.pointerEvents = 'none';
   await wait(300);
 
   await actionBtn("Request this appointment");
