@@ -248,7 +248,17 @@ body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135
 <script>
 const chat = document.getElementById('chat');
 function sb() { chat.scrollTop = chat.scrollHeight; }
-function addEl(html, cls) { const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; chat.appendChild(d); sb(); return d; }
+function addEl(html, cls) {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.innerHTML = html;
+  d.style.animation = 'none';
+  chat.appendChild(d);
+  d.offsetHeight;
+  d.style.animation = '';
+  sb();
+  return d;
+}
 function addTyping() { const d = document.createElement('div'); d.className = 'typing'; d.id = 'typing'; d.innerHTML = '<div class="avatar">A</div><div class="dots"><span></span><span></span><span></span></div>'; chat.appendChild(d); sb(); }
 function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
 function botMsg(text) { removeTyping(); return addEl('<div class="avatar">A</div><div class="bub">' + text + '</div>', 'msg bot'); }
@@ -462,9 +472,10 @@ async function runDemo() {
   `, 'provider-card');
 
   // Slot selection across both providers
-  const allSlots = document.querySelectorAll('[data-slot]');
+  const allSlots = chat.querySelectorAll('[data-slot]');
   const chosenSlot = await new Promise(resolve => {
     allSlots.forEach(s => {
+      s.style.cursor = 'pointer';
       s.addEventListener('click', () => {
         allSlots.forEach(x => x.classList.remove('selected'));
         s.classList.add('selected');

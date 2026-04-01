@@ -220,7 +220,10 @@ function addEl(html, cls) {
   const d = document.createElement('div');
   if (cls) d.className = cls;
   d.innerHTML = html;
+  d.style.animation = 'none';
   chat.appendChild(d);
+  d.offsetHeight;
+  d.style.animation = '';
   sb();
   return d;
 }

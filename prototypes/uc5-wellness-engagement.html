@@ -202,7 +202,10 @@ function addEl(html, cls = '') {
   const d = document.createElement('div');
   if (cls) d.className = cls;
   d.innerHTML = html;
+  d.style.animation = 'none';
   chat.appendChild(d);
+  d.offsetHeight;
+  d.style.animation = '';
   sb();
   return d;
 }
@@ -441,9 +444,10 @@ async function startDemo() {
   `, 'provider-card');
 
   // 22. Collect slot clicks across both provider cards
+  const allSlots = chat.querySelectorAll('[data-slot]');
   const selectedSlot = await new Promise(resolve => {
-    const allSlots = document.querySelectorAll('[data-slot]');
     allSlots.forEach(slot => {
+      slot.style.cursor = 'pointer';
       slot.addEventListener('click', () => {
         allSlots.forEach(s => s.classList.remove('selected'));
         slot.classList.add('selected');
@@ -451,6 +455,9 @@ async function startDemo() {
       });
     });
   });
+  availCard1.style.pointerEvents = 'none';
+  availCard2.style.pointerEvents = 'none';
+  await wait(300);
 
   // 23. USER CLICK: "Request this appointment"
   await actionBtn("Request this appointment");
